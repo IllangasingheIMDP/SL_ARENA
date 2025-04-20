@@ -1,32 +1,79 @@
-# SL_ARENA
+# SL_ARENA - React Native Setup Guide (Windows)
 
-# For Windows
-first create Android/Sdk folder in C Drive
-extract the zip file.
-copy cmdline-tools into Sdk
-create a latest folder in cmdline - tools.
-move contents in cmdline - tools to latest.
+## 🛠️ Android SDK Setup
 
-add C:\Android\Sdk\cmdline-tools\latest\bin to the PATH
-add System variable
-  key=ANDROID_HOME
-  value= C:\Android\Sdk
+### 1. Prepare SDK Directory
+- Create the following directory:
+  ```
+  C:\Android\Sdk
+  ```
+- Extract the downloaded Android SDK `.zip` file.
+- Copy the `cmdline-tools` folder into:
+  ```
+  C:\Android\Sdk\
+  ```
+- Inside `cmdline-tools`, create a folder named `latest`, and **move all contents** from `cmdline-tools` into this `latest` folder. Your structure should look like this:
+  ```
+  C:\Android\Sdk\cmdline-tools\latest\bin
+  ```
 
-after that run below is cmd
+---
+
+## 🔧 Environment Variables Setup
+
+### Add to `PATH`:
+- `C:\Android\Sdk\cmdline-tools\latest\bin`
+- `C:\Android\Sdk\platform-tools` *(will be available after installing platform tools)*
+
+### Add System Variable:
+- **Key:** `ANDROID_HOME`  
+- **Value:** `C:\Android\Sdk`
+
+---
+
+## 📦 Install Android Packages
+
+Open Command Prompt and run:
+
+```bash
 sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+```
 
-after this there will be platform-tools folder in Sdk.
-add C:\Android\Sdk\platform-tools to the PATH
+This will download and add the required tools under `C:\Android\Sdk\platform-tools`.
 
-in windows explorer open cmd from address line.in cmd type "code ."
-open in vs code.
-to run the mobile app in one terminal
+---
+
+## 🧑‍💻 Project Setup in VS Code
+
+### 1. Open Project in VS Code
+- Open File Explorer and navigate to your project directory.
+- In the address bar, type:
+  ```
+  cmd
+  ```
+- Then run:
+  ```
+  code .
+  ```
+
+---
+
+## 🚀 Running the App
+
+### Terminal 1: Start Metro Bundler
+
+```bash
 cd slarena
 npx react-native start
+```
 
-connect to mobile device through usb
-in another terminal
+### Terminal 2: Run the App on Device
+
+1. Connect your Android device via USB.
+2. Make sure **Developer Mode** and **USB Debugging** are enabled.
+3. Then run:
+
+```bash
 cd slarena
 npx react-native run-android
-
-
+```
