@@ -32,6 +32,6 @@ db.query('SELECT 1')
     console.error('❌ Database connection failed:', err.message);
   });
 
-app.listen(3000, () => {
+app.listen(5000, () => {
   console.log('🚀 Server running on http://localhost:3000');
 });
