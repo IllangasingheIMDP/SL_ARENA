@@ -56,6 +56,22 @@ const getPlayerStats = async (req, res) => {
   };
 
 
+  const fetchTrainingReminders = async (req, res) => {
+    try {
+      const playerId = req.user.user_id;
+  
+      const sessions = await PlayerModel.getTrainingSessionsByPlayer(playerId);
+  
+      res.json({
+        success: true,
+        data: sessions
+      });
+    } catch (error) {
+      console.error('Error fetching training sessions:', error);
+      res.status(500).json({ success: false, message: 'Server error' });
+    }
+  };
+
 
 
 
@@ -63,7 +79,8 @@ const getPlayerStats = async (req, res) => {
 module.exports ={
     getPlayerStats,
     fetchPlayerAchievements,
-    fetchPerformanceTrend
+    fetchPerformanceTrend,
+    fetchTrainingReminders
 
 
 }

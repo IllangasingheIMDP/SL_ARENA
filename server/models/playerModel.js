@@ -43,8 +43,25 @@ const getPlayerAchievements = async (userId) => {
     return rows;
   };
 
+
+  const getTrainingSessionsByPlayer = async (playerId) => {
+    const [rows] = await db.execute(`
+      SELECT 
+        session_date,
+        duration,
+        focus_area,
+        notes
+      FROM Training_Sessions
+      WHERE player_id = ?
+      ORDER BY session_date DESC
+    `, [playerId]);
+  
+    return rows;
+  };
+
 module.exports = { 
     getPlayerStats,
     getPlayerAchievements,
-    getPerformanceOverTime
+    getPerformanceOverTime,
+    getTrainingSessionsByPlayer
  };
