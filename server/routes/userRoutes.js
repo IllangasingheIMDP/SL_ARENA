@@ -16,8 +16,8 @@ router.post('/login', validateLogin, userController.login);
 router.post('/choose-role', userController.chooseRole);
 // Protected routes (require authentication)
 router.get('/profile', authenticateToken, userController.getProfile);
-router.put('/profile', authenticateToken, validateProfileUpdate, userController.updateProfile);
-router.put('/change-password', authenticateToken, validatePasswordChange, userController.changePassword);
+router.put('/profile', authenticateToken, userController.updateProfile);
+router.put('/change-password', authenticateToken, userController.changePassword);
 
 // Admin only routes
 router.put('/role', authenticateToken, checkRole(['admin']), userController.updateRole);

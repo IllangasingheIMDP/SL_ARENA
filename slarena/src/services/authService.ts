@@ -76,6 +76,24 @@ class AuthService {
     }
   }
 
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    try {
+      const response = await api.put(
+        '/users/change-password',
+        { currentPassword, newPassword },
+        true
+      );
+      const responseData = await this.handleResponse(response);
+      
+      if (responseData.status !== 'success') {
+        throw new Error(responseData.message || 'Failed to change password');
+      }
+    } catch (error) {
+      console.error('Change password error:', error);
+      throw error;
+    }
+  }
+
   async logout(): Promise<void> {
     try {
       await AsyncStorage.removeItem('token');
