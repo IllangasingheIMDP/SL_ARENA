@@ -54,11 +54,11 @@ const getPerformanceOverTime = async (playerId) => {
 const getPlayerProfileDetails = async (player_id) => {
   // Validate input
   if (!player_id || isNaN(player_id) || player_id <= 0) {
-    logger.error(`Invalid player_id: ${player_id}`);
+    console.log(`Invalid player_id: ${player_id}`);
     throw new Error("Invalid player_id. Must be a positive number.");
   }
 try{
-  const [rows] = db.execute(
+  const [rows] = await db.execute(
     `SELECT 
                 p.bio,
                 p.batting_style,
@@ -79,6 +79,12 @@ try{
                     p.player_id = ?;`,
     [player_id]
   );
+  console.log('rows', rows);
+
+  if (!rows || rows.length === 0) {
+    console.log(`No profile found for player_id: ${player_id}`);
+    throw new Error("Player profile not found");
+  }
   // Transform data for frontend
   const profile = {
     bio: rows[0].bio || "No bio available",
@@ -94,33 +100,10 @@ try{
       })),
   };
 
-
-  const getTrainingSessionsByPlayer = async (playerId) => {
-    const [rows] = await db.execute(`
-      SELECT 
-        session_date,
-        duration,
-        focus_area,
-        notes
-      FROM Training_Sessions
-      WHERE player_id = ?
-      ORDER BY session_date DESC
-    `, [playerId]);
-  
-    return rows;
-  };
-
-module.exports = { 
-    getPlayerStats,
-    getPlayerAchievements,
-    getPerformanceOverTime,
-    getTrainingSessionsByPlayer
- };
-
   logger.info(`Successfully fetched profile for player_id: ${player_id}`);
   return profile;
-}catch{
-  logger.error(`Error fetching player profile for player_id: ${player_id}`, error);
+}catch(error){
+  console.log(`Error fetching player profile for player_id: ${player_id}`, error);
     throw new Error(`Failed to fetch player profile: ${error.message}`);
 }
 };
@@ -128,7 +111,7 @@ module.exports = {
 const getPlayerMedia = async (playerId) => {
   // Validate input
   if (!playerId || isNaN(playerId) || playerId <= 0) {
-    logger.error(`Invalid playerId: ${playerId}`);
+    console.log(`Invalid playerId: ${playerId}`);
     throw new Error('Invalid playerId. Must be a positive number.');
   }
 
@@ -141,23 +124,25 @@ const getPlayerMedia = async (playerId) => {
 
     // Log if no media is found
     if (rows.length === 0) {
-      logger.info(`No media found for playerId: ${playerId}`);
+     console.log(`No media found for playerId: ${playerId}`);
     }
 
     // Transform data: Extract video URLs into an array
     const videoUrls = rows.map(row => row.video_url).filter(url => url); // Remove null/undefined URLs
 
-    logger.info(`Successfully fetched ${videoUrls.length} video URLs for playerId: ${playerId}`);
+    console.log(`Successfully fetched ${videoUrls.length} video URLs for playerId: ${playerId}`);
     return videoUrls;
   } catch (error) {
-    logger.error(`Error fetching player media for playerId: ${playerId}`, error);
+    console.log(`Error fetching player media for playerId: ${playerId}`, error);
     throw new Error(`Failed to fetch player media: ${error.message}`);
   }
 };
 const updateProfileBio = async (playerId, bio) => {
+  console.log(`Updating bio for playerId: ${playerId}`);
+  console.log(`New bio: ${bio}`);
   // Validate input
   if (!playerId || isNaN(playerId) || playerId <= 0) {
-    logger.error(`Invalid playerId: ${playerId}`);
+    console.log(`Invalid playerId: ${playerId}`);
     throw new Error('Invalid playerId. Must be a positive number.');
   }
 
@@ -170,14 +155,14 @@ const updateProfileBio = async (playerId, bio) => {
 
     // Check if any rows were affected
     if (result.affectedRows === 0) {
-      logger.warn(`No rows updated for playerId: ${playerId}`);
+      console.log(`No rows updated for playerId: ${playerId}`);
       return false;
     }
 
-    logger.info(`Successfully updated bio for playerId: ${playerId}`);
+    console.log(`Successfully updated bio for playerId: ${playerId}`);
     return true;
   } catch (error) {
-    logger.error(`Error updating bio for playerId: ${playerId}`, error);
+    console.log(`Error updating bio for playerId: ${playerId}`, error);
     throw new Error(`Failed to update bio: ${error.message}`);
   }
 }
@@ -187,6 +172,6 @@ module.exports = {
   getPlayerAchievements,
   getPerformanceOverTime,
   getPlayerProfileDetails,
-  getPlayerMedia
+  getPlayerMedia,
+  updateProfileBio
 };
-
