@@ -95,10 +95,31 @@ const rejectTournamentApplicant = async (req, res) => {
     }
 };
 
+const getAcceptedTeamsByTournament = async (req, res) => {
+    try {
+        const { tournament_id } = req.body;
+
+        if (!tournament_id) {
+            return res.status(400).json({ message: 'tournament_id is required' });
+        }
+
+        const teams = await OrganizerModel.getAcceptedTeamsByTournament(tournament_id);
+
+        res.status(200).json({
+            message: 'Accepted teams fetched successfully',
+            data: teams
+        });
+    } catch (err) {
+        console.error('Error fetching accepted teams:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 module.exports = {
     createTournament,
     getTournamentsByOrganizer,
     getAppliedTeamsToOngoingTournaments,
     acceptTournamentApplicant,
-    rejectTournamentApplicant
+    rejectTournamentApplicant,
+    getAcceptedTeamsByTournament
 };
