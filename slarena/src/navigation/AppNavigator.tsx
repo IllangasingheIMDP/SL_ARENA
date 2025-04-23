@@ -4,19 +4,29 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../context/AuthContext';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
-import DashboardScreen from '../screens/DashboardScreen';
+import RoleSelectionScreen from '../screens/RoleSelectionScreen';
+import GeneralDashboard from '../screens/user/GeneralDashboard';
+import PlayerDashboard from '../screens/player/PlayerDashboard';
+import OrganisationDashboard from '../screens/organisation/OrganisationDashboard';
+import TrainerDashboard from '../screens/trainer/TrainerDashboard';
+import AdminDashboard from '../screens/admin/AdminDashboard';
 import { ActivityIndicator, View } from 'react-native';
 
 export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
-  Dashboard: undefined;
+  RoleSelection: undefined;
+  GeneralDashboard: undefined;
+  PlayerDashboard: undefined;
+  OrganisationDashboard: undefined;
+  TrainerDashboard: undefined;
+  AdminDashboard: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, selectedRole } = useAuth();
 
   if (loading) {
     return (
@@ -40,15 +50,79 @@ const AppNavigator = () => {
         }}
       >
         {user ? (
-          // Authenticated stack
-          <Stack.Screen
-            name="Dashboard"
-            component={DashboardScreen}
-            options={{
-              title: 'SL Arena',
-              headerBackVisible: false,
-            }}
-          />
+          // If a role is selected, navigate to the appropriate dashboard
+          selectedRole ? (
+            (() => {
+              const role = selectedRole.toLowerCase();
+              switch (role) {
+                case 'player':
+                  return (
+                    <Stack.Screen
+                      name="PlayerDashboard"
+                      component={PlayerDashboard}
+                      options={{
+                        title: 'Player Dashboard',
+                        headerBackVisible: false,
+                      }}
+                    />
+                  );
+                case 'organisation':
+                  return (
+                    <Stack.Screen
+                      name="OrganisationDashboard"
+                      component={OrganisationDashboard}
+                      options={{
+                        title: 'Organisation Dashboard',
+                        headerBackVisible: false,
+                      }}
+                    />
+                  );
+                case 'trainer':
+                  return (
+                    <Stack.Screen
+                      name="TrainerDashboard"
+                      component={TrainerDashboard}
+                      options={{
+                        title: 'Trainer Dashboard',
+                        headerBackVisible: false,
+                      }}
+                    />
+                  );
+                case 'admin':
+                  return (
+                    <Stack.Screen
+                      name="AdminDashboard"
+                      component={AdminDashboard}
+                      options={{
+                        title: 'Admin Dashboard',
+                        headerBackVisible: false,
+                      }}
+                    />
+                  );
+                default:
+                  return (
+                    <Stack.Screen
+                      name="GeneralDashboard"
+                      component={GeneralDashboard}
+                      options={{
+                        title: 'Dashboard',
+                        headerBackVisible: false,
+                      }}
+                    />
+                  );
+              }
+            })()
+          ) : (
+            // No role selected - show role selection screen
+            <Stack.Screen
+              name="RoleSelection"
+              component={RoleSelectionScreen}
+              options={{
+                title: 'Select Role',
+                headerBackVisible: false,
+              }}
+            />
+          )
         ) : (
           // Auth stack
           <>

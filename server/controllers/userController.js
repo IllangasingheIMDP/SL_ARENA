@@ -80,7 +80,7 @@ const login = async (req, res) => {
     
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user.user_id, email: user.email, role: user.role },
+      { userId: user.user_id },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN }
     );
@@ -93,7 +93,6 @@ const login = async (req, res) => {
         email: user.email,
         name: user.name,
         role: user.role,
-        verification_status: user.verification_status,
         token
       }
     });
