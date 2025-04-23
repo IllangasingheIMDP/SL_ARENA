@@ -31,8 +31,24 @@ const getTournamentsByOrganizer = async (organizer_id) => {
     return rows;
 };
 
+const getAppliedTeamsToOngoingTournamentsByOrganizer = async (organizer_id) => {
+    const [rows] = await db.execute(
+        `SELECT 
+            ta.id,
+            ta.team_id,
+            t.team_name
+         FROM tournament_applicants ta
+         INNER JOIN Tournaments tor ON ta.tournament_id = tor.tournament_id
+         INNER JOIN Teams t ON ta.team_id = t.team_id
+         WHERE tor.organizer_id = ? AND tor.status = 'ongoing' AND ta.status = 'applied'`,
+        [organizer_id]
+    );
+    return rows;
+};
+
 
 module.exports = {
     createTournament,
-    getTournamentsByOrganizer
+    getTournamentsByOrganizer,
+    getAppliedTeamsToOngoingTournamentsByOrganizer
 };
