@@ -73,3 +73,38 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Editor specific
+.vscode/
+*.swp
+*.swo
+
+# React Native specific
+.expo/
+*.bundle
+*.jsbundle.map
+.jest/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# iOS specific
+ios/*.xcarchive
+ios/*.dSYM.zip
+ios/*.ipa
+ios/Pods/
+ios/.xcode.env.local
+
+# Android specific
+android/app/release/
+android/.project
+android/app/debug/
+android/*.apk
+android/captures/
