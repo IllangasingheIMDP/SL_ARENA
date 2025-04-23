@@ -3,6 +3,7 @@ const { PASSWORD_REGEX, EMAIL_REGEX } = require('../config/constants');
 
 // Validate registration data
 const validateRegistration = (req, res, next) => {
+  console.log(req.body);
   const { email, password, name } = req.body;
   const errors = [];
   
