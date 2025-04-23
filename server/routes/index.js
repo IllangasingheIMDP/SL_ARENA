@@ -18,6 +18,7 @@ router.get('/health', (req, res) => {
 
 // Mount routes
 router.use(`${BASE_PATH}/users`, userRoutes);
+router.use(`${BASE_PATH}/players`, require('./playerRoutes'));
 
 // Handle 404 for API routes
 router.all(`${BASE_PATH}/*`, (req, res) => {
