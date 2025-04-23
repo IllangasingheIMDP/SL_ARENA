@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const API_URL = 'https://slarena-production.up.railway.app/api/v1/users'; // Change this to your actual API URL
+import { api } from '../utils/api';
 
 export interface LoginCredentials {
   email: string;
@@ -31,41 +30,23 @@ export interface ApiError {
 }
 
 class AuthService {
-  private async handleResponse(response: Response): Promise<any> {
-    const data = await response.json();
-    
+  private async handleResponse(response: any): Promise<any> {
     if (!response.ok) {
       const error: ApiError = {
-        message: data.message || 'An error occurred',
+        message: response.message || 'An error occurred',
         status: response.status,
-        errors: data.errors
+        errors: response.errors
       };
-      console.error('API Error:', {
-        status: response.status,
-        statusText: response.statusText,
-        data: data
-      });
+      console.error('API Error:', error);
       throw error;
     }
-    
-    return data;
+    return response;
   }
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
-      console.log('Attempting login with:', { email: credentials.email });
-      
-      const response = await fetch(`${API_URL}/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(credentials),
-      });
-
+      const response = await api.post('/users/login', credentials, false);
       const responseData = await this.handleResponse(response);
-      console.log('Login Response:', responseData);
       
       if (responseData.data && responseData.data.token) {
         const userData = {
@@ -94,42 +75,8 @@ class AuthService {
 
   async register(data: RegisterData): Promise<AuthResponse> {
     try {
-      const registerUrl = `${API_URL}/register`;
-      console.log('Registration Request:', {
-        url: registerUrl,
-        data: { ...data, password: '[REDACTED]' }
-      });
-      
-      // Test the API connection first
-      try {
-        const testResponse = await fetch(API_URL, { 
-          method: 'HEAD',
-          headers: {
-            'Accept': 'application/json'
-          }
-        });
-        console.log('API Connection Test:', {
-          status: testResponse.status,
-          ok: testResponse.ok,
-          url: API_URL
-        });
-      } catch (error) {
-        console.error('API Connection Test Failed:', error);
-        throw new Error('Cannot connect to the server. Please check your internet connection.');
-      }
-
-      const response = await fetch(registerUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(data),
-      });
-
-      console.log('Registration Response Status:', response.status);
+      const response = await api.post('/users/register', data, false);
       const responseData = await this.handleResponse(response);
-      console.log('Registration Response Data:', responseData);
       
       if (responseData.data && responseData.data.token) {
         const userData = {
@@ -151,21 +98,15 @@ class AuthService {
         throw new Error('Invalid response format from server');
       }
     } catch (error) {
-      console.error('Registration Error:', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined,
-        type: error instanceof Error ? error.constructor.name : typeof error
-      });
+      console.error('Registration Error:', error);
       throw error;
     }
   }
 
   async logout(): Promise<void> {
     try {
-      console.log('Logging out user');
       await AsyncStorage.removeItem('token');
       await AsyncStorage.removeItem('user');
-      console.log('Logout successful');
     } catch (error) {
       console.error('Logout error:', error);
       throw error;
@@ -174,9 +115,7 @@ class AuthService {
 
   async getToken(): Promise<string | null> {
     try {
-      const token = await AsyncStorage.getItem('token');
-      console.log('Token retrieved:', token ? 'exists' : 'not found');
-      return token;
+      return await AsyncStorage.getItem('token');
     } catch (error) {
       console.error('Error getting token:', error);
       return null;
@@ -186,7 +125,6 @@ class AuthService {
   async getUser(): Promise<any | null> {
     try {
       const user = await AsyncStorage.getItem('user');
-      console.log('User data retrieved:', user ? 'exists' : 'not found');
       return user ? JSON.parse(user) : null;
     } catch (error) {
       console.error('Error getting user:', error);
