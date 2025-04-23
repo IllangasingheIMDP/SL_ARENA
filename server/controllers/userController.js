@@ -78,12 +78,12 @@ const login = async (req, res) => {
       });
     }
     
-    // Generate JWT token
-    const token = jwt.sign(
-      { userId: user.user_id, email: user.email, role: user.role },
-      JWT_SECRET,
-      { expiresIn: JWT_EXPIRES_IN }
-    );
+    // // Generate JWT token
+    // const token = jwt.sign(
+    //   { userId: user.user_id, email: user.email, role: user.role },
+    //   JWT_SECRET,
+    //   { expiresIn: JWT_EXPIRES_IN }
+    // );
     
     res.status(200).json({
       status: 'success',
@@ -92,9 +92,9 @@ const login = async (req, res) => {
         userId: user.user_id,
         email: user.email,
         name: user.name,
-        role: user.role,
-        verification_status: user.verification_status,
-        token
+        role: user.role
+        
+        
       }
     });
   } catch (error) {
@@ -105,7 +105,37 @@ const login = async (req, res) => {
     });
   }
 };
+const chooseRole = async (req, res) => {
+  try {
+    const { userId, role } = req.body;
+    const isRoleValid = await UserModel.RoleValidation(userId, role);
+    if (!isRoleValid) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid role'
+      });
+    }
+        const token = jwt.sign(
+       { userId: userId, role: role },
+       JWT_SECRET,
+       { expiresIn: JWT_EXPIRES_IN }
+     );
 
+     res.status(200).json({
+      status: 'success',
+      message: 'Role chosen successfully',
+      data: {
+        token
+      }
+     });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to choose role',
+      error: error.message
+    });
+  }
+};
 // Get current user profile
 const getProfile = async (req, res) => {
   try {
@@ -279,6 +309,7 @@ const updateVerificationStatus = async (req, res) => {
 module.exports = {
   register,
   login,
+  chooseRole,
   getProfile,
   updateProfile,
   changePassword,

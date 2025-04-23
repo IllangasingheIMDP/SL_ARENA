@@ -1,7 +1,7 @@
 // config/constants.js
 module.exports = {
   JWT_SECRET: process.env.JWT_SECRET || 'your_jwt_secret_key',
-  JWT_EXPIRES_IN: '24h',
+  JWT_EXPIRES_IN: '365d',
   SALT_ROUNDS: 10,
   VERIFICATION_EXPIRY: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
   DEFAULT_PAGE_SIZE: 10,
