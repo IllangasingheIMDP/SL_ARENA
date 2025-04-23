@@ -55,9 +55,21 @@ const updateApplicantStatus = async (id, status) => {
     return result;
 };
 
+const getAcceptedTeamsByTournament = async (tournament_id) => {
+    const [rows] = await db.execute(
+        `SELECT t.team_id, t.team_name
+         FROM tournament_applicants ta
+         INNER JOIN Teams t ON ta.team_id = t.team_id
+         WHERE ta.tournament_id = ? AND ta.status = 'accepted'`,
+        [tournament_id]
+    );
+    return rows;
+};
+
 module.exports = {
     createTournament,
     getTournamentsByOrganizer,
     getAppliedTeamsToOngoingTournamentsByOrganizer,
-    updateApplicantStatus
+    updateApplicantStatus,
+    getAcceptedTeamsByTournament
 };
