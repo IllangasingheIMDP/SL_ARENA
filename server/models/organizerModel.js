@@ -47,8 +47,17 @@ const getAppliedTeamsToOngoingTournamentsByOrganizer = async (organizer_id) => {
 };
 
 
+const updateApplicantStatus = async (id, status) => {
+    const [result] = await db.execute(
+        `UPDATE tournament_applicants SET status = ? WHERE id = ?`,
+        [status, id]
+    );
+    return result;
+};
+
 module.exports = {
     createTournament,
     getTournamentsByOrganizer,
-    getAppliedTeamsToOngoingTournamentsByOrganizer
+    getAppliedTeamsToOngoingTournamentsByOrganizer,
+    updateApplicantStatus
 };
