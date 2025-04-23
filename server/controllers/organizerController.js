@@ -55,8 +55,8 @@ const getTournamentsByOrganizer = async (req, res) => {
 
 const getAppliedTeamsToOngoingTournaments = async (req, res) => {
     try {
-        //const userId = req.user.user_id;
-        const userId=1;
+        const userId = req.user.user_id;
+       
 
         const teams = await OrganizerModel.getAppliedTeamsToOngoingTournamentsByOrganizer(userId);
 
@@ -70,8 +70,35 @@ const getAppliedTeamsToOngoingTournaments = async (req, res) => {
     }
 };
 
+
+const acceptTournamentApplicant = async (req, res) => {
+    try {
+        const { id } = req.body;
+        await OrganizerModel.updateApplicantStatus(id, 'accepted');
+
+        res.status(200).json({ message: 'Applicant accepted successfully' });
+    } catch (err) {
+        console.error('Error accepting applicant:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+const rejectTournamentApplicant = async (req, res) => {
+    try {
+        const { id } = req.body;
+        await OrganizerModel.updateApplicantStatus(id, 'rejected');
+
+        res.status(200).json({ message: 'Applicant rejected successfully' });
+    } catch (err) {
+        console.error('Error rejecting applicant:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 module.exports = {
     createTournament,
     getTournamentsByOrganizer,
-    getAppliedTeamsToOngoingTournaments
+    getAppliedTeamsToOngoingTournaments,
+    acceptTournamentApplicant,
+    rejectTournamentApplicant
 };
