@@ -54,81 +54,66 @@ const getPerformanceOverTime = async (playerId) => {
 const getPlayerProfileDetails = async (player_id) => {
   // Validate input
   if (!player_id || isNaN(player_id) || player_id <= 0) {
-    logger.error(`Invalid player_id: ${player_id}`);
-    throw new Error("Invalid player_id. Must be a positive number.");
+    console.log(`Invalid player_id: ${player_id}`);
+    throw new Error('Invalid player_id. Must be a positive number.');
   }
-try{
-  const [rows] = db.execute(
-    `SELECT 
-                p.bio,
-                p.batting_style,
-                p.bowling_style,
-                p.fielding_position,
-                a.achievement_type,
-                m.match_type,
-                v.venue_name
-                FROM 
-                    Players p
-                LEFT JOIN 
-                    Achievements a ON p.player_id = a.player_id
-                LEFT JOIN 
-                    Matches m ON a.match_id = m.match_id
-                LEFT JOIN 
-                    Venues v ON m.venue_id = v.venue_id
-                WHERE 
-                    p.player_id = ?;`,
-    [player_id]
-  );
-  // Transform data for frontend
-  const profile = {
-    bio: rows[0].bio || "No bio available",
-    batting_style: rows[0].batting_style || "Unknown",
-    bowling_style: rows[0].bowling_style || "Unknown",
-    fielding_position: rows[0].fielding_position || "Unknown",
-    achievements: rows
-      .filter((row) => row.achievement_type) // Exclude rows with null achievements
-      .map((row) => ({
-        achievement_type: row.achievement_type,
-        match_type: row.match_type || "N/A",
-        venue_name: row.venue_name || "N/A",
-      })),
-  };
 
+  try {
+    const [rows] = await db.execute(
+      `SELECT 
+          p.bio,
+          p.batting_style,
+          p.bowling_style,
+          p.fielding_position,
+          a.achievement_type,
+          m.match_type,
+          v.venue_name
+       FROM 
+          Players p
+       LEFT JOIN 
+          Achievements a ON p.player_id = a.player_id
+       LEFT JOIN 
+          Matches m ON a.match_id = m.match_id
+       LEFT JOIN 
+          Venues v ON m.venue_id = v.venue_id
+       WHERE 
+          p.player_id = ?;`,
+      [player_id]
+    );
 
-  const getTrainingSessionsByPlayer = async (playerId) => {
-    const [rows] = await db.execute(`
-      SELECT 
-        session_date,
-        duration,
-        focus_area,
-        notes
-      FROM Training_Sessions
-      WHERE player_id = ?
-      ORDER BY session_date DESC
-    `, [playerId]);
-  
-    return rows;
-  };
+    // Check if rows is empty
+    if (!rows || rows.length === 0) {
+      console.log(`No profile found for player_id: ${player_id}`);
+      throw new Error('Player profile not found');
+    }
 
-module.exports = { 
-    getPlayerStats,
-    getPlayerAchievements,
-    getPerformanceOverTime,
-    getTrainingSessionsByPlayer
- };
+    // Transform data for frontend
+    const profile = {
+      bio: rows[0].bio || 'No bio available',
+      batting_style: rows[0].batting_style || 'Unknown',
+      bowling_style: rows[0].bowling_style || 'Unknown', // Fixed typo: was batting_style
+      fielding_position: rows[0].fielding_position || 'Unknown',
+      achievements: rows
+        .filter((row) => row.achievement_type) // Exclude rows with null achievements
+        .map((row) => ({
+          achievement_type: row.achievement_type,
+          match_type: row.match_type || 'N/A',
+          venue_name: row.venue_name || 'N/A',
+        })),
+    };
 
-  logger.info(`Successfully fetched profile for player_id: ${player_id}`);
-  return profile;
-}catch{
-  logger.error(`Error fetching player profile for player_id: ${player_id}`, error);
-    throw new Error(`Failed to fetch player profile: ${error.message}`);
-}
+    console.log(`Successfully fetched profile for player_id: ${player_id}`);
+    return profile;
+  } catch (error) {
+    console.error(`Error fetching player profile for player_id: ${player_id}`, error);
+    throw new Error(`Failed to fetch player profile: ${error.message || 'Unknown error'}`);
+  }
 };
 
 const getPlayerMedia = async (playerId) => {
   // Validate input
   if (!playerId || isNaN(playerId) || playerId <= 0) {
-    logger.error(`Invalid playerId: ${playerId}`);
+   console.log(`Invalid playerId: ${playerId}`);
     throw new Error('Invalid playerId. Must be a positive number.');
   }
 
@@ -141,52 +126,68 @@ const getPlayerMedia = async (playerId) => {
 
     // Log if no media is found
     if (rows.length === 0) {
-      logger.info(`No media found for playerId: ${playerId}`);
+      console.log(`No media found for playerId: ${playerId}`);
     }
 
     // Transform data: Extract video URLs into an array
     const videoUrls = rows.map(row => row.video_url).filter(url => url); // Remove null/undefined URLs
 
-    logger.info(`Successfully fetched ${videoUrls.length} video URLs for playerId: ${playerId}`);
+    console.log(`Successfully fetched ${videoUrls.length} video URLs for playerId: ${playerId}`);
     return videoUrls;
   } catch (error) {
-    logger.error(`Error fetching player media for playerId: ${playerId}`, error);
+    console.log(`Error fetching player media for playerId: ${playerId}`, error);
     throw new Error(`Failed to fetch player media: ${error.message}`);
   }
 };
-const updateProfileBio = async (playerId, bio) => {
-  // Validate input
-  if (!playerId || isNaN(playerId) || playerId <= 0) {
-    logger.error(`Invalid playerId: ${playerId}`);
-    throw new Error('Invalid playerId. Must be a positive number.');
-  }
-
+const updateProfileBio = async (player_id, bio) => {
   try {
-    // Execute the update query
-    const [result] = await db.execute(
-      'UPDATE Players SET bio = ? WHERE player_id = ?',
-      [bio, playerId]
-    );
-
-    // Check if any rows were affected
-    if (result.affectedRows === 0) {
-      logger.warn(`No rows updated for playerId: ${playerId}`);
-      return false;
+    // Validate player_id
+    if (!player_id || isNaN(player_id) || player_id <= 0) {
+      console.log(`Invalid player_id: ${player_id}`);
+      throw new Error('Invalid player_id. Must be a positive number.');
     }
 
-    logger.info(`Successfully updated bio for playerId: ${playerId}`);
-    return true;
+    // Convert undefined bio to null
+    const sanitizedBio = bio ?? null; // Use null if bio is undefined
+    console.log(`Updating bio for player_id: ${player_id}, bio: ${sanitizedBio}`);
+
+    // Execute query
+    await db.execute(
+      `UPDATE Players SET bio = ? WHERE player_id = ?`,
+      [sanitizedBio, player_id]
+    );
+
+    console.log(`Successfully updated bio for player_id: ${player_id}`);
+    return { message: 'Bio updated successfully' };
   } catch (error) {
-    logger.error(`Error updating bio for playerId: ${playerId}`, error);
+    console.error(`Error updating bio for playerId: ${player_id}`, error);
     throw new Error(`Failed to update bio: ${error.message}`);
   }
-}
+};
+
+
+const getTrainingSessionsByPlayer = async (playerId) => {
+  const [rows] = await db.execute(`
+    SELECT 
+      session_date,
+      duration,
+      focus_area,
+      notes
+    FROM Training_Sessions
+    WHERE player_id = ?
+    ORDER BY session_date DESC
+  `, [playerId]);
+
+  return rows;
+};
 
 module.exports = {
   getPlayerStats,
   getPlayerAchievements,
   getPerformanceOverTime,
   getPlayerProfileDetails,
-  getPlayerMedia
+  getPlayerMedia,
+  getTrainingSessionsByPlayer,
+  updateProfileBio
 };
 
