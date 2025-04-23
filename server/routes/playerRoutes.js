@@ -12,7 +12,7 @@ router.get('/reminders', authenticateToken,checkRole(['player']), playerControll
 
 //player profile
 router.get('/profiledetails',authenticateToken,checkRole(['player']), playerController.getPlayerProfileDetails);
-router.get('/getPlayerMedia', authenticateToken, checkRole(['player']), playerController.getPlayerMedia);
+router.get('/getPlayerVideos', authenticateToken, checkRole(['player']), playerController.getPlayerVideos);
 router.put('/updateProfilebio', authenticateToken, checkRole(['player']), playerController.updateProfileBio);
 
 

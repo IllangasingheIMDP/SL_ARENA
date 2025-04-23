@@ -113,7 +113,7 @@ const getPlayerProfileDetails = async (player_id) => {
   }
 };
 
-const getPlayerMedia = async (playerId) => {
+const getPlayerVideos = async (playerId) => {
   // Validate input
   if (!playerId || isNaN(playerId) || playerId <= 0) {
    console.log(`Invalid playerId: ${playerId}`);
@@ -189,7 +189,7 @@ module.exports = {
   getPlayerAchievements,
   getPerformanceOverTime,
   getPlayerProfileDetails,
-  getPlayerMedia,
+  getPlayerVideos,
   getTrainingSessionsByPlayer,
   updateProfileBio
 };

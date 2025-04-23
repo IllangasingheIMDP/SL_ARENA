@@ -88,10 +88,10 @@ const getPlayerStats = async (req, res) => {
     }
   }
 
-  const getPlayerMedia = async (req, res) => {
+  const getPlayerVideos = async (req, res) => {
     try {
         const playerId = req.user.user_id;
-        const media = await PlayerModel.getPlayerMedia(playerId);
+        const media = await PlayerModel.getPlayerVideos(playerId);
         res.json({
             success: true,
             data: media
@@ -138,9 +138,9 @@ module.exports ={
     fetchTrainingReminders,
 
     getPlayerProfileDetails,
-    getPlayerMedia,
-    updateProfileBio
-
+    
+    updateProfileBio,
+    getPlayerVideos
 
 
 }

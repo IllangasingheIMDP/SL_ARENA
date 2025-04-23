@@ -4,7 +4,7 @@ import {
   PlayerAchievement,
   PlayerProfile,
   TrainingSession,
-  PlayerMedia,
+  PlayerVideos,
   UpdateProfileBioRequest
 } from '../types/playerTypes';
 
@@ -26,8 +26,8 @@ const getPlayerProfile = async (): Promise<PlayerProfile> => {
   return response.data;
 };
 
-const getPlayerMedia = async (): Promise<string[]> => {
-  const response = await api.get(`/players/getPlayerMedia`);
+const getPlayerVideos = async (): Promise<string[]> => {
+  const response = await api.get(`/players/getPlayerVideos`);
   //console.log(response,'response media');
   return response.data;
 };
@@ -46,7 +46,7 @@ export const playerService = {
   getPlayerStats,
   getPlayerAchievements,
   getPlayerProfile,
-  getPlayerMedia,
+  getPlayerVideos,
   updateProfileBio,
   getTrainingSessions
 }; 

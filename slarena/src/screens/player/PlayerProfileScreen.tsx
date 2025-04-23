@@ -9,6 +9,8 @@ import {
   ActivityIndicator,
   TextInput,
   Alert,
+  Linking,
+  Dimensions,
 } from 'react-native';
 import { playerService } from '../../services/playerService';
 import {
@@ -16,20 +18,24 @@ import {
   PlayerProfile,
   PlayerAchievement,
   TrainingSession,
+  PlayerVideos,
 } from '../../types/playerTypes';
 import { Video, ResizeMode } from 'expo-av';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
+import YoutubePlayer from 'react-native-youtube-iframe';
 
 const PlayerProfileScreen = () => {
   const [stats, setStats] = useState<PlayerStats | null>(null);
   const [profile, setProfile] = useState<PlayerProfile | null>(null);
   const [achievements, setAchievements] = useState<PlayerAchievement[]>([]);
-  const [media, setMedia] = useState<string[]>([]);
+  const [videos, setVideos] = useState<string[]>([]);
   const [trainingSessions, setTrainingSessions] = useState<TrainingSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [bioText, setBioText] = useState('');
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -55,8 +61,9 @@ const PlayerProfileScreen = () => {
       setAchievements(achievementsData);
 
       // Fetch media
-      const mediaData = await playerService.getPlayerMedia();
-      setMedia(mediaData);
+      const videoData = await playerService.getPlayerVideos();
+      console.log('Video Data:', videoData);
+      setVideos(videoData);
 
       // Fetch training sessions
       const trainingData = await playerService.getTrainingSessions();
@@ -96,6 +103,10 @@ const PlayerProfileScreen = () => {
     } catch (error) {
       Alert.alert('Error', 'Failed to pick media');
     }
+  };
+
+  const extractVideoId = (url: string) => {
+    return url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1];
   };
 
   if (loading) {
@@ -195,21 +206,57 @@ const PlayerProfileScreen = () => {
           <Ionicons name="cloud-upload" size={24} color="#fff" />
           <Text style={styles.uploadButtonText}>Upload Media</Text>
         </TouchableOpacity>
+        
+        {selectedVideo && (
+          <View style={styles.videoPlayerContainer}>
+            <YoutubePlayer
+              height={220}
+              play={isPlaying}
+              videoId={selectedVideo}
+              onChangeState={(state) => {
+                if (state === 'ended') {
+                  setIsPlaying(false);
+                }
+              }}
+            />
+            <TouchableOpacity 
+              style={styles.closeButton}
+              onPress={() => {
+                setSelectedVideo(null);
+                setIsPlaying(false);
+              }}
+            >
+              <Ionicons name="close-circle" size={30} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        )}
+
         <View style={styles.mediaGrid}>
-          {media?.map((url, index) => (
-            <View key={index} style={styles.mediaItem}>
-              {url.endsWith('.mp4') ? (
-                <Video
-                  source={{ uri: url }}
-                  style={styles.mediaContent}
-                  useNativeControls
-                  resizeMode={ResizeMode.COVER}
-                />
-              ) : (
-                <Image source={{ uri: url }} style={styles.mediaContent} />
-              )}
-            </View>
-          ))}
+          {videos?.map((url, index) => {
+            const videoId = extractVideoId(url);
+            if (videoId) {
+              const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+              return (
+                <TouchableOpacity 
+                  key={index} 
+                  style={styles.mediaItem}
+                  onPress={() => {
+                    setSelectedVideo(videoId);
+                    setIsPlaying(true);
+                  }}
+                >
+                  <Image 
+                    source={{ uri: thumbnailUrl }} 
+                    style={styles.mediaContent} 
+                  />
+                  <View style={styles.playButtonOverlay}>
+                    <Ionicons name="play-circle" size={50} color="#fff" />
+                  </View>
+                </TouchableOpacity>
+              );
+            }
+            return null;
+          })}
         </View>
       </View>
 
@@ -380,6 +427,29 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     marginTop: 5,
+  },
+  playButtonOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  videoPlayerContainer: {
+    marginBottom: 15,
+    position: 'relative',
+    backgroundColor: '#000',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1,
   },
 });
 

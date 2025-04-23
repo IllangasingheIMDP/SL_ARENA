@@ -30,8 +30,8 @@ export interface TrainingSession {
   notes: string;
 }
 
-export interface PlayerMedia {
-  video_url: string;
+export interface PlayerVideos {
+  video_urls: string[];
 }
 
 export interface UpdateProfileBioRequest {
