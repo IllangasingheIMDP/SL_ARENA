@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'http://localhost:5001/api/v1/users'; // Change this to your actual API URL
+const API_URL = 'https://slarena-production.up.railway.app/api/v1/users'; // Change this to your actual API URL
 
 export interface LoginCredentials {
   email: string;
@@ -90,7 +90,7 @@ class AuthService {
       });
 
       const responseData = await this.handleResponse(response);
-      console.log('Registration successful:', { userId: responseData.user.id });
+      console.log('Registration successful:', {responseData });
       
       await AsyncStorage.setItem('token', responseData.token);
       await AsyncStorage.setItem('user', JSON.stringify(responseData.user));
