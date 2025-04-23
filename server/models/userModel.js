@@ -18,14 +18,14 @@ class UserModel {
   }
   static async createUser(userData) {
     try {
-      const { email, password, name, phone, date_of_birth, role } = userData;
+      const { email, password, name } = userData;
       
       // Hash password
       const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
       
       const [result] = await db.execute(
-        'INSERT INTO Users (email, password_hash, name, phone, date_of_birth, role) VALUES (?, ?, ?, ?, ?, ?)',
-        [email, password_hash, name, phone || null, date_of_birth || null, role || 'general']
+        'INSERT INTO Users (email, password_hash, name, role) VALUES (?, ?, ?, ?, ?, ?)',
+        [email, password_hash, name, 'general']
       );
       
       return result.insertId;

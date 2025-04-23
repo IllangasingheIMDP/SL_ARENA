@@ -77,7 +77,6 @@ const login = async (req, res) => {
         message: 'Invalid email or password'
       });
     }
-    
     // // Generate JWT token
     // const token = jwt.sign(
     //   { userId: user.user_id, email: user.email, role: user.role },
@@ -93,8 +92,6 @@ const login = async (req, res) => {
         email: user.email,
         name: user.name,
         role: user.role
-        
-        
       }
     });
   } catch (error) {

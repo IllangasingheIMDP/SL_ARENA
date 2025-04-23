@@ -1,33 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '../utils/api';
-
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
-
-export interface RegisterData {
-  email: string;
-  password: string;
-  name: string;
-}
-
-export interface AuthResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    role: string;
-    verification_status?: string;
-  };
-}
-
-export interface ApiError {
-  message: string;
-  status?: number;
-  errors?: any;
-}
+import { LoginCredentials, RegisterData, ApiError, User, AuthResponse } from '../types/authTypes';
 
 class AuthService {
   private async handleResponse(response: any): Promise<any> {
@@ -55,14 +28,11 @@ class AuthService {
           email: responseData.data.email,
           name: responseData.data.name,
           role: responseData.data.role,
-          verification_status: responseData.data.verification_status
         };
         
-        await AsyncStorage.setItem('token', responseData.data.token);
         await AsyncStorage.setItem('user', JSON.stringify(userData));
         
         return {
-          token: responseData.data.token,
           user: userData
         };
       } else {

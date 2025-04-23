@@ -6,10 +6,19 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../navigation/AppNavigator';
 
-const DashboardScreen = () => {
-  const { user, logout } = useAuth();
+type GeneralDashboardNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'GeneralDashboard'
+>;
+
+const GeneralDashboard = () => {
+  const { user, logout, setSelectedRole } = useAuth();
+  const navigation = useNavigation<GeneralDashboardNavigationProp>();
 
   const handleLogout = async () => {
     try {
@@ -17,6 +26,10 @@ const DashboardScreen = () => {
     } catch (error) {
       console.error('Error logging out:', error);
     }
+  };
+
+  const handleSwitchRole = () => {
+    setSelectedRole(null);
   };
 
   return (
@@ -35,9 +48,15 @@ const DashboardScreen = () => {
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Role:</Text>
-            <Text style={styles.infoValue}>{user?.role}</Text>
+            <Text style={styles.infoValue}>{user?.role?.map((role, index) => (
+              `${role}${index < user.role.length - 1 ? ', ' : ''}`
+            ))}</Text>
           </View>
         </View>
+
+        <TouchableOpacity style={styles.switchRoleButton} onPress={handleSwitchRole}>
+          <Text style={styles.switchRoleButtonText}>Switch Role</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutButtonText}>Logout</Text>
@@ -104,12 +123,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
+  switchRoleButton: {
+    backgroundColor: '#4CAF50',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  switchRoleButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   logoutButton: {
     backgroundColor: '#f4511e',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
-    marginTop: 20,
   },
   logoutButtonText: {
     color: '#fff',
@@ -118,4 +148,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DashboardScreen; 
+export default GeneralDashboard; 
