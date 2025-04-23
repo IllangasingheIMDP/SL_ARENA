@@ -28,7 +28,7 @@ const register = async (req, res) => {
     
     // Generate JWT token
     const token = jwt.sign(
-      { userId, email, role: role || 'general' },
+      { userId, email, role: role || ["general"] },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN }
     );
@@ -40,7 +40,7 @@ const register = async (req, res) => {
         userId,
         email,
         name,
-        role: role || 'general',
+        role: role || ["general"],
         token
       }
     });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Image,
   ActivityIndicator,
   Alert,
+  Button,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../context/AuthContext';
@@ -16,15 +17,16 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import userService from '../services/userService';
 
-type RoleSelectionScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'RoleSelection'
->;
-
 const RoleSelectionScreen = () => {
-  const { user, setSelectedRole } = useAuth();
-  const navigation = useNavigation<RoleSelectionScreenNavigationProp>();
+  const { user, setSelectedRole, logout } = useAuth();
   const [loading, setLoading] = useState(false);
+
+  // Add debugging logs
+  useEffect(() => {
+    console.log('User object:', user);
+    console.log('User roles:', user?.role);
+    console.log('Is role array?', Array.isArray(user?.role));
+  }, [user]);
 
   const handleRoleSelect = async (role: string) => {
     if (!user || !user.id) {
@@ -34,7 +36,6 @@ const RoleSelectionScreen = () => {
 
     try {
       setLoading(true);
-      
       // Call the backend API to update the user's selected role
       const response = await userService.chooseRole(user.id, role);
       
@@ -54,6 +55,14 @@ const RoleSelectionScreen = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -69,7 +78,7 @@ const RoleSelectionScreen = () => {
         </View>
       ) : (
         <ScrollView style={styles.content}>
-          {user?.role && user.role.length > 0 ? (
+          {user?.role && Array.isArray(user.role) && user.role.length > 0 ? (
             user.role.map((role, index) => (
               <TouchableOpacity
                 key={index}
@@ -94,8 +103,14 @@ const RoleSelectionScreen = () => {
           ) : (
             <View style={styles.noRolesContainer}>
               <Text style={styles.noRolesText}>
-                No roles assigned. Please contact support.
+                No roles assigned. Please contact support or return to login.
               </Text>
+              <TouchableOpacity
+                style={styles.logoutButton}
+                onPress={handleLogout}
+              >
+                <Text style={styles.logoutButtonText}>Return to Login</Text>
+              </TouchableOpacity>
             </View>
           )}
         </ScrollView>
@@ -196,6 +211,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
+  },
+  logoutButton: {
+    padding: 15,
+    backgroundColor: '#f4511e',
+    borderRadius: 10,
+    marginTop: 20,
+  },
+  logoutButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
   },
 });
 
