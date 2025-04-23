@@ -1,6 +1,10 @@
-// ScoreUpdateScreen.tsx
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, FlatList, StyleSheet, SafeAreaView, Button } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../type'; // adjust the path if needed
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Live Score'>;
 
 type Ball = {
   id: number;
@@ -11,6 +15,7 @@ type Ball = {
 export default function ScoreUpdateScreen() {
   const [balls, setBalls] = useState<Ball[]>([]);
   const [ballCount, setBallCount] = useState(1);
+  const navigation = useNavigation<NavigationProp>();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -22,7 +27,7 @@ export default function ScoreUpdateScreen() {
 
       setBalls(prev => [newBall, ...prev]);
       setBallCount(prev => prev + 1);
-    }, 3000); // every 3 seconds
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [ballCount]);
@@ -30,6 +35,7 @@ export default function ScoreUpdateScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Live Score (Ball by Ball)</Text>
+      <Button title="About" onPress={() => navigation.navigate('Player Dashboard')} />
       <FlatList
         data={balls}
         keyExtractor={item => item.id.toString()}

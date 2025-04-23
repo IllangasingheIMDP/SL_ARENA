@@ -57,73 +57,47 @@ const getPlayerProfileDetails = async (player_id) => {
     logger.error(`Invalid player_id: ${player_id}`);
     throw new Error("Invalid player_id. Must be a positive number.");
   }
-try{
-  const [rows] = db.execute(
-    `SELECT 
-                p.bio,
-                p.batting_style,
-                p.bowling_style,
-                p.fielding_position,
-                a.achievement_type,
-                m.match_type,
-                v.venue_name
-                FROM 
-                    Players p
-                LEFT JOIN 
-                    Achievements a ON p.player_id = a.player_id
-                LEFT JOIN 
-                    Matches m ON a.match_id = m.match_id
-                LEFT JOIN 
-                    Venues v ON m.venue_id = v.venue_id
-                WHERE 
-                    p.player_id = ?;`,
-    [player_id]
-  );
-  // Transform data for frontend
-  const profile = {
-    bio: rows[0].bio || "No bio available",
-    batting_style: rows[0].batting_style || "Unknown",
-    bowling_style: rows[0].bowling_style || "Unknown",
-    fielding_position: rows[0].fielding_position || "Unknown",
-    achievements: rows
-      .filter((row) => row.achievement_type) // Exclude rows with null achievements
-      .map((row) => ({
-        achievement_type: row.achievement_type,
-        match_type: row.match_type || "N/A",
-        venue_name: row.venue_name || "N/A",
-      })),
-  };
 
+  try {
+    const [rows] = await db.execute(
+      `SELECT 
+          p.bio,
+          p.batting_style,
+          p.bowling_style,
+          p.fielding_position,
+          a.achievement_type,
+          m.match_type,
+          v.venue_name
+        FROM Players p
+        LEFT JOIN Achievements a ON p.player_id = a.player_id
+        LEFT JOIN Matches m ON a.match_id = m.match_id
+        LEFT JOIN Venues v ON m.venue_id = v.venue_id
+        WHERE p.player_id = ?;`,
+      [player_id]
+    );
 
-  const getTrainingSessionsByPlayer = async (playerId) => {
-    const [rows] = await db.execute(`
-      SELECT 
-        session_date,
-        duration,
-        focus_area,
-        notes
-      FROM Training_Sessions
-      WHERE player_id = ?
-      ORDER BY session_date DESC
-    `, [playerId]);
-  
-    return rows;
-  };
+    const profile = {
+      bio: rows[0]?.bio || "No bio available",
+      batting_style: rows[0]?.batting_style || "Unknown",
+      bowling_style: rows[0]?.bowling_style || "Unknown",
+      fielding_position: rows[0]?.fielding_position || "Unknown",
+      achievements: rows
+        .filter((row) => row.achievement_type)
+        .map((row) => ({
+          achievement_type: row.achievement_type,
+          match_type: row.match_type || "N/A",
+          venue_name: row.venue_name || "N/A",
+        })),
+    };
 
-module.exports = { 
-    getPlayerStats,
-    getPlayerAchievements,
-    getPerformanceOverTime,
-    getTrainingSessionsByPlayer
- };
-
-  logger.info(`Successfully fetched profile for player_id: ${player_id}`);
-  return profile;
-}catch{
-  logger.error(`Error fetching player profile for player_id: ${player_id}`, error);
+    logger.info(`Successfully fetched profile for player_id: ${player_id}`);
+    return profile;
+  } catch (error) {
+    logger.error(`Error fetching player profile for player_id: ${player_id}`, error);
     throw new Error(`Failed to fetch player profile: ${error.message}`);
-}
+  }
 };
+
 
 const getPlayerMedia = async (playerId) => {
   // Validate input
@@ -182,11 +156,81 @@ const updateProfileBio = async (playerId, bio) => {
   }
 }
 
+
+const getTrainingSessionsByPlayer = async (playerId) => {
+  const [rows] = await db.execute(`
+    SELECT 
+      session_date,
+      duration,
+      focus_area,
+      notes
+    FROM Training_Sessions
+    WHERE player_id = ?
+    ORDER BY session_date DESC
+  `, [playerId]);
+
+  return rows;
+};
+
+
+const getFilteredMatches = async ({ date, type, location }) => {
+  let query = `
+    SELECT m.*, v.venue_name, t1.team_name AS team1_name, t2.team_name AS team2_name
+    FROM Matches m
+    JOIN Venues v ON m.venue_id = v.venue_id
+    JOIN Teams t1 ON m.team1_id = t1.team_id
+    JOIN Teams t2 ON m.team2_id = t2.team_id
+    WHERE 1 = 1
+  `;
+  const params = [];
+
+  if (date) {
+    query += ' AND m.match_date = ?';
+    params.push(date);
+  }
+
+  if (type) {
+    query += ' AND m.match_type = ?';
+    params.push(type);
+  }
+
+  if (location) {
+    query += ' AND v.venue_name LIKE ?';
+    params.push(`%${location}%`);
+  }
+
+  const [rows] = await db.execute(query, params);
+  return rows;
+};
+
+
+const getMatchDetails = async (matchId) => {
+  const [rows] = await db.execute(
+    `
+    SELECT m.*, v.venue_name, t1.team_name AS team1_name, t2.team_name AS team2_name
+    FROM Matches m
+    JOIN Venues v ON m.venue_id = v.venue_id
+    JOIN Teams t1 ON m.team1_id = t1.team_id
+    JOIN Teams t2 ON m.team2_id = t2.team_id
+    WHERE m.match_id = ?
+    `,
+    [matchId]
+  );
+
+  return rows[0];
+};
+
 module.exports = {
+  
+  
+  
+  getTrainingSessionsByPlayer,
   getPlayerStats,
   getPlayerAchievements,
   getPerformanceOverTime,
   getPlayerProfileDetails,
-  getPlayerMedia
+  getPlayerMedia,
+  getFilteredMatches,
+  getMatchDetails
 };
 

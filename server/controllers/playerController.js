@@ -25,6 +25,7 @@ const getPlayerStats = async (req, res) => {
   const fetchPlayerAchievements = async (req, res) => {
     try {
       const userId = req.user.user_id;
+     
   
       const achievements = await PlayerModel.getPlayerAchievements(userId);
   
@@ -42,6 +43,7 @@ const getPlayerStats = async (req, res) => {
   const fetchPerformanceTrend = async (req, res) => {
     try {
       const playerId = req.user.user_id;
+      
   
       const data = await PlayerModel.getPerformanceOverTime(playerId);
   
@@ -60,6 +62,7 @@ const getPlayerStats = async (req, res) => {
   const fetchTrainingReminders = async (req, res) => {
     try {
       const playerId = req.user.user_id;
+      
   
       const sessions = await PlayerModel.getTrainingSessionsByPlayer(playerId);
   
@@ -122,7 +125,53 @@ const getPlayerStats = async (req, res) => {
         console.error('Error updating profile bio:', error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
-  }
+  };
+
+
+  const getFilteredMatches = async (req, res) => {
+    try {
+      
+      const filters = {
+        date: req.body.date,
+        type: req.body.type,
+        location: req.body.location
+      };
+      
+  
+      const matches = await PlayerModel.getFilteredMatches(filters);
+  
+      res.json({
+        success: true,
+        data: matches
+      });
+    } catch (error) {
+      console.error('Error fetching filtered matches:', error);
+      res.status(500).json({ success: false, message: 'Server error' });
+    }
+  };
+
+
+  const getMatchDetails = async (req, res) => {
+    try {
+      
+      const matchId = req.params.id;
+  
+      const match = await PlayerModel.getMatchDetails(matchId);
+  
+      if (!match) {
+        return res.status(404).json({ success: false, message: 'Match not found' });
+      }
+  
+      res.json({
+        success: true,
+        data: match
+      });
+    } catch (error) {
+      console.error('Error fetching match details:', error);
+      res.status(500).json({ success: false, message: 'Server error' });
+    }
+  };
+  
 
 
 
@@ -139,7 +188,9 @@ module.exports ={
 
     getPlayerProfileDetails,
     getPlayerMedia,
-    updateProfileBio
+    updateProfileBio,
+    getFilteredMatches,
+    getMatchDetails
 
 
 

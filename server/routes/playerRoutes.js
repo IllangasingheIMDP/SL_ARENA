@@ -14,7 +14,8 @@ router.get('/reminders', authenticateToken,checkRole(['player']), playerControll
 router.get('/profiledetails',authenticateToken,checkRole(['player']), playerController.getPlayerProfileDetails);
 router.get('/getPlayerMedia', authenticateToken, checkRole(['player']), playerController.getPlayerMedia);
 router.put('/updateProfilebio', authenticateToken, checkRole(['player']), playerController.updateProfileBio);
-
+router.get('/matches/filter', playerController.getFilteredMatches);
+router.get('/matches/:id', playerController.getMatchDetails);
 
 
 
