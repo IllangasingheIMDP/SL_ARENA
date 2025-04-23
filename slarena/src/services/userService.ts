@@ -3,7 +3,9 @@ import { api } from '../utils/api';
 interface ChooseRoleResponse {
   status: string;
   message: string;
-  token: string;
+  data: {
+    token: string;
+  };
 }
 
 class UserService {
