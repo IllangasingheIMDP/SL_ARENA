@@ -6,7 +6,6 @@ const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/constants');
 // Register a new user
 const register = async (req, res) => {
   try {
-    console.log(req.body);
     const { email, password, name, phone, date_of_birth, role } = req.body;
     
     // Check if user already exists
@@ -23,10 +22,9 @@ const register = async (req, res) => {
       email,
       password,
       name,
-      phone,
-      date_of_birth,
-      role: role || 'general'
     });
+
+    console.log('User created successfully');
     
     // Generate JWT token
     const token = jwt.sign(

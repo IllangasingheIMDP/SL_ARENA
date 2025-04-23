@@ -10,6 +10,7 @@ import PlayerDashboard from '../screens/player/PlayerDashboard';
 import OrganisationDashboard from '../screens/organisation/OrganisationDashboard';
 import TrainerDashboard from '../screens/trainer/TrainerDashboard';
 import AdminDashboard from '../screens/admin/AdminDashboard';
+import UserProfileScreen from '../screens/user/UserProfileScreen';
 import { ActivityIndicator, View } from 'react-native';
 
 export type RootStackParamList = {
@@ -21,6 +22,7 @@ export type RootStackParamList = {
   OrganisationDashboard: undefined;
   TrainerDashboard: undefined;
   AdminDashboard: undefined;
+  UserProfile: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -101,14 +103,23 @@ const AppNavigator = () => {
                   );
                 default:
                   return (
-                    <Stack.Screen
-                      name="GeneralDashboard"
-                      component={GeneralDashboard}
-                      options={{
-                        title: 'Dashboard',
-                        headerBackVisible: false,
-                      }}
-                    />
+                    <>
+                      <Stack.Screen
+                        name="GeneralDashboard"
+                        component={GeneralDashboard}
+                        options={{
+                          title: 'Dashboard',
+                          headerBackVisible: false,
+                        }}
+                      />
+                      <Stack.Screen
+                        name="UserProfile"
+                        component={UserProfileScreen}
+                        options={{
+                          title: 'Profile',
+                        }}
+                      />
+                    </>
                   );
               }
             })()

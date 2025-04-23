@@ -40,7 +40,10 @@ const GeneralDashboard = () => {
       </View>
 
       <View style={styles.content}>
-        <View style={styles.card}>
+        <TouchableOpacity 
+          style={styles.card} 
+          onPress={() => navigation.navigate('UserProfile')}
+        >
           <Text style={styles.cardTitle}>Profile Information</Text>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Email:</Text>
@@ -52,7 +55,8 @@ const GeneralDashboard = () => {
               `${role}${index < user.role.length - 1 ? ', ' : ''}`
             ))}</Text>
           </View>
-        </View>
+          <Text style={styles.viewProfileText}>Tap to view full profile</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity style={styles.switchRoleButton} onPress={handleSwitchRole}>
           <Text style={styles.switchRoleButtonText}>Switch Role</Text>
@@ -145,6 +149,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  viewProfileText: {
+    color: '#666',
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 10,
   },
 });
 

@@ -24,12 +24,13 @@ class UserModel {
       const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
       
       const [result] = await db.execute(
-        'INSERT INTO Users (email, password_hash, name, role) VALUES (?, ?, ?, ?, ?, ?)',
-        [email, password_hash, name, 'general']
+        'INSERT INTO Users (email, password_hash, name, role) VALUES (?, ?, ?, ?)',
+        [email, password_hash, name, JSON.stringify(['general'])]
       );
       
       return result.insertId;
     } catch (error) {
+      console.log('Error creating user:', error);
       throw error;
     }
   }
