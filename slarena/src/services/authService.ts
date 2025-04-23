@@ -31,7 +31,8 @@ export interface ApiError {
 
 class AuthService {
   private async handleResponse(response: any): Promise<any> {
-    if (!response.ok) {
+    //console.log('Response:', response.status);
+    if (response.status !== 'success') {
       const error: ApiError = {
         message: response.message || 'An error occurred',
         status: response.status,
