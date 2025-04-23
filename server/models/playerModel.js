@@ -231,6 +231,7 @@ module.exports = {
   getPlayerProfileDetails,
   getPlayerMedia,
   getFilteredMatches,
-  getMatchDetails
+  getMatchDetails,
+  updateProfileBio 
 };
 
