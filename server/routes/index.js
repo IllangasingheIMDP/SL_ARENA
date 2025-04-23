@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const userRoutes = require('./userRoutes');
+const organizerRoutes = require('./organizerRoutes');
 
 // API version
 const API_VERSION = 'v1';
@@ -19,6 +20,7 @@ router.get('/health', (req, res) => {
 // Mount routes
 router.use(`${BASE_PATH}/users`, userRoutes);
 router.use(`${BASE_PATH}/players`, require('./playerRoutes'));
+router.use(`${BASE_PATH}/organizers`,organizerRoutes);
 
 // Handle 404 for API routes
 router.all(`${BASE_PATH}/*`, (req, res) => {
