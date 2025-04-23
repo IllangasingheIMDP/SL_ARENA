@@ -20,6 +20,7 @@ export interface AuthResponse {
     email: string;
     name: string;
     role: string;
+    verification_status?: string;
   };
 }
 
@@ -58,16 +59,33 @@ class AuthService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify(credentials),
       });
 
-      const data = await this.handleResponse(response);
-      console.log('Login successful:', { userId: data.user.id });
+      const responseData = await this.handleResponse(response);
+      console.log('Login Response:', responseData);
       
-      await AsyncStorage.setItem('token', data.token);
-      await AsyncStorage.setItem('user', JSON.stringify(data.user));
-      return data;
+      if (responseData.data && responseData.data.token) {
+        const userData = {
+          id: responseData.data.userId.toString(),
+          email: responseData.data.email,
+          name: responseData.data.name,
+          role: responseData.data.role,
+          verification_status: responseData.data.verification_status
+        };
+        
+        await AsyncStorage.setItem('token', responseData.data.token);
+        await AsyncStorage.setItem('user', JSON.stringify(userData));
+        
+        return {
+          token: responseData.data.token,
+          user: userData
+        };
+      } else {
+        throw new Error('Invalid response format from server');
+      }
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -113,23 +131,21 @@ class AuthService {
       const responseData = await this.handleResponse(response);
       console.log('Registration Response Data:', responseData);
       
-      // Handle the actual response structure
       if (responseData.data && responseData.data.token) {
-        await AsyncStorage.setItem('token', responseData.data.token);
-        await AsyncStorage.setItem('user', JSON.stringify({
-          id: responseData.data.userId,
+        const userData = {
+          id: responseData.data.userId.toString(),
           email: responseData.data.email,
           name: responseData.data.name,
-          role: responseData.data.role
-        }));
+          role: responseData.data.role,
+          verification_status: responseData.data.verification_status
+        };
+        
+        await AsyncStorage.setItem('token', responseData.data.token);
+        await AsyncStorage.setItem('user', JSON.stringify(userData));
+        
         return {
           token: responseData.data.token,
-          user: {
-            id: responseData.data.userId,
-            email: responseData.data.email,
-            name: responseData.data.name,
-            role: responseData.data.role
-          }
+          user: userData
         };
       } else {
         throw new Error('Invalid response format from server');
