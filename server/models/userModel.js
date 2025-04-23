@@ -5,6 +5,17 @@ const { SALT_ROUNDS } = require('../config/constants');
 
 class UserModel {
   // Create a new user
+  static async RoleValidation(user_id, role) {
+    try {
+      const [result] = await db.execute(
+        'SELECT * FROM Users WHERE user_id = ? AND JSON_CONTAINS(role, ?)',
+        [user_id, JSON.stringify(role)]
+      );
+      return result.length > 0;
+    } catch (error) {
+      throw error;
+    }
+  }
   static async createUser(userData) {
     try {
       const { email, password, name, phone, date_of_birth, role } = userData;

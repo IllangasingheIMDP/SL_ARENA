@@ -13,7 +13,7 @@ const {
 // Public routes
 router.post('/register',   validateRegistration, userController.register);
 router.post('/login', validateLogin, userController.login);
-
+router.post('/choose-role', userController.chooseRole);
 // Protected routes (require authentication)
 router.get('/profile', authenticateToken, userController.getProfile);
 router.put('/profile', authenticateToken, validateProfileUpdate, userController.updateProfile);
