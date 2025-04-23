@@ -100,6 +100,7 @@ const login = async (req, res) => {
     });
   }
 };
+
 const chooseRole = async (req, res) => {
   try {
     const { userId, role } = req.body;
@@ -131,6 +132,7 @@ const chooseRole = async (req, res) => {
     });
   }
 };
+
 // Get current user profile
 const getProfile = async (req, res) => {
   try {
@@ -157,13 +159,10 @@ const getProfile = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const userId = req.user.user_id;
-    const { name, phone, date_of_birth, profile_picture } = req.body;
+    const { name } = req.body;
     
     const updated = await UserModel.updateProfile(userId, {
-      name,
-      phone,
-      date_of_birth,
-      profile_picture
+      name
     });
     
     if (!updated) {
