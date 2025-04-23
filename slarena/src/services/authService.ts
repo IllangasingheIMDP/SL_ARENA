@@ -76,27 +76,70 @@ class AuthService {
 
   async register(data: RegisterData): Promise<AuthResponse> {
     try {
-      console.log('Attempting registration with:', { 
-        email: data.email,
-        name: data.name 
+      const registerUrl = `${API_URL}/register`;
+      console.log('Registration Request:', {
+        url: registerUrl,
+        data: { ...data, password: '[REDACTED]' }
       });
       
-      const response = await fetch(`${API_URL}/register`, {
+      // Test the API connection first
+      try {
+        const testResponse = await fetch(API_URL, { 
+          method: 'HEAD',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        console.log('API Connection Test:', {
+          status: testResponse.status,
+          ok: testResponse.ok,
+          url: API_URL
+        });
+      } catch (error) {
+        console.error('API Connection Test Failed:', error);
+        throw new Error('Cannot connect to the server. Please check your internet connection.');
+      }
+
+      const response = await fetch(registerUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify(data),
       });
 
+      console.log('Registration Response Status:', response.status);
       const responseData = await this.handleResponse(response);
-      console.log('Registration successful:', {responseData });
+      console.log('Registration Response Data:', responseData);
       
-      await AsyncStorage.setItem('token', responseData.token);
-      await AsyncStorage.setItem('user', JSON.stringify(responseData.user));
-      return responseData;
+      // Handle the actual response structure
+      if (responseData.data && responseData.data.token) {
+        await AsyncStorage.setItem('token', responseData.data.token);
+        await AsyncStorage.setItem('user', JSON.stringify({
+          id: responseData.data.userId,
+          email: responseData.data.email,
+          name: responseData.data.name,
+          role: responseData.data.role
+        }));
+        return {
+          token: responseData.data.token,
+          user: {
+            id: responseData.data.userId,
+            email: responseData.data.email,
+            name: responseData.data.name,
+            role: responseData.data.role
+          }
+        };
+      } else {
+        throw new Error('Invalid response format from server');
+      }
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('Registration Error:', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        type: error instanceof Error ? error.constructor.name : typeof error
+      });
       throw error;
     }
   }
