@@ -51,9 +51,12 @@ const GeneralDashboard = () => {
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Role:</Text>
-            <Text style={styles.infoValue}>{user?.role?.map((role, index) => (
-              `${role}${index < user.role.length - 1 ? ', ' : ''}`
-            ))}</Text>
+            <Text style={styles.infoValue}>
+              {Array.isArray(user?.role) 
+                ? user.role.join(', ')
+                : user?.role || 'No role'
+              }
+            </Text>
           </View>
           <Text style={styles.viewProfileText}>Tap to view full profile</Text>
         </TouchableOpacity>

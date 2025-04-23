@@ -10,7 +10,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { ApiError } from '../services/authService';
+import { ApiError } from '../types/authTypes';
 
 const RegisterScreen = ({ navigation }: any) => {
   const [name, setName] = useState('');

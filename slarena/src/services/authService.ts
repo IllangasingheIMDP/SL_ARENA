@@ -58,7 +58,6 @@ class AuthService {
           email: responseData.data.email,
           name: responseData.data.name,
           role: responseData.data.role,
-          verification_status: responseData.data.verification_status
         };
         
         await AsyncStorage.setItem('token', responseData.data.token);
