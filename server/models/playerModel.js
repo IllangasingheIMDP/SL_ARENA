@@ -94,6 +94,29 @@ try{
       })),
   };
 
+
+  const getTrainingSessionsByPlayer = async (playerId) => {
+    const [rows] = await db.execute(`
+      SELECT 
+        session_date,
+        duration,
+        focus_area,
+        notes
+      FROM Training_Sessions
+      WHERE player_id = ?
+      ORDER BY session_date DESC
+    `, [playerId]);
+  
+    return rows;
+  };
+
+module.exports = { 
+    getPlayerStats,
+    getPlayerAchievements,
+    getPerformanceOverTime,
+    getTrainingSessionsByPlayer
+ };
+
   logger.info(`Successfully fetched profile for player_id: ${player_id}`);
   return profile;
 }catch{
@@ -166,3 +189,4 @@ module.exports = {
   getPlayerProfileDetails,
   getPlayerMedia
 };
+
