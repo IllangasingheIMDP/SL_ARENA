@@ -115,11 +115,33 @@ const getAcceptedTeamsByTournament = async (req, res) => {
     }
 };
 
+const getPlayersWithStats = async (req, res) => {
+    try {
+        const { team_id } = req.body;
+
+        if (!team_id) {
+            return res.status(400).json({ message: 'team_id is required' });
+        }
+
+        const players = await OrganizerModel.getPlayersWithStatsByTeam(team_id);
+
+        res.status(200).json({
+            message: 'Players fetched successfully',
+            data: players
+        });
+    } catch (err) {
+        console.error('Error fetching players:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
 module.exports = {
     createTournament,
     getTournamentsByOrganizer,
     getAppliedTeamsToOngoingTournaments,
     acceptTournamentApplicant,
     rejectTournamentApplicant,
-    getAcceptedTeamsByTournament
+    getAcceptedTeamsByTournament,
+    getPlayersWithStats
 };
