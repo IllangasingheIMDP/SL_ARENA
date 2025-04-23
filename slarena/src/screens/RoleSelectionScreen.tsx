@@ -39,10 +39,9 @@ const RoleSelectionScreen = () => {
       const response = await userService.chooseRole(user.id, role);
       
       if (response.status === "success") {
-        console.log('Selected token:', response.data.token);
         // Set the selected role in the context
         // The AppNavigator will handle the navigation automatically based on the selected role
-        await AsyncStorage.setItem('token', response.data.token);
+        await AsyncStorage.setItem('token', response.data?.token || '');
         setSelectedRole(role);
       } else {
         Alert.alert('Error', response.message || 'Failed to select role');

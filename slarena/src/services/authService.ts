@@ -22,20 +22,23 @@ class AuthService {
       const response = await api.post('/users/login', credentials, false);
       const responseData = await this.handleResponse(response);
       
-      if (responseData.data && responseData.data.token) {
+      if (responseData.data) {
         const userData = {
-          id: responseData.data.userId.toString(),
-          email: responseData.data.email,
-          name: responseData.data.name,
-          role: responseData.data.role,
+          id: responseData.data.userId ? responseData.data.userId.toString() : '',
+          email: responseData.data.email || '',
+          name: responseData.data.name || '',
+          role: responseData.data.role || [],
         };
         
+        // Store user data
         await AsyncStorage.setItem('user', JSON.stringify(userData));
         
+        // Return the response without requiring a token
         return {
           user: userData
         };
       } else {
+        console.error('Unexpected response format:', responseData);
         throw new Error('Invalid response format from server');
       }
     } catch (error) {

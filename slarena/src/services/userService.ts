@@ -3,7 +3,7 @@ import { api } from '../utils/api';
 interface ChooseRoleResponse {
   status: string;
   message: string;
-  data: {
+  data?: {
     token: string;
   };
 }
