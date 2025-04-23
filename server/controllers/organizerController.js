@@ -53,7 +53,25 @@ const getTournamentsByOrganizer = async (req, res) => {
     }
 };
 
+const getAppliedTeamsToOngoingTournaments = async (req, res) => {
+    try {
+        //const userId = req.user.user_id;
+        const userId=1;
+
+        const teams = await OrganizerModel.getAppliedTeamsToOngoingTournamentsByOrganizer(userId);
+
+        res.status(200).json({
+            message: 'Applied teams to ongoing tournaments fetched successfully',
+            data: teams
+        });
+    } catch (err) {
+        console.error('Error fetching applied teams:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 module.exports = {
     createTournament,
-    getTournamentsByOrganizer
+    getTournamentsByOrganizer,
+    getAppliedTeamsToOngoingTournaments
 };
