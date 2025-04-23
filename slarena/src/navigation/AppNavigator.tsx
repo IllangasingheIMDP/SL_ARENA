@@ -7,6 +7,7 @@ import RegisterScreen from '../screens/RegisterScreen';
 import RoleSelectionScreen from '../screens/RoleSelectionScreen';
 import GeneralDashboard from '../screens/user/GeneralDashboard';
 import PlayerDashboard from '../screens/player/PlayerDashboard';
+import PlayerProfileScreen from '../screens/player/PlayerProfileScreen';
 import OrganisationDashboard from '../screens/organisation/OrganisationDashboard';
 import TrainerDashboard from '../screens/trainer/TrainerDashboard';
 import AdminDashboard from '../screens/admin/AdminDashboard';
@@ -19,6 +20,7 @@ export type RootStackParamList = {
   RoleSelection: undefined;
   GeneralDashboard: undefined;
   PlayerDashboard: undefined;
+  PlayerProfile: undefined;
   OrganisationDashboard: undefined;
   TrainerDashboard: undefined;
   AdminDashboard: undefined;
@@ -59,14 +61,23 @@ const AppNavigator = () => {
               switch (role) {
                 case 'player':
                   return (
-                    <Stack.Screen
-                      name="PlayerDashboard"
-                      component={PlayerDashboard}
-                      options={{
-                        title: 'Player Dashboard',
-                        headerBackVisible: false,
-                      }}
-                    />
+                    <>
+                      <Stack.Screen
+                        name="PlayerDashboard"
+                        component={PlayerDashboard}
+                        options={{
+                          title: 'Player Dashboard',
+                          headerBackVisible: false,
+                        }}
+                      />
+                      <Stack.Screen
+                        name="PlayerProfile"
+                        component={PlayerProfileScreen}
+                        options={{
+                          title: 'Player Profile',
+                        }}
+                      />
+                    </>
                   );
                 case 'organisation':
                   return (
