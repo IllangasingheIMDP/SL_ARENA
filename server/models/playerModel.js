@@ -1,4 +1,5 @@
 const db = require("../config/dbconfig"); // assuming you use MySQL2 or similar
+const { get } = require("../routes");
 
 const getPlayerStats = async (userId) => {
   const [rows] = await db.execute(
@@ -181,6 +182,39 @@ const getTrainingSessionsByPlayer = async (playerId) => {
   return rows;
 };
 
+
+
+const getPlayerPublicDetails = async (playerId) => {
+  console.log("in model");
+  console.log(playerId);
+  try {
+    const [rows] = await db.execute(
+      `SELECT 
+        p.bio,
+        p.batting_style,
+        p.bowling_style,
+        p.fielding_position
+      FROM 
+    Players p
+    JOIN 
+    Users u ON p.player_id = u.user_id
+    where p.player_id = ?`,
+      [playerId]
+    );
+    console.log("rows", [rows]);
+
+
+    // if (rows.length === 0) {
+    //   throw new Error('Player not found');
+    // }
+
+    return rows[0];
+  } catch (error) {
+    console.error('Error fetching player public details:', error);
+    throw new Error('Failed to fetch player public details');
+  }
+}
+
 module.exports = {
   getPlayerStats,
   getPlayerAchievements,
@@ -188,6 +222,8 @@ module.exports = {
   getPlayerProfileDetails,
   getPlayerMedia,
   getTrainingSessionsByPlayer,
-  updateProfileBio
+  updateProfileBio,
+  savePlayerVideo,
+  getPlayerPublicDetails,
 };
 

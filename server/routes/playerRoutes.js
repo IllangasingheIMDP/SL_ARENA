@@ -21,4 +21,5 @@ router.put('/updateProfilebio', authenticateToken, checkRole(['player']), player
 
 
 
+
 module.exports = router;

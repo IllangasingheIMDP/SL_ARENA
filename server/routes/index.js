@@ -2,10 +2,14 @@
 const express = require('express');
 const router = express.Router();
 const userRoutes = require('./userRoutes');
+const playerRoutes = require('./playerRoutes');
+const sharedPlayerRoutes = require('./shared-routes/playerRoutes');
+
 
 // API version
 const API_VERSION = 'v1';
 const BASE_PATH = `/api/${API_VERSION}`;
+
 
 // Health check route
 router.get('/health', (req, res) => {
@@ -18,7 +22,8 @@ router.get('/health', (req, res) => {
 
 // Mount routes
 router.use(`${BASE_PATH}/users`, userRoutes);
-router.use(`${BASE_PATH}/players`, require('./playerRoutes'));
+router.use(`${BASE_PATH}/players`, playerRoutes);
+router.use(`${BASE_PATH}/sharedplayer-routes`, sharedPlayerRoutes);
 
 // Handle 404 for API routes
 router.all(`${BASE_PATH}/*`, (req, res) => {
