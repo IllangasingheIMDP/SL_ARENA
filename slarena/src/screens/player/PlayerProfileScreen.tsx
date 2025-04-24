@@ -53,6 +53,8 @@ const PlayerProfileScreen = () => {
   const [videoUrl, setVideoUrl] = useState('');
   const [videoMatchId, setVideoMatchId] = useState('');
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -385,10 +387,17 @@ const PlayerProfileScreen = () => {
                 {photos && photos.length > 0 ? (
                   photos.map((photo) => (
                     <View key={photo.photo_id} style={styles.simpleMediaItem}>
-                      <Image 
-                        source={{ uri: photo.photo_url }} 
-                        style={styles.simpleMediaContent} 
-                      />
+                      <TouchableOpacity 
+                        onPress={() => {
+                          setSelectedPhoto(photo.photo_url);
+                          setShowPhotoModal(true);
+                        }}
+                      >
+                        <Image 
+                          source={{ uri: photo.photo_url }} 
+                          style={styles.simpleMediaContent} 
+                        />
+                      </TouchableOpacity>
                       <Text style={styles.simpleMediaTitle}>{photo.title}</Text>
                       <TouchableOpacity 
                         style={styles.simpleDeleteButton}
@@ -527,6 +536,32 @@ const PlayerProfileScreen = () => {
                     setShowVideoPlayer(false);
                   }
                 }}
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Photo Modal */}
+      <Modal
+        visible={showPhotoModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowPhotoModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.photoModalContainer}>
+            <TouchableOpacity 
+              style={styles.closeButton}
+              onPress={() => setShowPhotoModal(false)}
+            >
+              <Ionicons name="close" size={24} color="#fff" />
+            </TouchableOpacity>
+            {selectedPhoto && (
+              <Image 
+                source={{ uri: selectedPhoto }} 
+                style={styles.modalPhoto} 
+                resizeMode="contain"
               />
             )}
           </View>
@@ -785,6 +820,18 @@ const styles = StyleSheet.create({
     right: 10,
     zIndex: 1,
     padding: 5,
+  },
+  photoModalContainer: {
+    width: '90%',
+    height: '80%',
+    backgroundColor: '#000',
+    borderRadius: 10,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  modalPhoto: {
+    width: '100%',
+    height: '100%',
   },
 });
 
