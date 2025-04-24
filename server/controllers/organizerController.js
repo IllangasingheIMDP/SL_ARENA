@@ -135,6 +135,28 @@ const getPlayersWithStats = async (req, res) => {
     }
 };
 
+const getTeamsNotApplied = async (req, res) => {
+    try {
+        const { tournament_id } = req.body;
+
+        if (!tournament_id) {
+            return res.status(400).json({ message: "tournament_id is required" });
+        }
+
+        const teams = await OrganizerModel.getTeamsNotAppliedToTournament(tournament_id);
+
+        res.status(200).json({
+            message: 'Teams not applied to this tournament',
+            data: teams
+        });
+
+    } catch (err) {
+        console.error("Error fetching teams not applied:", err);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+
+
 
 module.exports = {
     createTournament,
@@ -143,5 +165,6 @@ module.exports = {
     acceptTournamentApplicant,
     rejectTournamentApplicant,
     getAcceptedTeamsByTournament,
-    getPlayersWithStats
+    getPlayersWithStats,
+    getTeamsNotApplied
 };
