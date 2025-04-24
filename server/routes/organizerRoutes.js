@@ -3,7 +3,7 @@ const router = express.Router();
 const organizerController = require('../controllers/organizerController');
 const { authenticateToken, checkRole } = require('../middleware/auth');
 
-router.get('/createtournament', authenticateToken,checkRole(['organizer']), organizerController.createTournament);
+router.post('/createtournament', authenticateToken,checkRole(['organizer']), organizerController.createTournament);
 router.get('/ongoingtournaments', authenticateToken,checkRole(['organizer']),organizerController.getTournamentsByOrganizer);
 router.get('/applied-teams',authenticateToken,checkRole(['organizer']), organizerController.getAppliedTeamsToOngoingTournaments);
 router.post('/applicants/accept',authenticateToken,checkRole(['organizer']), organizerController.acceptTournamentApplicant);
@@ -19,7 +19,7 @@ router.post('/get-next-ball', authenticateToken,checkRole(['organizer']),organiz
 router.post('/updateInningSummary',authenticateToken,checkRole(['organizer']), organizerController.updateInningSummary);
 router.post('/updatePlayerStats',authenticateToken,checkRole(['organizer']), organizerController.updatePlayerStats);
 
-
+  
 
 
 
