@@ -39,3 +39,14 @@ export type Tournament = {
   teams: Team[];
   status: TournamentStatus;
 }; 
+
+export type PlayerStats = {
+  player_id: number;
+  name: string;
+  role: string;
+  total_matches: number;
+  total_runs: string;
+  total_wickets: string;
+  batting_average: string;
+  bowling_economy: string;
+}

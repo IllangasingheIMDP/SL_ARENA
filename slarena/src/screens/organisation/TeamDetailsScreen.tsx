@@ -11,7 +11,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Team, TeamPlayer } from '../../types/tournamentTypes';
+import { PlayerStats, Team, TeamPlayer } from '../../types/tournamentTypes';
 import { tournamentService } from '../../services/tournamentService';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 
@@ -21,6 +21,7 @@ type RouteParams = {
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
+
 const TeamDetailsScreen = () => {
   const route = useRoute();
   const navigation = useNavigation<NavigationProp>();
@@ -29,29 +30,50 @@ const TeamDetailsScreen = () => {
   const [loading, setLoading] = useState(true);
   const [team, setTeam] = useState<Team | null>(null);
   const [players, setPlayers] = useState<TeamPlayer[]>([]);
+  const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchTeamDetails = async () => {
     try {
       setLoading(true);
-      // This would be replaced with an actual API call to get team details
-      // For now, we'll use mock data
-      const mockTeam: Team = {
-        team_id: teamId,
-        team_name: 'Team ' + teamId,
-        captain_id: 1,
-      };
       
-      const mockPlayers: TeamPlayer[] = [
-        { player_id: 1, role: 'Captain' },
-        { player_id: 2, role: 'Batsman' },
-        { player_id: 3, role: 'Bowler' },
-        { player_id: 4, role: 'All-rounder' },
-        { player_id: 5, role: 'Wicket-keeper' },
-      ];
+      // Fetch player stats from the backend
+      const stats = await tournamentService.getTeamPlayerStats(teamId);
+      console.log('Player stats:', stats);
       
-      setTeam(mockTeam);
-      setPlayers(mockPlayers);
+      // Create a team object from the first player's data
+      if (stats && stats.length > 0) {
+        const firstPlayer = stats[0];
+        const teamName = firstPlayer.team_name || `Team ${teamId}`;
+        
+        const teamData: Team = {
+          team_id: teamId,
+          team_name: teamName,
+          captain_id: firstPlayer.captain_id || null,
+        };
+        
+        setTeam(teamData);
+        
+        // Create player objects from the stats data
+        const playerData: TeamPlayer[] = stats.map((stat: PlayerStats) => ({
+          player_id: stat.player_id,
+          role: stat.role,
+        }));
+        
+        setPlayers(playerData);
+      } else {
+        // If no stats available, create a basic team object
+        const teamData: Team = {
+          team_id: teamId,
+          team_name: `Team ${teamId}`,
+          captain_id: undefined,
+        };
+        
+        setTeam(teamData);
+        setPlayers([]);
+      }
+      
+      setPlayerStats(stats);
     } catch (error) {
       console.error('Error fetching team details:', error);
       Alert.alert('Error', 'Failed to load team details. Please try again.');
@@ -77,18 +99,48 @@ const TeamDetailsScreen = () => {
     Alert.alert('Coming Soon', 'Player details screen will be available soon.');
   };
 
-  const renderPlayerItem = ({ item }: { item: TeamPlayer }) => (
-    <TouchableOpacity 
-      style={styles.playerItem}
-      onPress={() => handleViewPlayerDetails(item.player_id)}
-    >
-      <View style={styles.playerInfo}>
-        <Text style={styles.playerId}>Player ID: {item.player_id}</Text>
-        <Text style={styles.playerRole}>{item.role}</Text>
-      </View>
-      <Icon name="chevron-right" size={24} color="#666" />
-    </TouchableOpacity>
-  );
+  const renderPlayerItem = ({ item }: { item: TeamPlayer }) => {
+    // Find player stats if available
+    const stats = playerStats.find(stat => stat.player_id === item.player_id);
+    
+    // Check if this player is the captain
+    const isCaptain = team?.captain_id === item.player_id;
+    
+    return (
+      <TouchableOpacity 
+        style={[
+          styles.playerItem,
+          isCaptain && styles.captainItem
+        ]}
+        onPress={() => handleViewPlayerDetails(item.player_id)}
+      >
+        <View style={styles.playerInfo}>
+          <View style={styles.nameContainer}>
+            <Text style={[
+              styles.playerName,
+              isCaptain && styles.captainName
+            ]}>
+              {stats?.name || `Player ${item.player_id}`}
+            </Text>
+            {isCaptain && (
+              <View style={styles.captainBadge}>
+                <Text style={styles.captainBadgeText}>Captain</Text>
+              </View>
+            )}
+          </View>
+          <Text style={styles.playerRole}>{stats?.role || item.role}</Text>
+          {stats && (
+            <View style={styles.statsContainer}>
+              <Text style={styles.statsText}>Matches: {stats.total_matches}</Text>
+              <Text style={styles.statsText}>Runs: {stats.total_runs}</Text>
+              <Text style={styles.statsText}>Wickets: {stats.total_wickets}</Text>
+            </View>
+          )}
+        </View>
+        <Icon name="chevron-right" size={24} color="#666" />
+      </TouchableOpacity>
+    );
+  };
 
   if (loading && !refreshing) {
     return (
@@ -204,14 +256,38 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
+  captainItem: {
+    borderLeftWidth: 4,
+    borderLeftColor: '#f4511e',
+    backgroundColor: '#fff8f5',
+  },
   playerInfo: {
     flex: 1,
   },
-  playerId: {
+  nameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  playerName: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 4,
+  },
+  captainName: {
+    color: '#f4511e',
+  },
+  captainBadge: {
+    backgroundColor: '#f4511e',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginLeft: 8,
+  },
+  captainBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   playerRole: {
     fontSize: 14,
@@ -228,6 +304,16 @@ const styles = StyleSheet.create({
     color: '#999',
     marginTop: 16,
     textAlign: 'center',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  statsText: {
+    fontSize: 14,
+    color: '#666',
   },
 });
 
