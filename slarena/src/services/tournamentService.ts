@@ -78,5 +78,18 @@ export const tournamentService = {
       console.error(`Error updating team attendance for tournament ID ${tournamentId}, team ID ${teamId}:`, error);
       throw error;
     }
+  },
+
+  getTeamPlayerStats: async (teamId: number): Promise<any> => {
+    try {
+      const response = await api.post(
+        '/organizers/players-stats_ofTeam',
+        { team_id: teamId }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching player stats for team ID ${teamId}:`, error);
+      throw error;
+    }
   }
 }; 
