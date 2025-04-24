@@ -14,6 +14,8 @@ import AdminDashboard from '../screens/admin/AdminDashboard';
 import UserProfileScreen from '../screens/user/UserProfileScreen';
 import { ActivityIndicator, View } from 'react-native';
 import RoleRequestForm from '../screens/RoleRequestForm';
+import TournamentTeamsScreen from '../screens/organisation/TournamentTeamsScreen';
+import TeamDetailsScreen from '../screens/organisation/TeamDetailsScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -27,6 +29,8 @@ export type RootStackParamList = {
   AdminDashboard: undefined;
   UserProfile: undefined;
   RoleRequestForm: { role: string };
+  TournamentTeams: { tournamentId: number };
+  TeamDetails: { teamId: number };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -90,6 +94,22 @@ const AppNavigator = () => {
                         options={{
                           title: 'Organisation Dashboard',
                           headerBackVisible: false,
+                          headerShown: false,
+                        }}
+                      />
+                      <Stack.Screen
+                        name="TournamentTeams"
+                        component={TournamentTeamsScreen}
+                        options={{
+                          title: 'Tournament Teams',
+                          headerShown: false,
+                        }}
+                      />
+                      <Stack.Screen
+                        name="TeamDetails"
+                        component={TeamDetailsScreen}
+                        options={{
+                          title: 'Team Details',
                           headerShown: false,
                         }}
                       />
