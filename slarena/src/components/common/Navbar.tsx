@@ -6,10 +6,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Badge } from 'react-native-paper';
 import { notificationService } from '../../services/notificationService';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../../context/AuthContext';
+
 const API_URL = Constants.expoConfig?.extra?.socketUrl;
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -20,18 +21,17 @@ interface NavbarProps {
   showNotification?: boolean;
 }
 
-const Navbar: React.FC<NavbarProps> = ({
-  showBackButton = true,
-  showNotification = true,
-}) => {
-  const { user } = useAuth();
-  const userId = user?.id;
-  const navigation = useNavigation<NavigationProp>();
+// Custom hook for socket management
+const useSocketConnection = (userId: number | undefined) => {
+  const [socket, setSocket] = useState<Socket | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isConnected, setIsConnected] = useState(false);
 
   const fetchUnreadCount = async () => {
     try {
+      console.log('Fetching unread count...');
       const count = await notificationService.getUnreadCount();
+      console.log('Unread count fetched:', count);
       setUnreadCount(count);
     } catch (error) {
       console.error('Error fetching unread count:', error);
@@ -39,87 +39,153 @@ const Navbar: React.FC<NavbarProps> = ({
   };
 
   useEffect(() => {
-    if (showNotification) {
-      // Initial fetch
-      fetchUnreadCount();
+    let socketInstance: Socket | null = null;
 
-      // Set up Socket.IO connection
-      const setupSocket = async () => {
-        try {
-          const token = await AsyncStorage.getItem('token');
-          if (!token) {
-            console.warn('No token available for socket connection');
-            return;
-          }
-
-          //console.log('Attempting to connect to socket at:', API_URL);
-
-          const socket = io(API_URL, {
-            auth: { token },
-            transports: ['websocket', 'polling'],
-            timeout: 10000,
-            reconnection: true,
-            reconnectionAttempts: Infinity,
-            reconnectionDelay: 1000,
-            reconnectionDelayMax: 5000,
-            forceNew: true,
-            autoConnect: true,
-            upgrade: true,
-            rememberUpgrade: true,
-            path: '/socket.io/',
-            query: {
-              userId: userId
-            }
-          });
-
-          // Connection event handlers
-          socket.on('connect', () => {
-            //console.log('Socket connected successfully');
-            // Join user's notification room with correct user ID
-            socket.emit('join_notification_room', { userId });
-            //console.log('Joined notification room for user:', userId);
-          });
-
-          socket.on('connect_error', (error) => {
-            //console.error('Socket connection error:', error.message);
-            //console.log('Connection state:', socket.connected);
-            //console.log('Transport:', socket.io.engine.transport.name);
-          });
-
-          socket.on('disconnect', (reason) => {
-            //console.log('Socket disconnected:', reason);
-            if (reason === 'io server disconnect') {
-              // Server initiated disconnect, try to reconnect
-              socket.connect();
-            }
-          });
-
-          // Listen for new notifications
-          socket.on('new_notification', (data) => {
-            //console.log('New notification received:', data);
-            // Immediately fetch updated count
-            fetchUnreadCount();
-          });
-
-          // Listen for notification count updates
-          socket.on('notification_count_update', (count) => {
-            //console.log('Notification count updated:', count);
-            setUnreadCount(count);
-          });
-
-          // Cleanup on unmount
-          return () => {
-            //console.log('Cleaning up socket connection');
-            socket.disconnect();
-          };
-        } catch (error) {
-          console.error('Error setting up socket:', error);
+    const setupSocket = async () => {
+      try {
+        console.log('Setting up socket connection...');
+        const token = await AsyncStorage.getItem('token');
+        if (!token || !userId) {
+          console.log('No token or userId available:', { token: !!token, userId });
+          return;
         }
-      };
 
-      setupSocket();
+        console.log('Creating socket instance with URL:', API_URL, 'for user:', userId);
+        // Create socket instance with optimized options
+        socketInstance = io(API_URL, {
+          auth: { token },
+          transports: ['websocket'],
+          timeout: 5000,
+          reconnection: true,
+          reconnectionAttempts: 5,
+          reconnectionDelay: 1000,
+          reconnectionDelayMax: 3000,
+          forceNew: true,
+          autoConnect: true,
+          path: '/socket.io/',
+          query: { userId: userId.toString() } // Convert userId to string
+        });
+
+        // Connection event handlers
+        socketInstance.on('connect', () => {
+          console.log('Socket connected successfully for user:', userId);
+          setIsConnected(true);
+          // Join room and fetch initial count
+          console.log('Joining notification room for user:', userId);
+          socketInstance?.emit('join_notification_room', { userId: userId.toString() }); // Convert userId to string
+          fetchUnreadCount();
+        });
+
+        socketInstance.on('disconnect', (reason) => {
+          console.log('Socket disconnected. Reason:', reason, 'for user:', userId);
+          setIsConnected(false);
+        });
+
+        socketInstance.on('connect_error', (error) => {
+          console.error('Socket connection error for user:', userId, error.message);
+          console.log('Connection state:', socketInstance?.connected);
+          console.log('Transport:', socketInstance?.io?.engine?.transport?.name);
+          setIsConnected(false);
+        });
+
+        // Listen for new notifications
+        socketInstance.on('new_notification', (data) => {
+          console.log('New notification received for user:', userId, data);
+          // Immediately update count when new notification arrives
+          setUnreadCount(prev => {
+            console.log('Updating unread count from', prev, 'to', prev + 1);
+            return prev + 1;
+          });
+        });
+
+        // Listen for notification count updates
+        socketInstance.on('notification_count_update', (count) => {
+          console.log('Notification count update received for user:', userId, count);
+          setUnreadCount(count);
+        });
+
+        // Debug socket state
+        console.log('Socket instance created for user:', userId, {
+          connected: socketInstance.connected,
+          id: socketInstance.id,
+          transport: socketInstance.io?.engine?.transport?.name
+        });
+
+        setSocket(socketInstance);
+      } catch (error) {
+        console.error('Error setting up socket for user:', userId, error);
+      }
+    };
+
+    setupSocket();
+
+    // Cleanup function
+    return () => {
+      if (socketInstance) {
+        console.log('Cleaning up socket connection for user:', userId);
+        socketInstance.removeAllListeners();
+        socketInstance.disconnect();
+        setSocket(null);
+        setIsConnected(false);
+      }
+    };
+  }, [userId]); // Only recreate socket when userId changes
+
+  // Reconnect and fetch count if disconnected
+  useEffect(() => {
+    if (!isConnected && socket) {
+      console.log('Attempting to reconnect socket...');
+      socket.connect();
+    }
+  }, [isConnected, socket]);
+
+  // Periodically check connection and fetch count
+  useEffect(() => {
+    if (isConnected) {
+      console.log('Setting up periodic count check');
+      const interval = setInterval(() => {
+        console.log('Running periodic count check');
+        fetchUnreadCount();
+      }, 30000); // Check every 30 seconds
+
+      return () => {
+        console.log('Cleaning up periodic count check');
+        clearInterval(interval);
+      };
+    }
+  }, [isConnected]);
+
+  return { unreadCount, fetchUnreadCount, isConnected };
+};
+
+const Navbar: React.FC<NavbarProps> = ({
+  showBackButton = true,
+  showNotification = true,
+}) => {
+  const { user } = useAuth();
+  const userId = user?.id ? Number(user.id) : undefined;
+  const navigation = useNavigation<NavigationProp>();
+  const { unreadCount, fetchUnreadCount, isConnected } = useSocketConnection(userId);
+
+  // Fetch count when component mounts and when showNotification changes
+  useEffect(() => {
+    if (showNotification) {
+      console.log('Fetching count due to showNotification change');
+      fetchUnreadCount();
     }
   }, [showNotification]);
+
+  // Refresh count when returning from Notifications screen
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      if (showNotification) {
+        console.log('Fetching count due to screen focus');
+        fetchUnreadCount();
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation, showNotification]);
 
   return (
     <View style={styles.container}>
