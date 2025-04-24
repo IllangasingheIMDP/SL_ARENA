@@ -4,7 +4,8 @@ import { Tournament } from '../types/tournamentTypes';
 export const tournamentService = {
   getOngoingTournaments: async (): Promise<Tournament[]> => {
     try {
-      const response = await api.get('/organizers/ongoingtournements', true);
+      const response = await api.get('/organizers/ongoingtournaments');
+      console.log('Fetched tournaments:', response);
       return response.data;
     } catch (error) {
       console.error('Error fetching ongoing tournaments:', error);
