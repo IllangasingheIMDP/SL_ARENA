@@ -246,6 +246,20 @@ const getCurrentBatsmenRuns = async (req, res) => {
 
 
 
+const getNextBallController = async (req, res) => {
+    try {
+        const { inning_id } = req.body;
+        const nextBall = await OrganizerModel.getNextBall(inning_id);
+        res.json(nextBall);
+    } catch (error) {
+        console.error('Error fetching next ball:', error);
+        res.status(500).json({ message: 'Error fetching next ball' });
+    }
+};
+
+
+
+
 
 module.exports = {
     createTournament,
@@ -259,5 +273,6 @@ module.exports = {
     sendTournamentInvite,
     addInning,
     addDelivery,
-    getCurrentBatsmenRuns
+    getCurrentBatsmenRuns,
+    getNextBallController
 };

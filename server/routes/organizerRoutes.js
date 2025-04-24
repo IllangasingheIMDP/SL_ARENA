@@ -14,7 +14,9 @@ router.post('/not-applied-teams',authenticateToken,checkRole(['organizer']), org
 router.post('/send-invite',authenticateToken,checkRole(['organizer']), organizerController.sendTournamentInvite);
 router.post('/addInning',authenticateToken,checkRole(['organizer']), organizerController.addInning);
 router.post('/adddelivery',authenticateToken,checkRole(['organizer']), organizerController.addDelivery);
-router.post('/current-batsmen-runs',authenticateToken,checkRole(['organizer']), organizerController.getCurrentBatsmenRuns);
+router.post('/current-batsmen-runs', organizerController.getCurrentBatsmenRuns);
+router.post('/get-next-ball', authenticateToken,checkRole(['organizer']),organizerController.getNextBallController);
+
 
 
 
