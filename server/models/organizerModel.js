@@ -178,28 +178,35 @@ const insertDelivery = async (delivery) => {
 };
 
 const getCurrentBatsmenRuns = async (inning_id) => {
-    // Step 1: Get last deliveries where players are not out
-    const [rows] = await db.execute(
-        `SELECT batsman_id
-         FROM Deliveries
-         WHERE inning_id = ? AND wicket = 0
-         ORDER BY delivery_id DESC`,
-        [inning_id]
+    // Step 1: Get batsmen who have faced deliveries and are NOT out
+    const [activeBatsmenRows] = await db.execute(
+        `SELECT d.batsman_id
+         FROM Deliveries d
+         LEFT JOIN (
+             SELECT batsman_id
+             FROM Deliveries
+             WHERE inning_id = ? AND wicket = 1
+         ) AS out_batsmen
+         ON d.batsman_id = out_batsmen.batsman_id
+         WHERE d.inning_id = ? AND out_batsmen.batsman_id IS NULL
+         ORDER BY d.delivery_id DESC`,
+        [inning_id, inning_id]
     );
 
-    // Get unique batsmen in order (last two)
-    const uniqueBatsmen = [...new Set(rows.map(row => row.batsman_id))].slice(0, 2);
+    // Get unique, not-out batsmen (latest 2)
+    const uniqueBatsmen = [...new Set(activeBatsmenRows.map(row => row.batsman_id))].slice(0, 2);
 
     if (uniqueBatsmen.length === 0) return [];
 
-    // Step 2: Get total runs and name for each of those batsmen
+    // Step 2: Fetch total runs + name
+    const placeholders = uniqueBatsmen.map(() => '?').join(',');
     const [runsData] = await db.query(
         `SELECT d.batsman_id, u.name AS batsman_name, SUM(d.runs_scored) AS total_runs
          FROM Deliveries d
          JOIN Users u ON d.batsman_id = u.user_id
-         WHERE d.inning_id = ? AND d.batsman_id IN (?, ?)
+         WHERE d.inning_id = ? AND d.batsman_id IN (${placeholders})
          GROUP BY d.batsman_id`,
-        [inning_id, uniqueBatsmen[0], uniqueBatsmen[1] || 0]
+        [inning_id, ...uniqueBatsmen]
     );
 
     return runsData;
