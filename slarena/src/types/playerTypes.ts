@@ -36,4 +36,24 @@ export interface PlayerVideos {
 
 export interface UpdateProfileBioRequest {
   bio: string;
+}
+
+export interface Photo {
+  photo_id: string;
+  user_id: string;
+  match_id?: string;
+  title: string;
+  description: string;
+  photo_url: string;
+  created_at: string;
+}
+
+export interface Video {
+  video_id: string;
+  user_id: string;
+  match_id?: string;
+  title: string;
+  description: string;
+  video_url: string;
+  created_at: string;
 } 

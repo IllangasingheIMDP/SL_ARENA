@@ -1,6 +1,41 @@
 const PlayerModel = require('../models/playerModel');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/constants');
+const photosModel = require('../models/photosModel');
+const videosModel = require('../models/videosModel');
+
+const uploadVideo = async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const { title, description,videoUrl } = req.body;
+    
+    const result = await videosModel.uploadVideo(userId, title, description, videoUrl);
+    res.json({
+      success: true,
+      message: 'Video uploaded successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('Error uploading video:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+}
+const deleteVideo = async (req, res) => {
+  try {
+    const videoId = req.params.videoId;
+    const result = await videosModel.deleteVideo(videoId);
+    res.json({
+      success: true,
+      message: 'Video deleted successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('Error deleting video:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+}
+
+
 
 
 const getPlayerStats = async (req, res) => {
@@ -19,6 +54,70 @@ const getPlayerStats = async (req, res) => {
     }
   };
 
+
+  const uploadPhotoForMatch = async (req, res) => {
+    try {
+        const userId = req.user.user_id;
+        const { match_id, title, description } = req.body;
+        const photoUrl = req.file.path;
+        const result = await photosModel.uploadPhotoForMatch(userId, match_id, title, description, photoUrl);
+        res.json({
+            success: true,
+            message: 'Photo stored successfully',
+            data: result
+        });
+    } catch (error) {
+        console.error('Error uploading photo:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+  }
+
+  const uploadVideoForMatch = async (req, res) => {
+    try {
+        const userId = req.user.user_id;
+        const { match_id, title, description,videoUrl } = req.body;
+        
+        const result = await videosModel.uploadVideoForMatch(userId, match_id, title, description, videoUrl);
+        res.json({
+            success: true,
+            message: 'Video stored successfully',
+            data: result
+        });
+    } catch (error) {
+        console.error('Error uploading video:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+  }
+  
+  const uploadPhoto = async (req, res) => {
+    console.log(req.file,'req.file');
+    try {
+        const userId = req.user.user_id;
+        const { title, description } = req.body;
+        const photoUrl = req.file.path;
+        const result = await photosModel.uploadPhoto(userId, title, description, photoUrl);
+        res.json({
+            success: true,
+            message: 'Photo uploaded successfully',
+            data: result
+        });
+    } catch (error) {
+        console.error('Error uploading photo:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+
+  }
+
+  const getPlayerPhotos = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const photos = await photosModel.getPlayerPhotos(userId);
+        res.json({ success: true, data: photos });
+    } catch (error) {
+        console.error('Error fetching player photos:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+  }
 
 
 
@@ -90,7 +189,7 @@ const getPlayerStats = async (req, res) => {
 
   const getPlayerVideos = async (req, res) => {
     try {
-        const playerId = req.user.user_id;
+        const playerId = req.params.userId;
         const media = await PlayerModel.getPlayerVideos(playerId);
         res.json({
             success: true,
@@ -124,6 +223,21 @@ const getPlayerStats = async (req, res) => {
     }
   }
 
+  const deletePhoto = async (req, res) => {
+    try {
+        const photoId = req.params.photoId;
+        const result = await photosModel.deletePhoto(photoId);
+        res.json({
+            success: true,
+            message: 'Photo deleted successfully',
+            data: result
+        });
+    } catch (error) {
+        console.error('Error deleting photo:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+  }
+
 
 
 
@@ -131,16 +245,20 @@ const getPlayerStats = async (req, res) => {
 
 
 module.exports ={
+  deletePhoto,
     getPlayerStats,
     fetchPlayerAchievements,
     fetchPerformanceTrend,
-
+    uploadPhotoForMatch,
     fetchTrainingReminders,
-
+    uploadPhoto,
     getPlayerProfileDetails,
-    
+    getPlayerPhotos,
     updateProfileBio,
-    getPlayerVideos
+    getPlayerVideos,
+    uploadVideo,
+    deleteVideo,
+    uploadVideoForMatch
 
 
 }

@@ -4,9 +4,13 @@ import {
   PlayerAchievement,
   PlayerProfile,
   TrainingSession,
-  PlayerVideos,
+  Video,
   UpdateProfileBioRequest
 } from '../types/playerTypes';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
+
+const BASE_URL = Constants.expoConfig?.extra?.apiUrl;
 
 const getPlayerStats = async (): Promise<PlayerStats> => {
   const response = await api.get(`/players/stat`);
@@ -26,9 +30,15 @@ const getPlayerProfile = async (): Promise<PlayerProfile> => {
   return response.data;
 };
 
-const getPlayerVideos = async (): Promise<string[]> => {
-  const response = await api.get(`/players/getPlayerVideos`);
-  //console.log(response,'response media');
+const getPlayerVideos = async (userId: string): Promise<string[]> => {
+  
+  const response = await api.get(`/players/getPlayerVideos/${userId}`);
+  console.log(response,'response media');
+  return response.data;
+};
+
+const getPlayerPhotos = async (userId: string): Promise<any[]> => {
+  const response = await api.get(`/players/getPlayerPhotos/${userId}`);
   return response.data;
 };
 
@@ -42,11 +52,64 @@ const getTrainingSessions = async (): Promise<TrainingSession[]> => {
   return response.data;
 };
 
+const uploadPhoto = async (formData: FormData): Promise<void> => {
+  const token = await AsyncStorage.getItem('token');
+  const response = await fetch(`${BASE_URL}/players/uploadPhoto`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: formData,
+  });
+  if (!response.ok) {
+    throw new Error('Failed to upload photo');
+  }
+  return response.json();
+};
+
+const uploadPhotoForMatch = async (formData: FormData): Promise<void> => {
+  const token = await AsyncStorage.getItem('token');
+  const response = await fetch(`${BASE_URL}/players/uploadPhotoForMatch`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: formData,
+  });
+  if (!response.ok) {
+    throw new Error('Failed to upload photo for match');
+  }
+  return response.json();
+};
+
+const uploadVideo = async (data: { title: string; description: string; videoUrl: string }): Promise<void> => {
+  await api.post(`/players/uploadVideo`, data);
+};
+
+const uploadVideoForMatch = async (data: { match_id: string; title: string; description: string; videoUrl: string }): Promise<void> => {
+  await api.post(`/players/uploadVideoForMatch`, data);
+};
+
+const deletePhoto = async (photoId: string): Promise<void> => {
+  await api.delete(`/players/deletePhoto/${photoId}`);
+};
+
+const deleteVideo = async (videoId: string): Promise<void> => {
+  await api.delete(`/players/deleteVideo/${videoId}`);
+};
+
 export const playerService = {
   getPlayerStats,
   getPlayerAchievements,
   getPlayerProfile,
   getPlayerVideos,
+  getPlayerPhotos,
   updateProfileBio,
-  getTrainingSessions
+  getTrainingSessions,
+  uploadPhoto,
+  uploadPhotoForMatch,
+  uploadVideo,
+  uploadVideoForMatch,
+  deletePhoto,
+  deleteVideo
 }; 

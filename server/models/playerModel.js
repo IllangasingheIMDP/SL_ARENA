@@ -123,7 +123,7 @@ const getPlayerVideos = async (playerId) => {
   try {
     // Execute the query
     const [rows] = await db.execute(
-      'SELECT video_url FROM Videos WHERE user_id = ?;',
+      'SELECT * FROM Videos WHERE user_id = ?;',
       [playerId]
     );
 
@@ -133,10 +133,10 @@ const getPlayerVideos = async (playerId) => {
     }
 
     // Transform data: Extract video URLs into an array
-    const videoUrls = rows.map(row => row.video_url).filter(url => url); // Remove null/undefined URLs
+    //const videoUrls = rows.map(row => row.video_url).filter(url => url); // Remove null/undefined URLs
 
-    console.log(`Successfully fetched ${videoUrls.length} video URLs for playerId: ${playerId}`);
-    return videoUrls;
+    
+    return rows;
   } catch (error) {
     console.log(`Error fetching player media for playerId: ${playerId}`, error);
     throw new Error(`Failed to fetch player media: ${error.message}`);
