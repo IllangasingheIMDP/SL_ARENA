@@ -113,6 +113,25 @@ const createTournamentInvite = async (tournament_id, team_id) => {
     return result.insertId;
 };
 
+
+const createInning = async (match_id, batting_team_id, bowling_team_id) => {
+    // Step 1: Get current count of innings for this match
+    const [rows] = await db.execute(
+        'SELECT COUNT(*) AS inningCount FROM Innings WHERE match_id = ?',
+        [match_id]
+    );
+    const inningNumber = rows[0].inningCount + 1;
+
+    // Step 2: Insert the new inning
+    const [result] = await db.execute(
+        `INSERT INTO Innings (match_id, batting_team_id, bowling_team_id, inning_number)
+         VALUES (?, ?, ?, ?)`,
+        [match_id, batting_team_id, bowling_team_id, inningNumber]
+    );
+
+    return result;
+};
+
 module.exports = {
     createTournament,
     getTournamentsByOrganizer,
@@ -121,5 +140,6 @@ module.exports = {
     getAcceptedTeamsByTournament,
     getPlayersWithStatsByTeam,
     getTeamsNotAppliedToTournament,
-    createTournamentInvite
+    createTournamentInvite,
+    createInning
 };
