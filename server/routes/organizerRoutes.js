@@ -8,7 +8,7 @@ router.get('/ongoingtournaments', authenticateToken,checkRole(['organisation']),
 router.get('/applied-teams',authenticateToken,checkRole(['organisation']), organizerController.getAppliedTeamsToOngoingTournaments);
 router.post('/applicants/accept',authenticateToken,checkRole(['organisation']), organizerController.acceptTournamentApplicant);
 router.post('/applicants/reject',authenticateToken,checkRole(['organisation']), organizerController.rejectTournamentApplicant);
-router.post('/accepted-teams', authenticateToken,checkRole(['organisation']),organizerController.getAcceptedTeamsByTournament);
+router.post('/tournaments/teams', authenticateToken,checkRole(['organisation']),organizerController.getAcceptedTeamsByTournament);
 router.post('/players-stats_ofTeam', authenticateToken,checkRole(['organisation']),organizerController.getPlayersWithStats);
 router.post('/not-applied-teams',authenticateToken,checkRole(['organisation']), organizerController.getTeamsNotApplied);
 router.post('/send-invite',authenticateToken,checkRole(['organisation']), organizerController.sendTournamentInvite);

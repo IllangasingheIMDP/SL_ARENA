@@ -36,7 +36,6 @@ const OngoingTournamentsTab = () => {
     try {
       setLoading(true);
       const data = await tournamentService.getOngoingTournaments();
-      console.log('Fetched tournaments:', data);
       setTournaments(data);
     } catch (error) {
       console.error('Error fetching tournaments:', error);

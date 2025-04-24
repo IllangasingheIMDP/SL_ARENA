@@ -70,6 +70,7 @@ const getTournamentsByOrganizerController = async (req, res) => {
                 capacity: row.capacity
             }
         }));
+        
         res.status(200).json({
             message: 'Tournaments fetched successfully',
             data: tournaments

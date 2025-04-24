@@ -1,12 +1,39 @@
 import { api } from '../utils/api';
-import { Tournament } from '../types/tournamentTypes';
+import { Team, Tournament } from '../types/tournamentTypes';
 
 export const tournamentService = {
   getOngoingTournaments: async (): Promise<Tournament[]> => {
     try {
       const response = await api.get('/organizers/ongoingtournaments');
-      console.log('Fetched tournaments:', response);
-      return response.data;
+      
+      // Transform the API response to match the Tournament type
+      const transformedTournaments = response.data.map((item: any) => ({
+        tournament_id: item.tournament.tournament_id,
+        name: item.tournament.tournament_name,
+        start_date: item.tournament.start_date,
+        end_date: item.tournament.end_date,
+        type: item.tournament.tournament_type,
+        rules: item.tournament.rules,
+        venue: {
+          venue_id: item.venue.venue_id,
+          venue_name: item.venue.venue_name,
+          address: item.venue.address,
+          city: item.venue.city,
+          state: item.venue.state,
+          country: item.venue.country,
+          latitude: item.venue.latitude,
+          longitude: item.venue.longitude,
+          capacity: item.venue.capacity
+        },
+        organiser: {
+          organiser_id: item.organizer.organizer_id,
+          name: item.organizer.name
+        },
+        teams: [], // This will be populated when needed
+        status: item.tournament.status
+      }));
+      
+      return transformedTournaments;
     } catch (error) {
       console.error('Error fetching ongoing tournaments:', error);
       throw error;
@@ -32,10 +59,10 @@ export const tournamentService = {
   },
   
 
-  getTournamentTeams: async (tournamentId: number): Promise<any[]> => {
+  getTournamentTeams: async (tournamentId: number): Promise<Team[]> => {
     try {
       const response = await api.post(
-        '/tournaments/teams',
+        '/organizers/tournaments/teams',
         { tournament_id: tournamentId }
       );
       return response.data;

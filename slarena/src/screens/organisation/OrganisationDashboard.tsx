@@ -15,7 +15,6 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 // Import tab components
 import LogsTab from './tabs/LogsTab';
 import UpcomingMatchesTab from './tabs/UpcomingMatchesTab';
-import OngoingMatchesTab from './tabs/OngoingTournementsTab';
 import SettingsTab from './tabs/SettingsTab';
 import OngoingTournamentsTab from './tabs/OngoingTournamentsTab';
 
