@@ -53,21 +53,18 @@ const TournamentTeamsScreen = () => {
     fetchTeams();
   };
 
-  const handleViewTeamDetails = (teamId: number) => {
+  const handleViewTeamDetails = (team_: Team) => {
     // Navigate to team details screen
-    navigation.navigate('TeamDetails', { teamId });
+    navigation.navigate('TeamDetails', { team_ });
   };
 
   const renderTeamItem = ({ item }: { item: Team }) => (
     <TouchableOpacity 
       style={styles.teamItem}
-      onPress={() => handleViewTeamDetails(item.team_id)}
+      onPress={() => handleViewTeamDetails(item)}
     >
       <View style={styles.teamInfo}>
         <Text style={styles.teamName}>{item.team_name}</Text>
-        {item.captain_id && (
-          <Text style={styles.captainText}>Captain ID: {item.captain_id}</Text>
-        )}
       </View>
       <Icon name="chevron-right" size={24} color="#666" />
     </TouchableOpacity>

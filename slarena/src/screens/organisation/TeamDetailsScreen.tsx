@@ -16,7 +16,7 @@ import { tournamentService } from '../../services/tournamentService';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 
 type RouteParams = {
-  teamId: number;
+  team_: Team;
 };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -25,7 +25,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 const TeamDetailsScreen = () => {
   const route = useRoute();
   const navigation = useNavigation<NavigationProp>();
-  const { teamId } = route.params as RouteParams;
+  const { team_ } = route.params as RouteParams;
   
   const [loading, setLoading] = useState(true);
   const [team, setTeam] = useState<Team | null>(null);
@@ -38,18 +38,17 @@ const TeamDetailsScreen = () => {
       setLoading(true);
       
       // Fetch player stats from the backend
-      const stats = await tournamentService.getTeamPlayerStats(teamId);
+      const stats = await tournamentService.getTeamPlayerStats(team_.team_id);
       console.log('Player stats:', stats);
       
       // Create a team object from the first player's data
       if (stats && stats.length > 0) {
         const firstPlayer = stats[0];
-        const teamName = firstPlayer.team_name || `Team ${teamId}`;
         
         const teamData: Team = {
-          team_id: teamId,
-          team_name: teamName,
-          captain_id: firstPlayer.captain_id || null,
+          team_id: team_.team_id,
+          team_name: team_.team_name,
+          captain_id: team_.captain_id,
         };
         
         setTeam(teamData);
@@ -85,7 +84,7 @@ const TeamDetailsScreen = () => {
 
   useEffect(() => {
     fetchTeamDetails();
-  }, [teamId]);
+  }, [team_]);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -165,7 +164,12 @@ const TeamDetailsScreen = () => {
       <View style={styles.teamInfoContainer}>
         <Text style={styles.teamName}>{team?.team_name}</Text>
         {team?.captain_id && (
-          <Text style={styles.captainText}>Captain ID: {team.captain_id}</Text>
+          <View style={styles.captainInfoContainer}>
+            <Icon name="stars" size={16} color="#f4511e" />
+            <Text style={styles.captainText}>
+              Captain: {playerStats.find(p => p.player_id === team.captain_id)?.name || `Player ${team.captain_id}`}
+            </Text>
+          </View>
         )}
       </View>
       
@@ -228,9 +232,14 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 8,
   },
+  captainInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   captainText: {
     fontSize: 14,
     color: '#666',
+    marginLeft: 4,
   },
   sectionTitle: {
     fontSize: 16,
