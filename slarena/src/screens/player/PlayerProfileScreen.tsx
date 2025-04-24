@@ -247,7 +247,6 @@ const PlayerProfileScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
-      {/* Profile Header */}
       <View style={styles.header}>
         <Text style={styles.name}>{profile?.name || 'Player Name'}</Text>
         <Text style={styles.role}>{profile?.batting_style || 'Batting Style'}</Text>

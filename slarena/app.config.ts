@@ -7,5 +7,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   version: config.version || '1.0.0',
   extra: {
     apiUrl: process.env.API_URL,
+    socketUrl: process.env.SOCKET_URL,
   },
 }); 

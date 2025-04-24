@@ -5,6 +5,8 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
+const http = require('http');
+const { Server } = require('socket.io');
 
 const db = require('./config/dbconfig');
 const routes = require('./routes');
@@ -12,6 +14,35 @@ const { errorHandler } = require('./utils/errorHandler');
 
 // Initialize Express app
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'http://16.171.12.238',
+        'https://lpedu.lk',
+        'http://localhost:19000',
+        'http://localhost:19001',
+        'http://localhost:19002',
+        'exp://',
+      ];
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.some(allowedOrigin => {
+        if (allowedOrigin === 'exp://') {
+          return origin.startsWith('exp://');
+        }
+        return origin === allowedOrigin;
+      })) {
+        return callback(null, true);
+      }
+      callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+    methods: ['GET', 'POST']
+  }
+});
 
 // Set trusted proxy if behind a proxy
 // app.set('trust proxy', 1);
@@ -82,15 +113,53 @@ db.query('SELECT 1')
     console.error('❌ Database connection failed:', err.message);
   });
 
-// Mount routes
-app.use('/', routes);
+// Mount routes with io instance
+app.use('/', routes(io));
+
+// Socket.io connection handling
+io.on('connection', (socket) => {
+  //console.log('WebSocket user connected:', socket.id);
+
+  const token = socket.handshake.auth.token;
+  if (!token) {
+    console.log('No token provided, disconnecting:', socket.id);
+    socket.disconnect();
+    return;
+  }
+
+  try {
+    const jwt = require('jsonwebtoken');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user_id = decoded.id;
+
+    // Join user's notification room
+    const notificationRoom = `user_${user_id}`;
+    socket.join(notificationRoom);
+    //console.log(`User ${user_id} joined room ${notificationRoom}`);
+
+    // Handle join_notification_room event
+    socket.on('join_notification_room', ({ userId }) => {
+      const room = `user_${userId}`;
+      socket.join(room);
+      //console.log(`User ${userId} joined notification room ${room}`);
+    });
+
+    // Handle disconnect
+    socket.on('disconnect', () => {
+      //console.log('WebSocket user disconnected:', socket.id);
+    });
+  } catch (err) {
+    console.error('Invalid WebSocket token:', err.message);
+    socket.disconnect();
+  }
+});
 
 // Error handling middleware
 app.use(errorHandler);
 
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
 
@@ -103,3 +172,5 @@ process.on('unhandledRejection', (err) => {
   // Gracefully shut down server
   process.exit(1);
 });
+
+module.exports = { app, server, io };

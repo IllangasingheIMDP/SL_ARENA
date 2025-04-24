@@ -14,6 +14,7 @@ echo Found IP: %IP%
 :: Create or update the .env file
 (
     echo API_URL=http://%IP%:5001/api/v1
+    echo SOCKET_URL=http://%IP%:5001
 ) > .env
 
 echo .env file has been updated with API_URL=http://%IP%:5001/api/v1
