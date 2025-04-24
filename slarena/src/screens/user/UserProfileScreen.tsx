@@ -11,12 +11,20 @@ import {
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import Avatar from '../../components/Avatar';
-import RoleUpgrade from '../../components/RoleUpgrade';
 import PasswordChangeModal from '../../components/PasswordChangeModal';
 import userService from '../../services/userService';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../navigation/AppNavigator';
+
+type UserProfileScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'UserProfile'
+>;
 
 const UserProfileScreen = () => {
-  const { user, setSelectedRole, logout, setUser } = useAuth();
+  const { user, logout, setUser, setSelectedRole } = useAuth();
+  const navigation = useNavigation<UserProfileScreenNavigationProp>();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -44,38 +52,16 @@ const UserProfileScreen = () => {
     }
   };
 
-  const handleRoleSelect = async (role: string) => {
-    try {
-      setLoading(true);
-      if (!user?.id) {
-        Alert.alert('Error', 'User information not available');
-        return;
-      }
-
-      const response = await userService.chooseRole(user.id, role);
-      if (response.status === 'success') {
-        setSelectedRole(role);
-        Alert.alert('Success', 'Role updated successfully');
-      } else {
-        Alert.alert('Error', response.message || 'Failed to update role');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Failed to update role');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSwitchRole = () => {
-    setSelectedRole(null);
-  };
-
   const handleLogout = async () => {
     try {
       await logout();
     } catch (error) {
       console.error('Error logging out:', error);
     }
+  };
+
+  const handleRoleManagement = () => {
+    setSelectedRole(null);
   };
 
   return (
@@ -156,21 +142,20 @@ const UserProfileScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Role Upgrade Section */}
+        {/* Role Management Card */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Role Management</Text>
-          <RoleUpgrade onSelectRole={handleRoleSelect} />
+          <TouchableOpacity
+            style={styles.roleManagementButton}
+            onPress={handleRoleManagement}
+          >
+            <Text style={styles.roleManagementButtonText}>Manage Roles</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Account Options */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Account Options</Text>
-          <TouchableOpacity
-            style={[styles.accountButton, styles.switchRoleButton]}
-            onPress={handleSwitchRole}
-          >
-            <Text style={styles.accountButtonText}>Switch Role</Text>
-          </TouchableOpacity>
           <TouchableOpacity
             style={[styles.accountButton, styles.logoutButton]}
             onPress={handleLogout}
@@ -312,6 +297,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  roleManagementButton: {
+    backgroundColor: '#4CAF50',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  roleManagementButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
   accountButton: {
     padding: 12,
     borderRadius: 8,
@@ -322,10 +319,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
-  },
-  switchRoleButton: {
-    backgroundColor: '#4CAF50',
-    marginBottom: 10,
   },
   logoutButton: {
     backgroundColor: '#f44336',

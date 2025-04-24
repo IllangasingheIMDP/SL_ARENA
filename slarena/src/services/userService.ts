@@ -44,6 +44,19 @@ class UserService {
       throw error;
     }
   }
+
+  async submitRoleRequest(role: string, formData: any): Promise<any> {
+    try {
+      const response = await api.post('/users/role-request', {
+        role,
+        formData
+      }, true);
+      return response;
+    } catch (error) {
+      console.error('Error submitting role request:', error);
+      throw error;
+    }
+  }
 }
 
 export default new UserService(); 
