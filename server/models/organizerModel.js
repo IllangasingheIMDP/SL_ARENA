@@ -108,14 +108,20 @@ const updateApplicantStatus = async (id, status) => {
 
 const getAcceptedTeamsByTournament = async (tournament_id) => {
     const [rows] = await db.execute(
-        `SELECT t.team_id, t.team_name
-         FROM tournament_applicants ta
-         INNER JOIN Teams t ON ta.team_id = t.team_id
-         WHERE ta.tournament_id = ? AND ta.status = 'accepted'`,
-        [tournament_id]
+      `SELECT 
+          t.team_id, 
+          t.team_name, 
+          u.user_id AS captain_id, 
+          u.name AS captain_name
+       FROM tournament_applicants ta
+       INNER JOIN Teams t ON ta.team_id = t.team_id
+       INNER JOIN Users u ON t.captain_id = u.user_id
+       WHERE ta.tournament_id = ? AND ta.status = 'accepted'`,
+      [tournament_id]
     );
     return rows;
-};
+  };
+  
 
 const getPlayersWithStatsByTeam = async (team_id) => {
     const [rows] = await db.execute(
