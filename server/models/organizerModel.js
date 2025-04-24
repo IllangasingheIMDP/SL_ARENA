@@ -132,6 +132,51 @@ const createInning = async (match_id, batting_team_id, bowling_team_id) => {
     return result;
 };
 
+
+const insertDelivery = async (delivery) => {
+    const {
+        inning_id,
+        over_number,
+        ball_number,
+        batsman_id,
+        bowler_id,
+        runs_scored,
+        extras,
+        wicket,
+        dismissal_type,
+        extra_type
+    } = delivery;
+
+    const [result] = await db.execute(
+        `INSERT INTO Deliveries (
+            inning_id,
+            over_number,
+            ball_number,
+            batsman_id,
+            bowler_id,
+            runs_scored,
+            extras,
+            wicket,
+            dismissal_type,
+            extra_type
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+            inning_id,
+            over_number,
+            ball_number,
+            batsman_id,
+            bowler_id,
+            runs_scored || 0,
+            extras || 0,
+            wicket || false,
+            dismissal_type || null,
+            extra_type || null
+        ]
+    );
+
+    return result;
+};
+
 module.exports = {
     createTournament,
     getTournamentsByOrganizer,
@@ -141,5 +186,6 @@ module.exports = {
     getPlayersWithStatsByTeam,
     getTeamsNotAppliedToTournament,
     createTournamentInvite,
-    createInning
+    createInning,
+    insertDelivery
 };

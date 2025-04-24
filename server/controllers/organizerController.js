@@ -195,6 +195,42 @@ const addInning = async (req, res) => {
 };
 
 
+const addDelivery = async (req, res) => {
+    try {
+        const {
+            inning_id,
+            over_number,
+            ball_number,
+            batsman_id,
+            bowler_id,
+            runs_scored,
+            extras,
+            wicket,
+            dismissal_type,
+            extra_type
+        } = req.body;
+
+        const result = await OrganizerModel.insertDelivery({
+            inning_id,
+            over_number,
+            ball_number,
+            batsman_id,
+            bowler_id,
+            runs_scored,
+            extras,
+            wicket,
+            dismissal_type,
+            extra_type
+        });
+
+        res.status(201).json({ message: 'Delivery inserted successfully', insertId: result.insertId });
+    } catch (error) {
+        console.error('Error inserting delivery:', error);
+        res.status(500).json({ error: 'Error inserting delivery' });
+    }
+};
+
+
 
 
 module.exports = {
@@ -207,5 +243,6 @@ module.exports = {
     getPlayersWithStats,
     getTeamsNotApplied,
     sendTournamentInvite,
-    addInning
+    addInning,
+    addDelivery
 };
