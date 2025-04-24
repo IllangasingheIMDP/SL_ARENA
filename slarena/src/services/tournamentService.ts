@@ -40,7 +40,18 @@ export const tournamentService = {
     }
   },
 
-  
+  getTournamentTeams: async (tournamentId: number): Promise<Team[]> => {
+    try {
+      const response = await api.post(
+        '/organizers/tournaments/teams',
+        { tournament_id: tournamentId }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching teams for tournament ID ${tournamentId}:`, error);
+      throw error;
+    }
+  },
 
   updateTournamentStatus: async (tournamentId: number, status: string): Promise<Tournament> => {
     try {
@@ -56,22 +67,7 @@ export const tournamentService = {
       console.error(`Error updating tournament status for ID ${tournamentId}:`, error);
       throw error;
     }
-  },
-  
-
-  getTournamentTeams: async (tournamentId: number): Promise<Team[]> => {
-    try {
-      const response = await api.post(
-        '/organizers/tournaments/teams',
-        { tournament_id: tournamentId }
-      );
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching teams for tournament ID ${tournamentId}:`, error);
-      throw error;
-    }
-  },
-  
+  },  
 
   updateTeamAttendance: async (tournamentId: number, teamId: number, isPresent: boolean): Promise<any> => {
     try {
