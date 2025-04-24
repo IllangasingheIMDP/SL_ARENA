@@ -20,7 +20,4 @@ router.post('/updateInningSummary',authenticateToken,checkRole(['organisation'])
 router.post('/updatePlayerStats',authenticateToken,checkRole(['organisation']), organizerController.updatePlayerStats);
 
 
-
-
-
 module.exports = router;
