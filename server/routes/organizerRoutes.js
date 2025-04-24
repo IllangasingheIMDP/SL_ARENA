@@ -10,6 +10,7 @@ router.post('/applicants/accept',authenticateToken,checkRole(['organizer']), org
 router.post('/applicants/reject',authenticateToken,checkRole(['organizer']), organizerController.rejectTournamentApplicant);
 router.post('/accepted-teams', authenticateToken,checkRole(['organizer']),organizerController.getAcceptedTeamsByTournament);
 router.post('/players-stats_ofTeam', authenticateToken,checkRole(['organizer']),organizerController.getPlayersWithStats);
+router.post('/not-applied-teams',authenticateToken,checkRole(['organizer']), organizerController.getTeamsNotApplied);
 
 
 

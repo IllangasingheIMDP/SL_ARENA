@@ -87,6 +87,23 @@ const getPlayersWithStatsByTeam = async (team_id) => {
     return rows;
 };
 
+const getTeamsNotAppliedToTournament = async (tournament_id) => {
+    const [rows] = await db.execute(
+        `SELECT 
+            t.team_id, 
+            t.team_name, 
+            t.captain_id, 
+            u.name AS captain_name
+        FROM Teams t
+        JOIN Users u ON t.captain_id = u.user_id
+        WHERE t.team_id NOT IN (
+            SELECT team_id FROM tournament_applicants WHERE tournament_id = ?
+        )`,
+        [tournament_id]
+    );
+    return rows;
+};
+
 
 module.exports = {
     createTournament,
@@ -94,5 +111,6 @@ module.exports = {
     getAppliedTeamsToOngoingTournamentsByOrganizer,
     updateApplicantStatus,
     getAcceptedTeamsByTournament,
-    getPlayersWithStatsByTeam
+    getPlayersWithStatsByTeam,
+    getTeamsNotAppliedToTournament
 };
