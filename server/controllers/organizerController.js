@@ -257,6 +257,31 @@ const getNextBallController = async (req, res) => {
     }
 };
 
+const updateInningSummary = async (req, res) => {
+    const { inning_id } = req.body;
+  
+    try {
+      const result = await OrganizerModel.updateInningSummary(inning_id);
+      res.status(200).json({ message: 'Inning updated successfully', result });
+    } catch (error) {
+      console.error('Error updating inning:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+
+  const updatePlayerStats = async (req, res) => {
+    const { match_id } = req.body;
+  
+    try {
+      const result = await OrganizerModel.updatePlayerStats(match_id);
+      res.status(200).json({ message: 'Player stats updated', result });
+    } catch (error) {
+      console.error('Error updating player stats:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+  
+
 
 
 
@@ -274,5 +299,7 @@ module.exports = {
     addInning,
     addDelivery,
     getCurrentBatsmenRuns,
-    getNextBallController
+    getNextBallController,
+    updateInningSummary,
+    updatePlayerStats
 };

@@ -241,6 +241,88 @@ const getNextBall = async (inning_id) => {
     return { over_number, ball_number: ball_number + 1 };
 };
 
+const updateInningSummary = async (inning_id) => {
+    // Get total runs (runs_scored + extras), total wickets, overs
+    const [summary] = await db.execute(
+      `SELECT 
+        SUM(runs_scored + extras) AS total_runs,
+        SUM(wicket) AS total_wickets,
+        COUNT(*) / 6 AS overs_played
+      FROM Deliveries
+      WHERE inning_id = ?`,
+      [inning_id]
+    );
+  
+    const { total_runs, total_wickets, overs_played } = summary[0];
+    
+    const overVal = parseFloat(Number(overs_played || 0).toFixed(1));
+  
+    // Update Innings table
+    await db.execute(
+        `UPDATE Innings SET 
+          total_runs = ?, 
+          total_wickets = ?, 
+          overs_played = ?
+        WHERE inning_id = ?`,
+        [total_runs || 0, total_wickets || 0, overVal, inning_id]
+      );
+  
+    return summary[0];
+  };
+
+  const updatePlayerStats = async (match_id) => {
+    // ✅ Batting stats - insert or update by adding
+    await db.execute(
+      `INSERT INTO Player_Match_Stats (
+        player_id, match_id, runs_scored, balls_faced, fours, sixes,
+        wickets_taken, overs_bowled, runs_conceded
+      )
+      SELECT 
+        batsman_id, ?, 
+        SUM(runs_scored), 
+        COUNT(*), 
+        SUM(CASE WHEN runs_scored = 4 THEN 1 ELSE 0 END),
+        SUM(CASE WHEN runs_scored = 6 THEN 1 ELSE 0 END),
+        0, 0.0, 0
+      FROM Deliveries d
+      JOIN Innings i ON d.inning_id = i.inning_id
+      WHERE i.match_id = ?
+      GROUP BY batsman_id
+      ON DUPLICATE KEY UPDATE
+        runs_scored = runs_scored + VALUES(runs_scored),
+        balls_faced = balls_faced + VALUES(balls_faced),
+        fours = fours + VALUES(fours),
+        sixes = sixes + VALUES(sixes)`,
+      [match_id, match_id]
+    );
+  
+    // ✅ Bowling stats - insert or update by adding
+    await db.execute(
+      `INSERT INTO Player_Match_Stats (
+        player_id, match_id, runs_scored, balls_faced, fours, sixes,
+        wickets_taken, overs_bowled, runs_conceded
+      )
+      SELECT 
+        bowler_id, ?, 
+        0, 0, 0, 0,
+        SUM(CASE WHEN wicket = 1 THEN 1 ELSE 0 END), 
+        COUNT(*) / 6,
+        SUM(runs_scored + extras)
+      FROM Deliveries d
+      JOIN Innings i ON d.inning_id = i.inning_id
+      WHERE i.match_id = ?
+      GROUP BY bowler_id
+      ON DUPLICATE KEY UPDATE
+        wickets_taken = wickets_taken + VALUES(wickets_taken),
+        overs_bowled = overs_bowled + VALUES(overs_bowled),
+        runs_conceded = runs_conceded + VALUES(runs_conceded)`,
+      [match_id, match_id]
+    );
+  
+    return { message: 'Player stats updated by adding new values.' };
+  };
+  
+
 
 
 module.exports = {
@@ -255,5 +337,7 @@ module.exports = {
     createInning,
     insertDelivery,
     getCurrentBatsmenRuns,
-    getNextBall
+    getNextBall,
+    updateInningSummary,
+    updatePlayerStats
 };
