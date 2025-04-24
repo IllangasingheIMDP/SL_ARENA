@@ -37,21 +37,52 @@ const createTournament = async (req, res) => {
     }
 };
 
-const getTournamentsByOrganizer = async (req, res) => {
+const getTournamentsByOrganizerController = async (req, res) => {
     try {
-        const userId = req.user.user_id;
+        //const userId = req.user.user_id;
+        const userId=1;
+        const rows = await OrganizerModel.getTournamentsByOrganizer(userId);
 
-        const tournaments = await OrganizerModel.getTournamentsByOrganizer(userId);
+        const tournaments = rows.map(row => ({
+            tournament: {
+                tournament_id: row.tournament_id,
+                tournament_name: row.tournament_name,
+                start_date: row.start_date,
+                end_date: row.end_date,
+                tournament_type: row.tournament_type,
+                rules: row.rules,
+                status: row.status,
+                venue_id: row.venue_id,
+            },
+            organizer: {
+                organizer_id: row.organizer_id,
+                name: row.organizer_name,
+                email: row.organizer_email
+            },
+            venue: {
+                venue_id: row.venue_id,
+                venue_name: row.venue_name,
+                address: row.address,
+                city: row.city,
+                state: row.state,
+                country: row.country,
+                latitude: row.latitude,
+                longitude: row.longitude,
+                capacity: row.capacity
+            }
+        }));
 
         res.status(200).json({
             message: 'Tournaments fetched successfully',
             data: tournaments
         });
+
     } catch (err) {
         console.error('Error fetching tournaments:', err);
         res.status(500).json({ message: 'Server error' });
     }
 };
+
 
 const getAppliedTeamsToOngoingTournaments = async (req, res) => {
     try {
@@ -288,7 +319,7 @@ const updateInningSummary = async (req, res) => {
 
 module.exports = {
     createTournament,
-    getTournamentsByOrganizer,
+    getTournamentsByOrganizerController,
     getAppliedTeamsToOngoingTournaments,
     acceptTournamentApplicant,
     rejectTournamentApplicant,
