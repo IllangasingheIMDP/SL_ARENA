@@ -178,6 +178,22 @@ const sendTournamentInvite = async (req, res) => {
     }
 };
 
+const addInning = async (req, res) => {
+    const { match_id, batting_team_id, bowling_team_id } = req.body;
+
+    if (!match_id || !batting_team_id || !bowling_team_id) {
+        return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    try {
+        const result = await OrganizerModel.createInning(match_id, batting_team_id, bowling_team_id);
+        res.status(201).json({ message: 'Inning added successfully', inning_id: result.insertId });
+    } catch (error) {
+        console.error('Error creating inning:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
 
 
 
@@ -190,5 +206,6 @@ module.exports = {
     getAcceptedTeamsByTournament,
     getPlayersWithStats,
     getTeamsNotApplied,
-    sendTournamentInvite
+    sendTournamentInvite,
+    addInning
 };

@@ -12,6 +12,7 @@ router.post('/accepted-teams', authenticateToken,checkRole(['organizer']),organi
 router.post('/players-stats_ofTeam', authenticateToken,checkRole(['organizer']),organizerController.getPlayersWithStats);
 router.post('/not-applied-teams',authenticateToken,checkRole(['organizer']), organizerController.getTeamsNotApplied);
 router.post('/send-invite',authenticateToken,checkRole(['organizer']), organizerController.sendTournamentInvite);
+router.post('/addInning',authenticateToken,checkRole(['organizer']), organizerController.addInning);
 
 
 
