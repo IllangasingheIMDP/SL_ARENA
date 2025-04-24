@@ -61,6 +61,7 @@ const getPlayerProfileDetails = async (player_id) => {
   try {
     const [rows] = await db.execute(
       `SELECT 
+		  u.name,
           p.bio,
           p.batting_style,
           p.bowling_style,
@@ -70,6 +71,8 @@ const getPlayerProfileDetails = async (player_id) => {
           v.venue_name
        FROM 
           Players p
+		LEFT JOIN
+        Users u on p.player_id=u.user_id
        LEFT JOIN 
           Achievements a ON p.player_id = a.player_id
        LEFT JOIN 

@@ -9,17 +9,12 @@ import {
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-
-type PlayerDashboardNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'PlayerDashboard'
->;
 
 const PlayerDashboard = () => {
   const { user, logout, setSelectedRole } = useAuth();
-  const navigation = useNavigation<PlayerDashboardNavigationProp>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const handleLogout = async () => {
     try {
@@ -41,7 +36,10 @@ const PlayerDashboard = () => {
       </View>
 
       <View style={styles.content}>
-        <View style={styles.card}>
+        <TouchableOpacity 
+          style={styles.card}
+          onPress={() => navigation.navigate('PlayerProfile')}
+        >
           <Text style={styles.cardTitle}>Player Profile</Text>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Email:</Text>
@@ -51,7 +49,7 @@ const PlayerDashboard = () => {
             <Text style={styles.infoLabel}>Status:</Text>
             <Text style={styles.infoValue}>Active Player</Text>
           </View>
-        </View>
+        </TouchableOpacity>
 
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Quick Actions</Text>
