@@ -63,8 +63,8 @@ const TeamDetailsScreen = () => {
       } else {
         // If no stats available, create a basic team object
         const teamData: Team = {
-          team_id: teamId,
-          team_name: `Team ${teamId}`,
+          team_id: team_.team_id,
+          team_name: `Team ${team_.team_id}`,
           captain_id: undefined,
         };
         
