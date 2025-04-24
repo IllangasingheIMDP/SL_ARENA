@@ -104,6 +104,7 @@ const login = async (req, res) => {
 const chooseRole = async (req, res) => {
   try {
     const { userId, role } = req.body;
+    //console.log(userId,role,'userId,role');
     const isRoleValid = await UserModel.RoleValidation(userId, role);
     if (!isRoleValid) {
       return res.status(400).json({
@@ -112,7 +113,7 @@ const chooseRole = async (req, res) => {
       });
     }
         const token = jwt.sign(
-       { userId: userId, role: role },
+       { user_id: userId, role: role },
        JWT_SECRET,
        { expiresIn: JWT_EXPIRES_IN }
      );

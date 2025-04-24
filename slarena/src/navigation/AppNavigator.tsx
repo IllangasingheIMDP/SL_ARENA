@@ -7,6 +7,7 @@ import RegisterScreen from '../screens/RegisterScreen';
 import RoleScreen from '../screens/RoleScreen';
 import GeneralDashboard from '../screens/user/GeneralDashboard';
 import PlayerDashboard from '../screens/player/PlayerDashboard';
+import PlayerProfileScreen from '../screens/player/PlayerProfileScreen';
 import OrganisationDashboard from '../screens/organisation/OrganisationDashboard';
 import TrainerDashboard from '../screens/trainer/TrainerDashboard';
 import AdminDashboard from '../screens/admin/AdminDashboard';
@@ -20,6 +21,7 @@ export type RootStackParamList = {
   RoleScreen: undefined;
   GeneralDashboard: undefined;
   PlayerDashboard: undefined;
+  PlayerProfile: undefined;
   OrganisationDashboard: undefined;
   TrainerDashboard: undefined;
   AdminDashboard: undefined;
@@ -68,6 +70,13 @@ const AppNavigator = () => {
                         options={{
                           title: 'Player Dashboard',
                           headerBackVisible: false,
+                        }}
+                      />
+                      <Stack.Screen
+                        name="PlayerProfile"
+                        component={PlayerProfileScreen}
+                        options={{
+                          title: 'Player Profile',
                         }}
                       />
                     </>

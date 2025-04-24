@@ -19,6 +19,7 @@ const authenticateToken = async (req, res, next) => {
     // Verify the token
     jwt.verify(token, JWT_SECRET, async (err, decoded) => {
       if (err) {
+        console.log(err,'err');
         return res.status(403).json({ 
           status: 'error',
           message: 'Invalid or expired token.'
@@ -26,16 +27,12 @@ const authenticateToken = async (req, res, next) => {
       }
       
       // Check if user exists
-      const user = await UserModel.findById(decoded.userId);
-      if (!user) {
-        return res.status(404).json({ 
-          status: 'error',
-          message: 'User not found.'
-        });
-      }
       
-      // Attach user to request object
-      req.user = user;
+      
+      
+      req.user = decoded;
+      
+
       next();
     });
   } catch (error) {
@@ -60,6 +57,7 @@ const checkRole = (roles) => {
     if (roles.includes(req.user.role)) {
       next();
     } else {
+      console.log(req.user.role,'req.user.role');
       res.status(403).json({ 
         status: 'error',
         message: 'Access denied. Insufficient permissions.'
