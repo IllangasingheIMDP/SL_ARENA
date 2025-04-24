@@ -39,7 +39,6 @@ const TeamDetailsScreen = () => {
       
       // Fetch player stats from the backend
       const stats = await tournamentService.getTeamPlayerStats(team_.team_id);
-      console.log('Player stats:', stats);
       
       // Create a team object from the first player's data
       if (stats && stats.length > 0) {
