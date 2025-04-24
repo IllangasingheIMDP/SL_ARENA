@@ -1,8 +1,15 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
 import MatchCard from '../../../components/organisation/MatchCard';
 
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 const UpcomingMatchesTab = () => {
+  const navigation = useNavigation<NavigationProp>();
+
   const matches = [
     { 
       id: '1', 
@@ -38,6 +45,10 @@ const UpcomingMatchesTab = () => {
     // Navigate to match details screen
   };
 
+  const handleCreateTournament = () => {
+    navigation.navigate('CreateTournament');
+  };
+
   const renderMatchItem = ({ item }: { item: any }) => (
     <MatchCard
       team1={item.team1}
@@ -52,7 +63,15 @@ const UpcomingMatchesTab = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.tabTitle}>Upcoming Matches</Text>
+      <View style={styles.headerContainer}>
+        <Text style={styles.tabTitle}>Upcoming Matches</Text>
+        <TouchableOpacity 
+          style={styles.createButton}
+          onPress={handleCreateTournament}
+        >
+          <Text style={styles.createButtonText}>+</Text>
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={matches}
         renderItem={renderMatchItem}
@@ -68,11 +87,29 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   tabTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 16,
     color: '#333',
+  },
+  createButton: {
+    backgroundColor: '#f4511e',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  createButtonText: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
   },
 });
 

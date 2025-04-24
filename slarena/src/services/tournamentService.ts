@@ -2,6 +2,16 @@ import { api } from '../utils/api';
 import { Team, Tournament } from '../types/tournamentTypes';
 
 export const tournamentService = {
+  createTournament: async (tournamentData: any): Promise<any> => {
+    try {
+      const response = await api.post('/organizers/createtournament', tournamentData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating tournament:', error);
+      throw error;
+    }
+  },
+
   getOngoingTournaments: async (): Promise<Tournament[]> => {
     try {
       const response = await api.get('/organizers/ongoingtournaments');
