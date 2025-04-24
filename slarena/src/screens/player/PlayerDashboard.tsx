@@ -84,7 +84,7 @@ const PlayerDashboard = () => {
         </View>
 
         <TouchableOpacity style={styles.switchRoleButton} onPress={handleSwitchRole}>
-          <Text style={styles.switchRoleButtonText}>Switch Role</Text>
+          <Text style={styles.switchRoleButtonText}>Manage Roles</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
