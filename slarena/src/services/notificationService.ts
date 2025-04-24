@@ -12,7 +12,7 @@ export const notificationService = {
   getNotifications: async (): Promise<Notification[]> => {
     try {
       const response = await api.get('/notifications');
-      console.log('response in getNotifications', response);
+      //console.log('response in getNotifications', response);
       // Handle both response formats (with or without data property)
       const notifications = Array.isArray(response) ? response : (response.data || []);
       return notifications;
@@ -25,7 +25,7 @@ export const notificationService = {
   markAsRead: async (notificationId: number): Promise<void> => {
     try {
       const response = await api.put(`/notifications/${notificationId}/read`, {});
-      console.log('response in markAsRead', response);
+      //console.log('response in markAsRead', response);
     } catch (error) {
       console.error('Error marking notification as read:', error);
       throw error;
@@ -35,7 +35,7 @@ export const notificationService = {
   getUnreadCount: async (): Promise<number> => {
     try {
       const response = await api.get('/notifications');
-      console.log('response in getUnreadCount', response);
+      //console.log('response in getUnreadCount', response);
       // Handle both response formats (with or without data property)
       const notifications = Array.isArray(response) ? response : (response.data || []);
       if (!Array.isArray(notifications)) {

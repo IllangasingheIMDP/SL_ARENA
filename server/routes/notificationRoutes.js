@@ -7,6 +7,6 @@ const {authenticateToken,checkRole} = require('../middleware/auth'); // Your JWT
 module.exports = (io) => {
   router.post('/', authenticateToken, checkRole(['organizer','admin','general','player','trainer']), (req, res) => createNotification(io)(req, res));
   router.get('/', authenticateToken, checkRole(['organizer','admin','general','player','trainer']), getNotifications);
-  router.put('/:notification_id/read', authenticateToken, checkRole(['organizer','admin','general','player','trainer']), markNotificationAsRead);
+  router.put('/:notification_id/read', authenticateToken, checkRole(['organizer','admin','general','player','trainer']),(req,res) => markNotificationAsRead(io)(req,res));
   return router;
 };

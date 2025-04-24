@@ -6,6 +6,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Badge } from 'react-native-paper';
 import { notificationService } from '../../services/notificationService';
 import { RootStackParamList } from '../../navigation/AppNavigator';
+import { io } from 'socket.io-client';
+import Constants from 'expo-constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '../../context/AuthContext';
+const API_URL = Constants.expoConfig?.extra?.socketUrl;
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -19,6 +24,8 @@ const Navbar: React.FC<NavbarProps> = ({
   showBackButton = true,
   showNotification = true,
 }) => {
+  const { user } = useAuth();
+  const userId = user?.id;
   const navigation = useNavigation<NavigationProp>();
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -33,10 +40,73 @@ const Navbar: React.FC<NavbarProps> = ({
 
   useEffect(() => {
     if (showNotification) {
+      // Initial fetch
       fetchUnreadCount();
-      // Refresh unread count every minute
-      const interval = setInterval(fetchUnreadCount, 60000);
-      return () => clearInterval(interval);
+
+      // Set up Socket.IO connection
+      const setupSocket = async () => {
+        try {
+          const token = await AsyncStorage.getItem('token');
+          if (!token) {
+            console.warn('No token available for socket connection');
+            return;
+          }
+
+          console.log('Attempting to connect to socket at:', API_URL);
+
+          const socket = io(API_URL, {
+            auth: { token },
+            transports: ['polling', 'websocket'],
+            timeout: 20000,
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            forceNew: true,
+          });
+
+          // Connection event handlers
+          socket.on('connect', () => {
+            console.log('Socket connected successfully');
+            // Join user's notification room with correct user ID
+            socket.emit('join_notification_room', { userId });
+            console.log('Joined notification room for user:', userId);
+          });
+
+          socket.on('connect_error', (error) => {
+            console.error('Socket connection error:', error.message);
+            console.log('Connection state:', socket.connected);
+            console.log('Transport:', socket.io.engine.transport.name);
+          });
+
+          socket.on('disconnect', (reason) => {
+            console.log('Socket disconnected:', reason);
+          });
+
+          // Listen for new notifications
+          socket.on('new_notification', (data) => {
+            console.log('New notification received:', data);
+            // Immediately fetch updated count
+            fetchUnreadCount();
+          });
+
+          // Listen for notification count updates
+          socket.on('notification_count_update', (count) => {
+            console.log('Notification count updated:', count);
+            setUnreadCount(count);
+          });
+
+          // Cleanup on unmount
+          return () => {
+            console.log('Cleaning up socket connection');
+            socket.disconnect();
+          };
+        } catch (error) {
+          console.error('Error setting up socket:', error);
+        }
+      };
+
+      setupSocket();
     }
   }, [showNotification]);
 

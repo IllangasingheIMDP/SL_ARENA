@@ -132,9 +132,19 @@ io.on('connection', (socket) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user_id = decoded.id;
 
-    socket.join(`user_${user_id}`);
-    console.log(`User ${user_id} joined room user_${user_id}`);
+    // Join user's notification room
+    const notificationRoom = `user_${user_id}`;
+    socket.join(notificationRoom);
+    console.log(`User ${user_id} joined room ${notificationRoom}`);
 
+    // Handle join_notification_room event
+    socket.on('join_notification_room', ({ userId }) => {
+      const room = `user_${userId}`;
+      socket.join(room);
+      console.log(`User ${userId} joined notification room ${room}`);
+    });
+
+    // Handle disconnect
     socket.on('disconnect', () => {
       console.log('WebSocket user disconnected:', socket.id);
     });
