@@ -14,6 +14,8 @@ const {
 router.post('/register', userController.register);
 router.post('/login', validateLogin, userController.login);
 router.post('/choose-role', userController.chooseRole);
+router.get('/players-leaderboard', userController.getLeaderboard);
+
 // Protected routes (require authentication)
 router.get('/profile', authenticateToken, userController.getProfile);
 router.put('/profile', authenticateToken, userController.updateProfile);

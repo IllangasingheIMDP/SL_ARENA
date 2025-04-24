@@ -301,6 +301,22 @@ const updateVerificationStatus = async (req, res) => {
   }
 };
 
+async function getLeaderboard(req, res) {
+  const { role } = req.body;
+
+  if (!role) {
+    return res.status(400).json({ success: false, message: 'Role is required in the request body.' });
+  }
+
+  try {
+    const leaderboard = await UserModel.getLeaderboardByRole(role);
+    res.status(200).json({ success: true, data: leaderboard });
+  } catch (error) {
+    console.error(error.message);
+    res.status(400).json({ success: false, message: error.message });
+  }
+}
+
 module.exports = {
   register,
   login,
@@ -309,5 +325,6 @@ module.exports = {
   updateProfile,
   changePassword,
   updateRole,
-  updateVerificationStatus
+  updateVerificationStatus,
+  getLeaderboard
 };
