@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Venue } from '../../types/tournamentTypes';
-import MapView, { Marker } from 'react-native-maps';
 
 type VenueMapProps = {
   venue: Venue;
@@ -10,16 +9,8 @@ type VenueMapProps = {
 };
 
 const VenueMap: React.FC<VenueMapProps> = ({ venue, onClose }) => {
-  const { latitude, longitude, venue_name } = venue;
+  const { venue_name } = venue;
   
-  // Default to a fallback location if coordinates are not available
-  const initialRegion = {
-    latitude: latitude || 6.9271, // Default to Colombo, Sri Lanka
-    longitude: longitude || 79.8612,
-    latitudeDelta: 0.01,
-    longitudeDelta: 0.01,
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -30,19 +21,10 @@ const VenueMap: React.FC<VenueMapProps> = ({ venue, onClose }) => {
       </View>
 
       <View style={styles.mapContainer}>
-        <MapView
-          style={styles.map}
-          initialRegion={initialRegion}
-        >
-          <Marker
-            coordinate={{
-              latitude: initialRegion.latitude,
-              longitude: initialRegion.longitude,
-            }}
-            title={venue_name}
-            description={`${venue.address || ''} ${venue.city || ''} ${venue.country || ''}`}
-          />
-        </MapView>
+        <View style={styles.mapPlaceholder}>
+          <Icon name="map" size={64} color="#ccc" />
+          <Text style={styles.mapPlaceholderText}>Map will be available once API key is configured</Text>
+        </View>
       </View>
 
       <View style={styles.venueInfo}>
@@ -79,9 +61,19 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     height: Dimensions.get('window').height * 0.6,
+    backgroundColor: '#f5f5f5',
   },
-  map: {
-    ...StyleSheet.absoluteFillObject,
+  mapPlaceholder: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  mapPlaceholderText: {
+    fontSize: 16,
+    color: '#999',
+    marginTop: 16,
+    textAlign: 'center',
   },
   venueInfo: {
     padding: 16,
