@@ -8,6 +8,18 @@ export interface Notification {
   created_at: string;
 }
 
+export interface CreateNotificationPayload {
+  user_id: number;
+  message: string;
+  notification_type: string;
+}
+
+export interface CreateBulkNotificationPayload {
+  userIds: number[];
+  message: string;
+  notification_type: string;
+}
+
 export const notificationService = {
   getNotifications: async (): Promise<Notification[]> => {
     try {
@@ -46,6 +58,26 @@ export const notificationService = {
     } catch (error) {
       console.error('Error fetching unread count:', error);
       return 0;
+    }
+  },
+
+  createNotification: async (payload: CreateNotificationPayload): Promise<Notification> => {
+    try {
+      const response = await api.post('/notifications', payload);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating notification:', error);
+      throw error;
+    }
+  },
+
+  createBulkNotification: async (payload: CreateBulkNotificationPayload): Promise<{ message: string; affectedRows: number }> => {
+    try {
+      const response = await api.post('/notifications/bulk', payload);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating bulk notifications:', error);
+      throw error;
     }
   }
 }; 
