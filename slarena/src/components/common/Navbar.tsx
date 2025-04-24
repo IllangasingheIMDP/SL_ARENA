@@ -56,13 +56,20 @@ const Navbar: React.FC<NavbarProps> = ({
 
           const socket = io(API_URL, {
             auth: { token },
-            transports: ['polling', 'websocket'],
-            timeout: 20000,
+            transports: ['websocket', 'polling'],
+            timeout: 10000,
             reconnection: true,
-            reconnectionAttempts: 5,
+            reconnectionAttempts: Infinity,
             reconnectionDelay: 1000,
             reconnectionDelayMax: 5000,
             forceNew: true,
+            autoConnect: true,
+            upgrade: true,
+            rememberUpgrade: true,
+            path: '/socket.io/',
+            query: {
+              userId: userId
+            }
           });
 
           // Connection event handlers
@@ -74,13 +81,17 @@ const Navbar: React.FC<NavbarProps> = ({
           });
 
           socket.on('connect_error', (error) => {
-            console.error('Socket connection error:', error.message);
-           // console.log('Connection state:', socket.connected);
-           // console.log('Transport:', socket.io.engine.transport.name);
+            //console.error('Socket connection error:', error.message);
+            //console.log('Connection state:', socket.connected);
+            //console.log('Transport:', socket.io.engine.transport.name);
           });
 
           socket.on('disconnect', (reason) => {
             //console.log('Socket disconnected:', reason);
+            if (reason === 'io server disconnect') {
+              // Server initiated disconnect, try to reconnect
+              socket.connect();
+            }
           });
 
           // Listen for new notifications

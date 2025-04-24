@@ -118,7 +118,7 @@ app.use('/', routes(io));
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
-  console.log('WebSocket user connected:', socket.id);
+  //console.log('WebSocket user connected:', socket.id);
 
   const token = socket.handshake.auth.token;
   if (!token) {
@@ -135,18 +135,18 @@ io.on('connection', (socket) => {
     // Join user's notification room
     const notificationRoom = `user_${user_id}`;
     socket.join(notificationRoom);
-    console.log(`User ${user_id} joined room ${notificationRoom}`);
+    //console.log(`User ${user_id} joined room ${notificationRoom}`);
 
     // Handle join_notification_room event
     socket.on('join_notification_room', ({ userId }) => {
       const room = `user_${userId}`;
       socket.join(room);
-      console.log(`User ${userId} joined notification room ${room}`);
+      //console.log(`User ${userId} joined notification room ${room}`);
     });
 
     // Handle disconnect
     socket.on('disconnect', () => {
-      console.log('WebSocket user disconnected:', socket.id);
+      //console.log('WebSocket user disconnected:', socket.id);
     });
   } catch (err) {
     console.error('Invalid WebSocket token:', err.message);
