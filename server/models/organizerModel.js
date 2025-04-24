@@ -182,7 +182,7 @@ const getCurrentBatsmenRuns = async (inning_id) => {
     const [rows] = await db.execute(
         `SELECT batsman_id
          FROM Deliveries
-         WHERE inning_id = ? AND wicket = false
+         WHERE inning_id = ? AND wicket = 0
          ORDER BY delivery_id DESC`,
         [inning_id]
     );
@@ -205,6 +205,36 @@ const getCurrentBatsmenRuns = async (inning_id) => {
     return runsData;
 };
 
+const getNextBall = async (inning_id) => {
+    const [rows] = await db.execute(
+        `SELECT over_number, ball_number, extra_type
+         FROM Deliveries
+         WHERE inning_id = ?
+         ORDER BY over_number DESC, ball_number DESC, delivery_id DESC
+         LIMIT 1`,
+        [inning_id]
+    );
+
+    if (rows.length === 0) {
+        // First ball of the innings
+        return { over_number: 1, ball_number: 1 };
+    }
+
+    const { over_number, ball_number, extra_type } = rows[0];
+
+    if (extra_type === 'wide' || extra_type === 'no ball') {
+        // Same over and ball (illegal delivery)
+        return { over_number, ball_number };
+    }
+
+    if (ball_number === 6) {
+        return { over_number: over_number + 1, ball_number: 1 };
+    }
+
+    return { over_number, ball_number: ball_number + 1 };
+};
+
+
 
 module.exports = {
     createTournament,
@@ -217,5 +247,6 @@ module.exports = {
     createTournamentInvite,
     createInning,
     insertDelivery,
-    getCurrentBatsmenRuns
+    getCurrentBatsmenRuns,
+    getNextBall
 };
