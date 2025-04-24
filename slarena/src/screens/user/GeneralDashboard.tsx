@@ -17,20 +17,8 @@ type GeneralDashboardNavigationProp = NativeStackNavigationProp<
 >;
 
 const GeneralDashboard = () => {
-  const { user, logout, setSelectedRole } = useAuth();
+  const { user } = useAuth();
   const navigation = useNavigation<GeneralDashboardNavigationProp>();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
-
-  const handleSwitchRole = () => {
-    setSelectedRole(null);
-  };
 
   return (
     <ScrollView style={styles.container}>
@@ -59,14 +47,6 @@ const GeneralDashboard = () => {
             </Text>
           </View>
           <Text style={styles.viewProfileText}>Tap to view full profile</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.switchRoleButton} onPress={handleSwitchRole}>
-          <Text style={styles.switchRoleButtonText}>Switch Role</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>Logout</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -129,29 +109,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#333',
-  },
-  switchRoleButton: {
-    backgroundColor: '#4CAF50',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  switchRoleButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  logoutButton: {
-    backgroundColor: '#f4511e',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  logoutButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   viewProfileText: {
     color: '#666',

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,9 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
+import Avatar from '../../components/Avatar';
+import PasswordChangeModal from '../../components/PasswordChangeModal';
+import userService from '../../services/userService';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
@@ -20,21 +23,26 @@ type UserProfileScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const UserProfileScreen = () => {
-  const { user } = useAuth();
+  const { user, logout, setUser, setSelectedRole } = useAuth();
   const navigation = useNavigation<UserProfileScreenNavigationProp>();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    phone: '',
-    dateOfBirth: '',
   });
 
   const handleSaveProfile = async () => {
     try {
       setLoading(true);
-      // TODO: Implement profile update logic here
+      if (user) {
+        const updatedUser = { ...user, name: profileData.name };
+        setUser(updatedUser);
+      }
+      await userService.updateProfile(user?.id || '', {
+        name: profileData.name,
+      });
       Alert.alert('Success', 'Profile updated successfully');
       setIsEditing(false);
     } catch (error) {
@@ -44,82 +52,123 @@ const UserProfileScreen = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
+  const handleRoleManagement = () => {
+    setSelectedRole(null);
+  };
+
   return (
     <ScrollView style={styles.container}>
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color="#f4511e" />
+        </View>
+      )}
+
       <View style={styles.header}>
-        <View style={styles.avatarContainer}>
-          <Text style={styles.avatarText}>
-            {profileData.name.charAt(0).toUpperCase()}
-          </Text>
+        <Avatar
+          name={profileData.name}
+          size={120}
+          style={styles.avatar}
+        />
+        <View style={styles.headerInfo}>
+          <Text style={styles.name}>{profileData.name}</Text>
+          <Text style={styles.role}>General User</Text>
         </View>
       </View>
 
       <View style={styles.content}>
-        {loading ? (
-          <ActivityIndicator size="large" color="#f4511e" />
-        ) : (
-          <>
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Personal Information</Text>
-              {isEditing ? (
-                <>
-                  <TextInput
-                    style={styles.input}
-                    value={profileData.name}
-                    onChangeText={(text) =>
-                      setProfileData({ ...profileData, name: text })
-                    }
-                    placeholder="Name"
-                  />
-                  <TextInput
-                    style={styles.input}
-                    value={profileData.phone}
-                    onChangeText={(text) =>
-                      setProfileData({ ...profileData, phone: text })
-                    }
-                    placeholder="Phone"
-                    keyboardType="phone-pad"
-                  />
-                  <TextInput
-                    style={styles.input}
-                    value={profileData.dateOfBirth}
-                    onChangeText={(text) =>
-                      setProfileData({ ...profileData, dateOfBirth: text })
-                    }
-                    placeholder="Date of Birth (YYYY-MM-DD)"
-                  />
-                </>
-              ) : (
-                <>
-                  <Text style={styles.infoText}>Name: {profileData.name}</Text>
-                  <Text style={styles.infoText}>Email: {profileData.email}</Text>
-                  <Text style={styles.infoText}>
-                    Phone: {profileData.phone || 'Not set'}
-                  </Text>
-                  <Text style={styles.infoText}>
-                    Date of Birth: {profileData.dateOfBirth || 'Not set'}
-                  </Text>
-                </>
-              )}
-            </View>
-
+        {/* Profile Information Card */}
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardTitle}>Profile Information</Text>
             <TouchableOpacity
-              style={styles.button}
-              onPress={() => {
-                if (isEditing) {
-                  handleSaveProfile();
-                } else {
-                  setIsEditing(true);
-                }
-              }}
+              style={styles.editButton}
+              onPress={() => setIsEditing(!isEditing)}
             >
-              <Text style={styles.buttonText}>
-                {isEditing ? 'Save Profile' : 'Edit Profile'}
+              <Text style={styles.editButtonText}>
+                {isEditing ? 'Cancel' : 'Edit'}
               </Text>
             </TouchableOpacity>
-          </>
-        )}
+          </View>
+
+          {isEditing ? (
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Name</Text>
+              <TextInput
+                style={styles.input}
+                value={profileData.name}
+                onChangeText={(text) =>
+                  setProfileData({ ...profileData, name: text })
+                }
+                placeholder="Your name"
+              />
+              <TouchableOpacity
+                style={styles.saveButton}
+                onPress={handleSaveProfile}
+              >
+                <Text style={styles.saveButtonText}>Save Changes</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View>
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>Name</Text>
+                <Text style={styles.value}>{profileData.name}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>Email</Text>
+                <Text style={styles.value}>{profileData.email}</Text>
+              </View>
+            </View>
+          )}
+        </View>
+
+        {/* Security Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Security</Text>
+          <TouchableOpacity
+            style={styles.securityButton}
+            onPress={() => setShowPasswordModal(true)}
+          >
+            <Text style={styles.securityButtonText}>Change Password</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Role Management Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Role Management</Text>
+          <TouchableOpacity
+            style={styles.roleManagementButton}
+            onPress={handleRoleManagement}
+          >
+            <Text style={styles.roleManagementButtonText}>Manage Roles</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Account Options */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Account Options</Text>
+          <TouchableOpacity
+            style={[styles.accountButton, styles.logoutButton]}
+            onPress={handleLogout}
+          >
+            <Text style={styles.accountButtonText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
       </View>
+
+      <PasswordChangeModal
+        visible={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
+      />
     </ScrollView>
   );
 };
@@ -127,62 +176,152 @@ const UserProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f5f5f5',
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
   },
   header: {
     backgroundColor: '#f4511e',
     padding: 20,
+    paddingBottom: 40,
     alignItems: 'center',
   },
-  avatarContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
+  headerInfo: {
     alignItems: 'center',
-    marginBottom: 10,
+    marginTop: 10,
   },
-  avatarText: {
-    fontSize: 40,
-    color: '#f4511e',
+  avatar: {
+    borderWidth: 3,
+    borderColor: '#fff',
+  },
+  name: {
+    fontSize: 24,
     fontWeight: 'bold',
+    color: '#fff',
+    marginTop: 10,
+  },
+  role: {
+    fontSize: 16,
+    color: '#fff',
+    opacity: 0.8,
   },
   content: {
+    marginTop: -20,
+    paddingHorizontal: 15,
+    paddingBottom: 20,
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 15,
     padding: 20,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  section: {
-    marginBottom: 20,
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
   },
-  sectionTitle: {
+  cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
     color: '#333',
+  },
+  formGroup: {
+    marginBottom: 15,
+  },
+  label: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 5,
+  },
+  value: {
+    fontSize: 16,
+    color: '#333',
+  },
+  infoRow: {
+    marginBottom: 15,
   },
   input: {
     borderWidth: 1,
     borderColor: '#ddd',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
-  },
-  infoText: {
+    borderRadius: 8,
+    padding: 12,
     fontSize: 16,
-    marginBottom: 8,
-    color: '#666',
+    marginBottom: 15,
   },
-  button: {
-    backgroundColor: '#f4511e',
-    padding: 15,
+  editButton: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
     borderRadius: 5,
+    backgroundColor: '#f4511e',
+  },
+  editButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  saveButton: {
+    backgroundColor: '#4CAF50',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  securityButton: {
+    backgroundColor: '#2196F3',
+    padding: 12,
+    borderRadius: 8,
     alignItems: 'center',
     marginTop: 10,
   },
-  buttonText: {
+  securityButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
+  },
+  roleManagementButton: {
+    backgroundColor: '#4CAF50',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  roleManagementButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  accountButton: {
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  accountButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  logoutButton: {
+    backgroundColor: '#f44336',
   },
 });
 
