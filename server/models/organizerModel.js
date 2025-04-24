@@ -105,6 +105,14 @@ const getTeamsNotAppliedToTournament = async (tournament_id) => {
 };
 
 
+const createTournamentInvite = async (tournament_id, team_id) => {
+    const [result] = await db.execute(
+        `INSERT INTO tournament_invites (tournament_id, team_id, status) VALUES (?, ?, 'Invited')`,
+        [tournament_id, team_id]
+    );
+    return result.insertId;
+};
+
 module.exports = {
     createTournament,
     getTournamentsByOrganizer,
@@ -112,5 +120,6 @@ module.exports = {
     updateApplicantStatus,
     getAcceptedTeamsByTournament,
     getPlayersWithStatsByTeam,
-    getTeamsNotAppliedToTournament
+    getTeamsNotAppliedToTournament,
+    createTournamentInvite
 };
