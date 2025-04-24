@@ -7,29 +7,80 @@ const createTournament = async (tournamentData) => {
         start_date,
         end_date,
         tournament_type,
-        rules
+        rules,
+        venue_name,
+        city,
+        country,
+        capacity
     } = tournamentData;
 
-    const [result] = await db.execute(
-        `INSERT INTO Tournaments 
-        (organizer_id, tournament_name, start_date, end_date, tournament_type, rules,status) 
-        VALUES (?, ?, ?, ?, ?, ?,?)`,
-        [organizer_id, tournament_name, start_date, end_date, tournament_type, rules,'ongoing']
-    );
+    // Start a transaction
+    const connection = await db.getConnection();
+    await connection.beginTransaction();
 
-    return result.insertId;
+    try {
+        // First, create the venue
+        const [venueResult] = await connection.execute(
+            `INSERT INTO Venues 
+            (venue_name, city, country, capacity) 
+            VALUES (?, ?, ?, ?)`,
+            [venue_name, city, country, capacity]
+        );
+
+        const venue_id = venueResult.insertId;
+
+        // Then create the tournament with the venue_id
+        const [tournamentResult] = await connection.execute(
+            `INSERT INTO Tournaments 
+            (organizer_id, tournament_name, start_date, end_date, tournament_type, rules, status, venue_id) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            [organizer_id, tournament_name, start_date, end_date, tournament_type, rules, 'upcoming', venue_id]
+        );
+
+        await connection.commit();
+        return tournamentResult.insertId;
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
 };
 
 
 const getTournamentsByOrganizer = async (organizer_id) => {
     const [rows] = await db.execute(
-        `SELECT * FROM Tournaments 
-         WHERE organizer_id = ? AND status = 'ongoing' 
-         ORDER BY start_date DESC`,
+        `SELECT 
+            t.tournament_id,
+            t.tournament_name,
+            t.start_date,
+            t.end_date,
+            t.tournament_type,
+            t.rules,
+            t.status,
+            t.venue_id,
+            u.user_id AS organizer_id,
+            u.name AS organizer_name,
+            u.email AS organizer_email,
+            v.venue_name,
+            v.address,
+            v.city,
+            v.state,
+            v.country,
+            v.latitude,
+            v.longitude,
+            v.capacity
+        FROM Tournaments t
+        JOIN Users u ON t.organizer_id = u.user_id
+        LEFT JOIN Venues v ON t.venue_id = v.venue_id
+        WHERE t.organizer_id = ?
+          AND t.status IN ('start', 'matches');
+        `,
         [organizer_id]
     );
     return rows;
 };
+
 
 const getAppliedTeamsToOngoingTournamentsByOrganizer = async (organizer_id) => {
     const [rows] = await db.execute(
@@ -57,14 +108,20 @@ const updateApplicantStatus = async (id, status) => {
 
 const getAcceptedTeamsByTournament = async (tournament_id) => {
     const [rows] = await db.execute(
-        `SELECT t.team_id, t.team_name
-         FROM tournament_applicants ta
-         INNER JOIN Teams t ON ta.team_id = t.team_id
-         WHERE ta.tournament_id = ? AND ta.status = 'accepted'`,
-        [tournament_id]
+      `SELECT 
+          t.team_id, 
+          t.team_name, 
+          u.user_id AS captain_id, 
+          u.name AS captain_name
+       FROM tournament_applicants ta
+       INNER JOIN Teams t ON ta.team_id = t.team_id
+       INNER JOIN Users u ON t.captain_id = u.user_id
+       WHERE ta.tournament_id = ? AND ta.status = 'accepted'`,
+      [tournament_id]
     );
     return rows;
-};
+  };
+  
 
 const getPlayersWithStatsByTeam = async (team_id) => {
     const [rows] = await db.execute(
@@ -321,6 +378,15 @@ const updateInningSummary = async (inning_id) => {
   
     return { message: 'Player stats updated by adding new values.' };
   };
+
+
+  const updateTournamentStatus = async (tournament_id, status) => {
+    const [result] = await db.execute(
+      `UPDATE Tournaments SET status = ? WHERE tournament_id = ?`,
+      [status, tournament_id]
+    );
+    return result;
+  };
   
 
 
@@ -339,5 +405,6 @@ module.exports = {
     getCurrentBatsmenRuns,
     getNextBall,
     updateInningSummary,
-    updatePlayerStats
+    updatePlayerStats,
+    updateTournamentStatus
 };

@@ -5,17 +5,26 @@ const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/constants');
 const createTournament = async (req, res) => {
     try {
         const userId = req.user.user_id; // organizer_id
-        
+    
+
         const {
             tournament_name,
             start_date,
             end_date,
             tournament_type,
-            rules
+            rules,
+            venue_name,
+            city,
+            country,
+            capacity
         } = req.body;
 
         if (!tournament_name) {
             return res.status(400).json({ message: 'Tournament name is required' });
+        }
+
+        if (!venue_name || !city || !country || !capacity) {
+            return res.status(400).json({ message: 'Venue information is required' });
         }
 
         const newTournamentId = await OrganizerModel.createTournament({
@@ -24,7 +33,11 @@ const createTournament = async (req, res) => {
             start_date,
             end_date,
             tournament_type,
-            rules
+            rules,
+            venue_name,
+            city,
+            country,
+            capacity
         });
 
         res.status(201).json({
@@ -37,21 +50,51 @@ const createTournament = async (req, res) => {
     }
 };
 
-const getTournamentsByOrganizer = async (req, res) => {
+const getTournamentsByOrganizerController = async (req, res) => {
     try {
         const userId = req.user.user_id;
+        const rows = await OrganizerModel.getTournamentsByOrganizer(userId);
 
-        const tournaments = await OrganizerModel.getTournamentsByOrganizer(userId);
-
+        const tournaments = rows.map(row => ({
+            tournament: {
+                tournament_id: row.tournament_id,
+                tournament_name: row.tournament_name,
+                start_date: row.start_date,
+                end_date: row.end_date,
+                tournament_type: row.tournament_type,
+                rules: row.rules,
+                status: row.status,
+                venue_id: row.venue_id,
+            },
+            organizer: {
+                organizer_id: row.organizer_id,
+                name: row.organizer_name,
+                email: row.organizer_email
+            },
+            venue: {
+                venue_id: row.venue_id,
+                venue_name: row.venue_name,
+                address: row.address,
+                city: row.city,
+                state: row.state,
+                country: row.country,
+                latitude: row.latitude,
+                longitude: row.longitude,
+                capacity: row.capacity
+            }
+        }));
+      
         res.status(200).json({
             message: 'Tournaments fetched successfully',
             data: tournaments
         });
+
     } catch (err) {
         console.error('Error fetching tournaments:', err);
         res.status(500).json({ message: 'Server error' });
     }
 };
+
 
 const getAppliedTeamsToOngoingTournaments = async (req, res) => {
     try {
@@ -280,6 +323,19 @@ const updateInningSummary = async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
     }
   };
+
+
+  const updateTournamentStatus = async (req, res) => {
+    const { tournament_id, status } = req.body;
+  
+    try {
+      const result = await OrganizerModel.updateTournamentStatus(tournament_id, status);
+      res.status(200).json({ message: 'Tournament status updated successfully', result });
+    } catch (error) {
+      console.error('Error updating tournament status:', error);
+      res.status(500).json({ error: 'Failed to update tournament status' });
+    }
+  };
   
 
 
@@ -288,7 +344,7 @@ const updateInningSummary = async (req, res) => {
 
 module.exports = {
     createTournament,
-    getTournamentsByOrganizer,
+    getTournamentsByOrganizerController,
     getAppliedTeamsToOngoingTournaments,
     acceptTournamentApplicant,
     rejectTournamentApplicant,
@@ -301,5 +357,6 @@ module.exports = {
     getCurrentBatsmenRuns,
     getNextBallController,
     updateInningSummary,
-    updatePlayerStats
+    updatePlayerStats,
+    updateTournamentStatus
 };

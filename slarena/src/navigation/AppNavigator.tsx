@@ -18,6 +18,8 @@ import NotificationScreen from '../screens/NotificationScreen';
 import Navbar from '../components/common/Navbar';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Route } from '@react-navigation/native';
+import TournamentTeamsScreen from '../screens/organisation/TournamentTeamsScreen';
+import TeamDetailsScreen from '../screens/organisation/TeamDetailsScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -32,6 +34,8 @@ export type RootStackParamList = {
   UserProfile: undefined;
   RoleRequestForm: { role: string };
   Notifications: undefined;
+  TournamentTeams: { tournamentId: number };
+  TeamDetails: { teamId: number };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -122,6 +126,23 @@ const AppNavigator = () => {
                         options={{
                           title: 'Organisation Dashboard',
                           headerBackVisible: false,
+                          headerShown: false,
+                        }}
+                      />
+                      <Stack.Screen
+                        name="TournamentTeams"
+                        component={TournamentTeamsScreen}
+                        options={{
+                          title: 'Tournament Teams',
+                          headerShown: false,
+                        }}
+                      />
+                      <Stack.Screen
+                        name="TeamDetails"
+                        component={TeamDetailsScreen}
+                        options={{
+                          title: 'Team Details',
+                          headerShown: false,
                         }}
                       />
                       <Stack.Screen
