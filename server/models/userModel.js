@@ -158,6 +158,38 @@ class UserModel {
       throw error;
     }
   }
+
+  static async  getLeaderboardByRole(role) {
+    const validRoles = ['batting', 'bowling', 'allrounder'];
+    if (!validRoles.includes(role)) {
+      throw new Error('Invalid role');
+    }
+  
+    let sortColumn;
+    switch (role) {
+      case 'batting':
+        sortColumn = 'batting_points';
+        break;
+      case 'bowling':
+        sortColumn = 'bowling_points';
+        break;
+      case 'allrounder':
+        sortColumn = 'allrounder_points';
+        break;
+    }
+  
+    const [rows] = await db.query(`
+      SELECT p.player_id, u.name, p.${sortColumn}
+      FROM Players p 
+      JOIN Users u ON p.player_id = u.user_id 
+      WHERE p.role = ? 
+      ORDER BY p.${sortColumn} DESC
+    `, [role]);
+  
+    return rows;
+  }
 }
+
+
 
 module.exports = UserModel;
