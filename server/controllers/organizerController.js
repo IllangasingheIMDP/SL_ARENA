@@ -157,6 +157,29 @@ const getTeamsNotApplied = async (req, res) => {
 };
 
 
+const sendTournamentInvite = async (req, res) => {
+    try {
+        const { tournament_id, team_id } = req.body;
+
+        if (!tournament_id || !team_id) {
+            return res.status(400).json({ message: "tournament_id and team_id are required" });
+        }
+
+        const insertId = await OrganizerModel.createTournamentInvite(tournament_id, team_id);
+
+        res.status(201).json({
+            message: 'Invite sent successfully',
+            invite_id: insertId
+        });
+
+    } catch (err) {
+        console.error("Error sending invite:", err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+
+
 
 module.exports = {
     createTournament,
@@ -166,5 +189,6 @@ module.exports = {
     rejectTournamentApplicant,
     getAcceptedTeamsByTournament,
     getPlayersWithStats,
-    getTeamsNotApplied
+    getTeamsNotApplied,
+    sendTournamentInvite
 };
