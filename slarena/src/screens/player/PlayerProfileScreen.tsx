@@ -11,6 +11,7 @@ import {
   Alert,
   Linking,
   Dimensions,
+  Modal,
 } from 'react-native';
 import { playerService } from '../../services/playerService';
 import {
@@ -51,6 +52,7 @@ const PlayerProfileScreen = () => {
   const [videoDescription, setVideoDescription] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [videoMatchId, setVideoMatchId] = useState('');
+  const [showVideoPlayer, setShowVideoPlayer] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -448,6 +450,7 @@ const PlayerProfileScreen = () => {
                             onPress={() => {
                               setSelectedVideo(videoId);
                               setIsPlaying(true);
+                              setShowVideoPlayer(true);
                             }}
                           >
                             <Image 
@@ -494,6 +497,41 @@ const PlayerProfileScreen = () => {
           </View>
         ))}
       </View>
+
+      {/* Video Player Modal */}
+      <Modal
+        visible={showVideoPlayer}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowVideoPlayer(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.videoPlayerContainer}>
+            <TouchableOpacity 
+              style={styles.closeButton}
+              onPress={() => {
+                setShowVideoPlayer(false);
+                setIsPlaying(false);
+              }}
+            >
+              <Ionicons name="close" size={24} color="#fff" />
+            </TouchableOpacity>
+            {selectedVideo && (
+              <YoutubePlayer
+                height={300}
+                play={isPlaying}
+                videoId={selectedVideo}
+                onChangeState={(state) => {
+                  if (state === 'ended') {
+                    setIsPlaying(false);
+                    setShowVideoPlayer(false);
+                  }
+                }}
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -727,6 +765,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  videoPlayerContainer: {
+    width: '90%',
+    backgroundColor: '#000',
+    borderRadius: 10,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1,
+    padding: 5,
   },
 });
 

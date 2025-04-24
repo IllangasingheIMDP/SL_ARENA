@@ -33,7 +33,7 @@ const getPlayerProfile = async (): Promise<PlayerProfile> => {
 const getPlayerVideos = async (userId: string): Promise<string[]> => {
   
   const response = await api.get(`/players/getPlayerVideos/${userId}`);
-  console.log(response,'response media');
+  //console.log(response,'response media');
   return response.data;
 };
 
