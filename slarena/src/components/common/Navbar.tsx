@@ -29,9 +29,9 @@ const useSocketConnection = (userId: number | undefined) => {
 
   const fetchUnreadCount = async () => {
     try {
-      console.log('Fetching unread count...');
+      //console.log('Fetching unread count...');
       const count = await notificationService.getUnreadCount();
-      console.log('Unread count fetched:', count);
+      //console.log('Unread count fetched:', count);
       setUnreadCount(count);
     } catch (error) {
       console.error('Error fetching unread count:', error);
@@ -43,14 +43,14 @@ const useSocketConnection = (userId: number | undefined) => {
 
     const setupSocket = async () => {
       try {
-        console.log('Setting up socket connection...');
+        //console.log('Setting up socket connection...');
         const token = await AsyncStorage.getItem('token');
         if (!token || !userId) {
-          console.log('No token or userId available:', { token: !!token, userId });
+          //console.log('No token or userId available:', { token: !!token, userId });
           return;
         }
 
-        console.log('Creating socket instance with URL:', API_URL, 'for user:', userId);
+        //console.log('Creating socket instance with URL:', API_URL, 'for user:', userId);
         // Create socket instance with optimized options
         socketInstance = io(API_URL, {
           auth: { token },
@@ -68,52 +68,52 @@ const useSocketConnection = (userId: number | undefined) => {
 
         // Connection event handlers
         socketInstance.on('connect', () => {
-          console.log('Socket connected successfully for user:', userId);
+          //console.log('Socket connected successfully for user:', userId);
           setIsConnected(true);
           // Join room and fetch initial count
-          console.log('Joining notification room for user:', userId);
+          //console.log('Joining notification room for user:', userId);
           socketInstance?.emit('join_notification_room', { userId: userId.toString() }); // Convert userId to string
           fetchUnreadCount();
         });
 
         socketInstance.on('disconnect', (reason) => {
-          console.log('Socket disconnected. Reason:', reason, 'for user:', userId);
+          //console.log('Socket disconnected. Reason:', reason, 'for user:', userId);
           setIsConnected(false);
         });
 
         socketInstance.on('connect_error', (error) => {
-          console.error('Socket connection error for user:', userId, error.message);
-          console.log('Connection state:', socketInstance?.connected);
-          console.log('Transport:', socketInstance?.io?.engine?.transport?.name);
+          //console.error('Socket connection error for user:', userId, error.message);
+          //console.log('Connection state:', socketInstance?.connected);
+          //console.log('Transport:', socketInstance?.io?.engine?.transport?.name);
           setIsConnected(false);
         });
 
         // Listen for new notifications
         socketInstance.on('new_notification', (data) => {
-          console.log('New notification received for user:', userId, data);
+          //console.log('New notification received for user:', userId, data);
           // Immediately update count when new notification arrives
           setUnreadCount(prev => {
-            console.log('Updating unread count from', prev, 'to', prev + 1);
+            //console.log('Updating unread count from', prev, 'to', prev + 1);
             return prev + 1;
           });
         });
 
         // Listen for notification count updates
         socketInstance.on('notification_count_update', (count) => {
-          console.log('Notification count update received for user:', userId, count);
+          //console.log('Notification count update received for user:', userId, count);
           setUnreadCount(count);
         });
 
         // Debug socket state
-        console.log('Socket instance created for user:', userId, {
-          connected: socketInstance.connected,
-          id: socketInstance.id,
-          transport: socketInstance.io?.engine?.transport?.name
-        });
+        //console.log('Socket instance created for user:', userId, {
+        //  connected: socketInstance.connected,
+        //  id: socketInstance.id,
+        //  transport: socketInstance.io?.engine?.transport?.name
+        //});
 
         setSocket(socketInstance);
       } catch (error) {
-        console.error('Error setting up socket for user:', userId, error);
+        //console.error('Error setting up socket for user:', userId, error);
       }
     };
 
@@ -122,7 +122,7 @@ const useSocketConnection = (userId: number | undefined) => {
     // Cleanup function
     return () => {
       if (socketInstance) {
-        console.log('Cleaning up socket connection for user:', userId);
+        //console.log('Cleaning up socket connection for user:', userId);
         socketInstance.removeAllListeners();
         socketInstance.disconnect();
         setSocket(null);
@@ -134,7 +134,7 @@ const useSocketConnection = (userId: number | undefined) => {
   // Reconnect and fetch count if disconnected
   useEffect(() => {
     if (!isConnected && socket) {
-      console.log('Attempting to reconnect socket...');
+      //console.log('Attempting to reconnect socket...');
       socket.connect();
     }
   }, [isConnected, socket]);
@@ -142,9 +142,9 @@ const useSocketConnection = (userId: number | undefined) => {
   // Periodically check connection and fetch count
   useEffect(() => {
     if (isConnected) {
-      console.log('Setting up periodic count check');
+      //console.log('Setting up periodic count check');
       const interval = setInterval(() => {
-        console.log('Running periodic count check');
+        //console.log('Running periodic count check');
         fetchUnreadCount();
       }, 30000); // Check every 30 seconds
 
@@ -170,7 +170,7 @@ const Navbar: React.FC<NavbarProps> = ({
   // Fetch count when component mounts and when showNotification changes
   useEffect(() => {
     if (showNotification) {
-      console.log('Fetching count due to showNotification change');
+      //console.log('Fetching count due to showNotification change');
       fetchUnreadCount();
     }
   }, [showNotification]);
@@ -179,7 +179,7 @@ const Navbar: React.FC<NavbarProps> = ({
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       if (showNotification) {
-        console.log('Fetching count due to screen focus');
+        //console.log('Fetching count due to screen focus');
         fetchUnreadCount();
       }
     });
