@@ -177,6 +177,35 @@ const insertDelivery = async (delivery) => {
     return result;
 };
 
+const getCurrentBatsmenRuns = async (inning_id) => {
+    // Step 1: Get last deliveries where players are not out
+    const [rows] = await db.execute(
+        `SELECT batsman_id
+         FROM Deliveries
+         WHERE inning_id = ? AND wicket = false
+         ORDER BY delivery_id DESC`,
+        [inning_id]
+    );
+
+    // Get unique batsmen in order (last two)
+    const uniqueBatsmen = [...new Set(rows.map(row => row.batsman_id))].slice(0, 2);
+
+    if (uniqueBatsmen.length === 0) return [];
+
+    // Step 2: Get total runs and name for each of those batsmen
+    const [runsData] = await db.query(
+        `SELECT d.batsman_id, u.name AS batsman_name, SUM(d.runs_scored) AS total_runs
+         FROM Deliveries d
+         JOIN Users u ON d.batsman_id = u.user_id
+         WHERE d.inning_id = ? AND d.batsman_id IN (?, ?)
+         GROUP BY d.batsman_id`,
+        [inning_id, uniqueBatsmen[0], uniqueBatsmen[1] || 0]
+    );
+
+    return runsData;
+};
+
+
 module.exports = {
     createTournament,
     getTournamentsByOrganizer,
@@ -187,5 +216,6 @@ module.exports = {
     getTeamsNotAppliedToTournament,
     createTournamentInvite,
     createInning,
-    insertDelivery
+    insertDelivery,
+    getCurrentBatsmenRuns
 };

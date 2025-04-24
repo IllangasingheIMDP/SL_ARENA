@@ -231,6 +231,20 @@ const addDelivery = async (req, res) => {
 };
 
 
+const getCurrentBatsmenRuns = async (req, res) => {
+    try {
+        const { inning_id } = req.body;
+
+        const batsmen = await OrganizerModel.getCurrentBatsmenRuns(inning_id);
+
+        res.status(200).json({ batsmen });
+    } catch (error) {
+        console.error('Error fetching current batsmen runs:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
 
 
 module.exports = {
@@ -244,5 +258,6 @@ module.exports = {
     getTeamsNotApplied,
     sendTournamentInvite,
     addInning,
-    addDelivery
+    addDelivery,
+    getCurrentBatsmenRuns
 };
