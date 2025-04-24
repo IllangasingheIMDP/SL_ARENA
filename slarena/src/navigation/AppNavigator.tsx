@@ -14,6 +14,10 @@ import AdminDashboard from '../screens/admin/AdminDashboard';
 import UserProfileScreen from '../screens/user/UserProfileScreen';
 import { ActivityIndicator, View } from 'react-native';
 import RoleRequestForm from '../screens/RoleRequestForm';
+import NotificationScreen from '../screens/NotificationScreen';
+import Navbar from '../components/common/Navbar';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Route } from '@react-navigation/native';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -27,9 +31,29 @@ export type RootStackParamList = {
   AdminDashboard: undefined;
   UserProfile: undefined;
   RoleRequestForm: { role: string };
+  Notifications: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+
+interface CustomHeaderProps {
+  route: Route<string>;
+  navigation: any; // Using any for now to bypass the type error
+  options: {
+    title?: string;
+    headerBackVisible?: boolean;
+  };
+}
+
+const CustomHeader: React.FC<CustomHeaderProps> = ({ route, navigation, options }) => {
+  return (
+    <Navbar 
+      title={options.title} 
+      showBackButton={options.headerBackVisible} 
+      showNotification={route.name !== 'Notifications'}
+    />
+  );
+};
 
 const AppNavigator = () => {
   const { user, loading, selectedRole } = useAuth();
@@ -47,12 +71,13 @@ const AppNavigator = () => {
       <Stack.Navigator
         screenOptions={{
           headerStyle: {
-            backgroundColor: '#f4511e',
+            backgroundColor: '#fff',
           },
-          headerTintColor: '#fff',
+          headerTintColor: '#333',
           headerTitleStyle: {
             fontWeight: 'bold',
           },
+          header: (props) => <CustomHeader {...props} />,
         }}
       >
         {user ? (
@@ -79,6 +104,13 @@ const AppNavigator = () => {
                           title: 'Player Profile',
                         }}
                       />
+                      <Stack.Screen
+                        name="Notifications"
+                        component={NotificationScreen}
+                        options={{
+                          title: 'Notifications',
+                        }}
+                      />
                     </>
                   );
                 case 'organisation':
@@ -90,6 +122,13 @@ const AppNavigator = () => {
                         options={{
                           title: 'Organisation Dashboard',
                           headerBackVisible: false,
+                        }}
+                      />
+                      <Stack.Screen
+                        name="Notifications"
+                        component={NotificationScreen}
+                        options={{
+                          title: 'Notifications',
                         }}
                       />
                     </>
@@ -105,6 +144,13 @@ const AppNavigator = () => {
                           headerBackVisible: false,
                         }}
                       />
+                      <Stack.Screen
+                        name="Notifications"
+                        component={NotificationScreen}
+                        options={{
+                          title: 'Notifications',
+                        }}
+                      />
                     </>
                   );
                 case 'admin':
@@ -116,6 +162,13 @@ const AppNavigator = () => {
                         options={{
                           title: 'Admin Dashboard',
                           headerBackVisible: false,
+                        }}
+                      />
+                      <Stack.Screen
+                        name="Notifications"
+                        component={NotificationScreen}
+                        options={{
+                          title: 'Notifications',
                         }}
                       />
                     </>
@@ -136,6 +189,13 @@ const AppNavigator = () => {
                         component={UserProfileScreen}
                         options={{
                           title: 'Profile',
+                        }}
+                      />
+                      <Stack.Screen
+                        name="Notifications"
+                        component={NotificationScreen}
+                        options={{
+                          title: 'Notifications',
                         }}
                       />
                     </>
