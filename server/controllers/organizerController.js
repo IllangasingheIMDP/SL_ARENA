@@ -52,8 +52,7 @@ const createTournament = async (req, res) => {
 
 const getTournamentsByOrganizerController = async (req, res) => {
     try {
-        //const userId = req.user.user_id;
-        const userId=1;
+        const userId = req.user.user_id;
         const rows = await OrganizerModel.getTournamentsByOrganizer(userId);
 
         const tournaments = rows.map(row => ({
@@ -84,7 +83,7 @@ const getTournamentsByOrganizerController = async (req, res) => {
                 capacity: row.capacity
             }
         }));
-
+      
         res.status(200).json({
             message: 'Tournaments fetched successfully',
             data: tournaments
@@ -324,6 +323,19 @@ const updateInningSummary = async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
     }
   };
+
+
+  const updateTournamentStatus = async (req, res) => {
+    const { tournament_id, status } = req.body;
+  
+    try {
+      const result = await OrganizerModel.updateTournamentStatus(tournament_id, status);
+      res.status(200).json({ message: 'Tournament status updated successfully', result });
+    } catch (error) {
+      console.error('Error updating tournament status:', error);
+      res.status(500).json({ error: 'Failed to update tournament status' });
+    }
+  };
   
 
 
@@ -345,5 +357,6 @@ module.exports = {
     getCurrentBatsmenRuns,
     getNextBallController,
     updateInningSummary,
-    updatePlayerStats
+    updatePlayerStats,
+    updateTournamentStatus
 };

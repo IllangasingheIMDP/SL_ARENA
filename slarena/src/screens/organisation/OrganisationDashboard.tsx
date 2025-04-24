@@ -15,8 +15,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 // Import tab components
 import LogsTab from './tabs/LogsTab';
 import UpcomingMatchesTab from './tabs/UpcomingMatchesTab';
-import OngoingMatchesTab from './tabs/OngoingTournementsTab';
 import SettingsTab from './tabs/SettingsTab';
+import OngoingTournamentsTab from './tabs/OngoingTournamentsTab';
 
 type OrganisationDashboardNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -47,7 +47,7 @@ const OrganisationDashboard = () => {
       case 'upcoming':
         return <UpcomingMatchesTab />;
       case 'ongoing':
-        return <OngoingMatchesTab />;
+        return <OngoingTournamentsTab />;
       case 'settings':
         return <SettingsTab />;
       default:
