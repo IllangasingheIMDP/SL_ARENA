@@ -90,6 +90,7 @@ const AppNavigator = () => {
                         options={{
                           title: 'Organisation Dashboard',
                           headerBackVisible: false,
+                          headerShown: false,
                         }}
                       />
                     </>

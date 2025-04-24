@@ -3,21 +3,22 @@ const router = express.Router();
 const organizerController = require('../controllers/organizerController');
 const { authenticateToken, checkRole } = require('../middleware/auth');
 
-router.post('/createtournament', authenticateToken,checkRole(['organizer']), organizerController.createTournament);
-router.get('/ongoingtournaments', authenticateToken,checkRole(['organizer']),organizerController.getTournamentsByOrganizer);
-router.get('/applied-teams',authenticateToken,checkRole(['organizer']), organizerController.getAppliedTeamsToOngoingTournaments);
-router.post('/applicants/accept',authenticateToken,checkRole(['organizer']), organizerController.acceptTournamentApplicant);
-router.post('/applicants/reject',authenticateToken,checkRole(['organizer']), organizerController.rejectTournamentApplicant);
-router.post('/accepted-teams', authenticateToken,checkRole(['organizer']),organizerController.getAcceptedTeamsByTournament);
-router.post('/players-stats_ofTeam', authenticateToken,checkRole(['organizer']),organizerController.getPlayersWithStats);
-router.post('/not-applied-teams',authenticateToken,checkRole(['organizer']), organizerController.getTeamsNotApplied);
-router.post('/send-invite',authenticateToken,checkRole(['organizer']), organizerController.sendTournamentInvite);
-router.post('/addInning',authenticateToken,checkRole(['organizer']), organizerController.addInning);
-router.post('/adddelivery',authenticateToken,checkRole(['organizer']), organizerController.addDelivery);
-router.post('/current-batsmen-runs',authenticateToken,checkRole(['organizer']), organizerController.getCurrentBatsmenRuns);
-router.post('/get-next-ball', authenticateToken,checkRole(['organizer']),organizerController.getNextBallController);
-router.post('/updateInningSummary',authenticateToken,checkRole(['organizer']), organizerController.updateInningSummary);
-router.post('/updatePlayerStats',authenticateToken,checkRole(['organizer']), organizerController.updatePlayerStats);
+
+router.post('/createtournament', authenticateToken,checkRole(['organisation']), organizerController.createTournament);
+router.get('/ongoingtournaments',authenticateToken,checkRole(['organisation']),organizerController.getTournamentsByOrganizerController);
+router.get('/applied-teams',authenticateToken,checkRole(['organisation']), organizerController.getAppliedTeamsToOngoingTournaments);
+router.post('/applicants/accept',authenticateToken,checkRole(['organisation']), organizerController.acceptTournamentApplicant);
+router.post('/applicants/reject',authenticateToken,checkRole(['organisation']), organizerController.rejectTournamentApplicant);
+router.post('/accepted-teams', authenticateToken,checkRole(['organisation']),organizerController.getAcceptedTeamsByTournament);
+router.post('/players-stats_ofTeam', authenticateToken,checkRole(['organisation']),organizerController.getPlayersWithStats);
+router.post('/not-applied-teams',authenticateToken,checkRole(['organisation']), organizerController.getTeamsNotApplied);
+router.post('/send-invite',authenticateToken,checkRole(['organisation']), organizerController.sendTournamentInvite);
+router.post('/addInning',authenticateToken,checkRole(['organisation']), organizerController.addInning);
+router.post('/adddelivery',authenticateToken,checkRole(['organisation']), organizerController.addDelivery);
+router.post('/current-batsmen-runs',authenticateToken,checkRole(['organisation']), organizerController.getCurrentBatsmenRuns);
+router.post('/get-next-ball', authenticateToken,checkRole(['organisation']),organizerController.getNextBallController);
+router.post('/updateInningSummary',authenticateToken,checkRole(['organisation']), organizerController.updateInningSummary);
+router.post('/updatePlayerStats',authenticateToken,checkRole(['organisation']), organizerController.updatePlayerStats);
 
   
 

@@ -50,9 +50,24 @@ const createTournament = async (tournamentData) => {
 
 const getTournamentsByOrganizer = async (organizer_id) => {
     const [rows] = await db.execute(
-        `SELECT * FROM Tournaments 
-         WHERE organizer_id = ? AND status = 'ongoing' 
-         ORDER BY start_date DESC`,
+        `SELECT 
+    t.*, 
+    u.name AS organizer_name,
+    v.venue_id,
+    v.venue_name,
+    v.address,
+    v.city,
+    v.state,
+    v.country,
+    v.latitude,
+    v.longitude,
+    v.capacity
+FROM Tournaments t
+JOIN Users u ON t.organizer_id = u.user_id
+LEFT JOIN Venues v ON t.venue_id = v.venue_id
+WHERE t.organizer_id = ?
+  AND t.status IN ('start', 'matches');
+`,
         [organizer_id]
     );
     return rows;

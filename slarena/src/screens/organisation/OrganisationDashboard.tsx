@@ -1,15 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
+  SafeAreaView,
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
+// Import tab components
+import LogsTab from './tabs/LogsTab';
+import UpcomingMatchesTab from './tabs/UpcomingMatchesTab';
+import OngoingMatchesTab from './tabs/OngoingTournementsTab';
+import SettingsTab from './tabs/SettingsTab';
 
 type OrganisationDashboardNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -19,6 +26,7 @@ type OrganisationDashboardNavigationProp = NativeStackNavigationProp<
 const OrganisationDashboard = () => {
   const { user, logout, setSelectedRole } = useAuth();
   const navigation = useNavigation<OrganisationDashboardNavigationProp>();
+  const [activeTab, setActiveTab] = useState('logs');
 
   const handleLogout = async () => {
     try {
@@ -32,65 +40,63 @@ const OrganisationDashboard = () => {
     setSelectedRole(null);
   };
 
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'logs':
+        return <LogsTab />;
+      case 'upcoming':
+        return <UpcomingMatchesTab />;
+      case 'ongoing':
+        return <OngoingMatchesTab />;
+      case 'settings':
+        return <SettingsTab />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.welcomeText}>Organisation Dashboard</Text>
-        <Text style={styles.userName}>{user?.name}</Text>
-      </View>
-
+    <SafeAreaView style={styles.container}>
+      {/* Main Content */}
       <View style={styles.content}>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Organisation Profile</Text>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Email:</Text>
-            <Text style={styles.infoValue}>{user?.email}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Status:</Text>
-            <Text style={styles.infoValue}>Active Organisation</Text>
-          </View>
-        </View>
+        {renderContent()}
+      </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Quick Actions</Text>
-          <View style={styles.actionButtons}>
-            <TouchableOpacity style={styles.actionButton}>
-              <Text style={styles.actionButtonText}>Manage Teams</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
-              <Text style={styles.actionButtonText}>Tournaments</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
-              <Text style={styles.actionButtonText}>Reports</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
-              <Text style={styles.actionButtonText}>Settings</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Recent Activity</Text>
-          <View style={styles.activityItem}>
-            <Text style={styles.activityTitle}>New Team Registration</Text>
-            <Text style={styles.activityDate}>Today, 10:30 AM</Text>
-          </View>
-          <View style={styles.activityItem}>
-            <Text style={styles.activityTitle}>Tournament Schedule Updated</Text>
-            <Text style={styles.activityDate}>Yesterday, 3:45 PM</Text>
-          </View>
-        </View>
-
-        <TouchableOpacity style={styles.switchRoleButton} onPress={handleSwitchRole}>
-          <Text style={styles.switchRoleButtonText}>Switch Role</Text>
+      {/* Bottom Navigation */}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity 
+          style={[styles.navItem, activeTab === 'logs' && styles.activeNavItem]} 
+          onPress={() => setActiveTab('logs')}
+        >
+          <Icon name="history" size={24} color={activeTab === 'logs' ? '#4CAF50' : '#666'} />
+          <Text style={[styles.navText, activeTab === 'logs' && styles.activeNavText]}>Logs</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>Logout</Text>
+        <TouchableOpacity 
+          style={[styles.navItem, activeTab === 'upcoming' && styles.activeNavItem]} 
+          onPress={() => setActiveTab('upcoming')}
+        >
+          <Icon name="event" size={24} color={activeTab === 'upcoming' ? '#4CAF50' : '#666'} />
+          <Text style={[styles.navText, activeTab === 'upcoming' && styles.activeNavText]}>Upcoming</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.navItem, activeTab === 'ongoing' && styles.activeNavItem]} 
+          onPress={() => setActiveTab('ongoing')}
+        >
+          <Icon name="sports-cricket" size={24} color={activeTab === 'ongoing' ? '#4CAF50' : '#666'} />
+          <Text style={[styles.navText, activeTab === 'ongoing' && styles.activeNavText]}>Ongoing</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.navItem, activeTab === 'settings' && styles.activeNavItem]} 
+          onPress={() => setActiveTab('settings')}
+        >
+          <Icon name="settings" size={24} color={activeTab === 'settings' ? '#4CAF50' : '#666'} />
+          <Text style={[styles.navText, activeTab === 'settings' && styles.activeNavText]}>Settings</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -99,112 +105,38 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  header: {
-    padding: 20,
-    backgroundColor: '#4CAF50',
-  },
-  welcomeText: {
-    fontSize: 16,
-    color: '#fff',
-    opacity: 0.8,
-  },
-  userName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginTop: 5,
-  },
   content: {
-    padding: 20,
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    marginBottom: 10,
-  },
-  infoLabel: {
-    width: 80,
-    fontSize: 16,
-    color: '#666',
-  },
-  infoValue: {
     flex: 1,
-    fontSize: 16,
-    color: '#333',
   },
-  actionButtons: {
+  bottomNav: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    height: 60,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
-  actionButton: {
-    backgroundColor: '#4CAF50',
-    padding: 15,
-    borderRadius: 10,
-    width: '48%',
-    marginBottom: 10,
+  navItem: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 8,
   },
-  actionButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: 'bold',
+  activeNavItem: {
+    borderTopWidth: 2,
+    borderTopColor: '#4CAF50',
   },
-  activityItem: {
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  activityTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  activityDate: {
-    fontSize: 14,
+  navText: {
+    fontSize: 12,
     color: '#666',
-    marginTop: 5,
+    marginTop: 4,
   },
-  switchRoleButton: {
-    backgroundColor: '#2196F3',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  switchRoleButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  logoutButton: {
-    backgroundColor: '#f4511e',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  logoutButtonText: {
-    color: '#fff',
-    fontSize: 16,
+  activeNavText: {
+    color: '#4CAF50',
     fontWeight: 'bold',
   },
 });
