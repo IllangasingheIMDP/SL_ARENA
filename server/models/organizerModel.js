@@ -23,13 +23,37 @@ const createTournament = async (tournamentData) => {
 
 const getTournamentsByOrganizer = async (organizer_id) => {
     const [rows] = await db.execute(
-        `SELECT * FROM Tournaments 
-         WHERE organizer_id = ? AND status = 'ongoing' 
-         ORDER BY start_date DESC`,
+        `SELECT 
+            t.tournament_id,
+            t.tournament_name,
+            t.start_date,
+            t.end_date,
+            t.tournament_type,
+            t.rules,
+            t.status,
+            t.venue_id,
+            u.user_id AS organizer_id,
+            u.name AS organizer_name,
+            u.email AS organizer_email,
+            v.venue_name,
+            v.address,
+            v.city,
+            v.state,
+            v.country,
+            v.latitude,
+            v.longitude,
+            v.capacity
+        FROM Tournaments t
+        JOIN Users u ON t.organizer_id = u.user_id
+        LEFT JOIN Venues v ON t.venue_id = v.venue_id
+        WHERE t.organizer_id = ?
+          AND t.status IN ('start', 'matches');
+        `,
         [organizer_id]
     );
     return rows;
 };
+
 
 const getAppliedTeamsToOngoingTournamentsByOrganizer = async (organizer_id) => {
     const [rows] = await db.execute(
@@ -321,6 +345,15 @@ const updateInningSummary = async (inning_id) => {
   
     return { message: 'Player stats updated by adding new values.' };
   };
+
+
+  const updateTournamentStatus = async (tournament_id, status) => {
+    const [result] = await db.execute(
+      `UPDATE Tournaments SET status = ? WHERE tournament_id = ?`,
+      [status, tournament_id]
+    );
+    return result;
+  };
   
 
 
@@ -339,5 +372,6 @@ module.exports = {
     getCurrentBatsmenRuns,
     getNextBall,
     updateInningSummary,
-    updatePlayerStats
+    updatePlayerStats,
+    updateTournamentStatus
 };

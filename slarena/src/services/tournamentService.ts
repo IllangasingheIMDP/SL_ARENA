@@ -4,7 +4,7 @@ import { Tournament } from '../types/tournamentTypes';
 export const tournamentService = {
   getOngoingTournaments: async (): Promise<Tournament[]> => {
     try {
-      const response = await api.get('/organisers/ongoingtournements', true);
+      const response = await api.get('/organizers/ongoingtournements', true);
       return response.data;
     } catch (error) {
       console.error('Error fetching ongoing tournaments:', error);
@@ -12,35 +12,38 @@ export const tournamentService = {
     }
   },
 
-  getTournamentDetails: async (tournamentId: number): Promise<Tournament> => {
-    try {
-      const response = await api.get(`/tournaments/${tournamentId}`, true);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching tournament details for ID ${tournamentId}:`, error);
-      throw error;
-    }
-  },
+  
 
   updateTournamentStatus: async (tournamentId: number, status: string): Promise<Tournament> => {
     try {
-      const response = await api.put(`/tournaments/${tournamentId}/status`, { status }, true);
+      const response = await api.put(
+        '/tournaments/updatestatus',
+        {
+          tournament_id: tournamentId,
+          status: status,
+        }
+      );
       return response.data;
     } catch (error) {
       console.error(`Error updating tournament status for ID ${tournamentId}:`, error);
       throw error;
     }
   },
+  
 
   getTournamentTeams: async (tournamentId: number): Promise<any[]> => {
     try {
-      const response = await api.get(`/tournaments/${tournamentId}/teams`, true);
+      const response = await api.post(
+        '/tournaments/teams',
+        { tournament_id: tournamentId }
+      );
       return response.data;
     } catch (error) {
       console.error(`Error fetching teams for tournament ID ${tournamentId}:`, error);
       throw error;
     }
   },
+  
 
   updateTeamAttendance: async (tournamentId: number, teamId: number, isPresent: boolean): Promise<any> => {
     try {
