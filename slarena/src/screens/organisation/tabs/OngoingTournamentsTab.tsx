@@ -55,9 +55,18 @@ const OngoingTournamentsTab = () => {
     fetchTournaments();
   };
 
-  const handleStartPress = (tournament: Tournament) => {
-    setSelectedTournament(tournament);
-    setShowAttendanceForm(true);
+  const handleStartPress = async (tournament: Tournament) => {
+    try {
+      setLoading(true);
+      const teams = await tournamentService.getTournamentTeams(tournament.tournament_id);
+      setSelectedTournament({ ...tournament, teams });
+      setShowAttendanceForm(true);
+    } catch (error) {
+      console.error('Error fetching teams:', error);
+      Alert.alert('Error', 'Failed to load teams. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleViewTeamsPress = (tournament: Tournament) => {

@@ -34,6 +34,12 @@ const TeamAttendanceForm: React.FC<TeamAttendanceFormProps> = ({
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    if (!teams || teams.length === 0) {
+      Alert.alert('Error', 'No teams found for this tournament');
+      onComplete();
+      return;
+    }
+    
     // Initialize attendance state
     const initialAttendance = teams.map(team => ({
       teamId: team.team_id,
