@@ -34,6 +34,44 @@ const createNotification = (io) => async (req, res) => {
   }
 };
 
+// Create bulk notifications and emit via WebSocket
+const createBulkNotification = (io) => async (req, res) => {
+  try {
+    const { userIds, message, notification_type } = req.body;
+    if (!userIds || !Array.isArray(userIds) || !message || !notification_type) {
+      return res.status(400).json({ error: 'Missing required fields or invalid userIds format' });
+    }
+
+    console.log('Creating bulk notifications for users:', userIds);
+    const result = await notificationModel.createBulk(userIds, message, notification_type);
+    console.log('Bulk notifications created:', result);
+
+    // Get and emit updated counts for each user
+    for (const userId of userIds) {
+      const notifications = await notificationModel.getByUserId(userId);
+      const unreadCount = notifications.filter(n => n.is_read === 0).length;
+      
+      const room = `user_${userId}`;
+      io.to(room).emit('new_notification', {
+        user_id: userId,
+        message,
+        notification_type,
+        is_read: 0,
+        created_at: new Date()
+      });
+      io.to(room).emit('notification_count_update', unreadCount);
+    }
+
+    res.status(201).json({
+      message: 'Bulk notifications created successfully',
+      affectedRows: result.affectedRows
+    });
+  } catch (err) {
+    console.error('Error creating bulk notifications:', err);
+    res.status(500).json({ error: 'Failed to create bulk notifications' });
+  }
+};
+
 // Get user's notifications
 const getNotifications = async (req, res) => {
   try {
@@ -81,4 +119,9 @@ const markNotificationAsRead = (io) => async (req, res) => {
   }
 };
 
-module.exports = { createNotification, getNotifications, markNotificationAsRead };
+module.exports = { 
+  createNotification, 
+  createBulkNotification,
+  getNotifications, 
+  markNotificationAsRead 
+};

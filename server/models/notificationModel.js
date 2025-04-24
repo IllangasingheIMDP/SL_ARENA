@@ -1,6 +1,37 @@
 const db = require('../config/dbconfig'); // Your MySQL connection from previous setup
 
 const notificationModel = {
+  // Create notifications for multiple users
+  createBulk: async (userIds, message, notification_type) => {
+    console.log('Creating bulk notifications:', { userIds, message, notification_type });
+    try {
+      // Create an array of values for bulk insert
+      const values = userIds.map(userId => [userId, message, notification_type, 0]);
+      
+      // Create placeholders for the bulk insert
+      const placeholders = values.map(() => '(?, ?, ?, ?)').join(', ');
+      
+      // Flatten the values array for the query
+      const flatValues = values.flat();
+      
+      const [result] = await db.execute(
+        `INSERT INTO Notifications (user_id, message, notification_type, is_read) 
+         VALUES ${placeholders}`,
+        flatValues
+      );
+      
+      console.log('Bulk notifications created successfully:', result);
+      return {
+        affectedRows: result.affectedRows,
+        insertId: result.insertId,
+        message: 'Bulk notifications created successfully'
+      };
+    } catch (err) {
+      console.error('Database error in createBulk:', err);
+      throw err;
+    }
+  },
+
   // Create a new notification
   create: async (user_id, message, notification_type) => {
     console.log('Creating notification in database:', { user_id, message, notification_type });

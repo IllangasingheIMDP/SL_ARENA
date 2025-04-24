@@ -52,7 +52,7 @@ const Navbar: React.FC<NavbarProps> = ({
             return;
           }
 
-          console.log('Attempting to connect to socket at:', API_URL);
+          //console.log('Attempting to connect to socket at:', API_URL);
 
           const socket = io(API_URL, {
             auth: { token },
@@ -67,38 +67,38 @@ const Navbar: React.FC<NavbarProps> = ({
 
           // Connection event handlers
           socket.on('connect', () => {
-            console.log('Socket connected successfully');
+            //console.log('Socket connected successfully');
             // Join user's notification room with correct user ID
             socket.emit('join_notification_room', { userId });
-            console.log('Joined notification room for user:', userId);
+            //console.log('Joined notification room for user:', userId);
           });
 
           socket.on('connect_error', (error) => {
             console.error('Socket connection error:', error.message);
-            console.log('Connection state:', socket.connected);
-            console.log('Transport:', socket.io.engine.transport.name);
+           // console.log('Connection state:', socket.connected);
+           // console.log('Transport:', socket.io.engine.transport.name);
           });
 
           socket.on('disconnect', (reason) => {
-            console.log('Socket disconnected:', reason);
+            //console.log('Socket disconnected:', reason);
           });
 
           // Listen for new notifications
           socket.on('new_notification', (data) => {
-            console.log('New notification received:', data);
+            //console.log('New notification received:', data);
             // Immediately fetch updated count
             fetchUnreadCount();
           });
 
           // Listen for notification count updates
           socket.on('notification_count_update', (count) => {
-            console.log('Notification count updated:', count);
+            //console.log('Notification count updated:', count);
             setUnreadCount(count);
           });
 
           // Cleanup on unmount
           return () => {
-            console.log('Cleaning up socket connection');
+            //console.log('Cleaning up socket connection');
             socket.disconnect();
           };
         } catch (error) {
