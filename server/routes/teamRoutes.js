@@ -38,10 +38,16 @@ router.get('/:team_id/players',
 );
 
 
-router.get('/user/:user_id/teams', 
+router.get('/player/teams', 
     authenticateToken,
     checkRole(['player']), 
     teamController.getTeamsByUserId
+);
+
+router.get('/:team_id/is-captain', 
+    authenticateToken,
+    checkRole(['player', 'admin', 'general', 'organisation', 'trainer']), 
+    teamController.isUserTeamCaptain
 );
 
 router.post('/delete-team', 

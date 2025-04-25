@@ -182,6 +182,20 @@ const getTeamsByUserId = async (userId) => {
     }
 };
 
+const isUserTeamCaptain = async (teamId, userId) => {
+    try {
+        const query = `
+            SELECT COUNT(*) as count
+            FROM Teams
+            WHERE team_id = ? AND captain_id = ?
+        `;
+        const [result] = await db.query(query, [teamId, userId]);
+        return result[0].count > 0;
+    } catch (error) {
+        throw new Error(`Error checking if user is team captain: ${error.message}`);
+    }
+};
+
 module.exports = {
     getPlayerTeams,
     getAllTeams,
@@ -192,6 +206,7 @@ module.exports = {
     getTeamsLeadByPlayer,
     getTeamsByUserId,
     removePlayerFromTeam,
-    deleteTeam
+    deleteTeam,
+    isUserTeamCaptain
 };
 
