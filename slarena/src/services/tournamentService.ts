@@ -263,6 +263,16 @@ export const tournamentService = {
     }
   },
 
+
+  getAppliedRequests: async (tournamentId: number): Promise<any[]> => {
+    try {
+      const response = await api.get(`/organizers/applied-requests/${tournamentId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching applied requests:', error);
+       throw error;
+    }
+  },
   getTeamTournaments: async (teamId: number): Promise<{
     registered: Tournament[];
     applied: Tournament[];
@@ -324,6 +334,15 @@ export const tournamentService = {
     }
   },
 
+  acceptRequest: async (tournamentId: number, teamId: number): Promise<any> => {
+    try {
+      const response = await api.put(`/organizers/accept-req/${tournamentId}/${teamId}`, {});
+      return response.data;
+    } catch (error) {
+      console.error('Error accepting request:', error);
+            throw error;
+    }
+  },
   getPlayerTeams: async (): Promise<Team[]> => {
     try {
       const response = await api.get('/teams/player/teams');
@@ -338,6 +357,17 @@ export const tournamentService = {
     }
   },
 
+  rejectRequest: async (tournamentId: number, teamId: number): Promise<any> => {
+    console.log("tournamentId", tournamentId);
+    console.log("teamId", teamId);
+    try {
+      const response = await api.delete(`/organizers/reject-req/${tournamentId}/${teamId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error rejecting request:', error);
+      throw error;
+    }
+  },
   isTeamCaptain: async (teamId: number): Promise<boolean> => {
     try {
       const response = await api.get(`/teams/${teamId}/is-captain`);
