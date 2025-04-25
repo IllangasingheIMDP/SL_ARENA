@@ -36,6 +36,25 @@ const getPlayerTeams = async (req, res) => {
     }
 };
 
+// Get team by name
+const getTeamByName = async (req, res) => {
+    try {
+        const teamName = req.params.team_name;
+        const team = await Team.getTeamByName(teamName);
+        res.status(200).json({
+            success: true,
+            data: team
+        });
+    } catch (error) {
+        console.log(error,'error in getTeamByName');
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
 // Get all teams
 const getAllTeams = async (req, res) => {
     try {
@@ -132,5 +151,6 @@ module.exports = {
     getAllTeams,
     getTeamPlayers,
     createTeam,
+    getTeamByName,
     addPlayerToTeam
 };

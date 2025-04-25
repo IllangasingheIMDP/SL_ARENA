@@ -4,9 +4,10 @@ const db = require("../config/dbconfig"); // assuming you use MySQL2 or similar
 const getPlayerTeams = async (playerId) => {
     try {
         const query = `
-            SELECT t.* 
+            SELECT t.team_id,t.team_name,t.points,u.name as captain
             FROM Teams t
             INNER JOIN Team_Players tp ON t.team_id = tp.team_id
+            INNER JOIN Users u ON t.captain_id = u.user_id
             WHERE tp.player_id = ?
         `;
         const [teams] = await db.query(query, [playerId]);
@@ -19,7 +20,7 @@ const getPlayerTeams = async (playerId) => {
 // Get all teams
 const getAllTeams = async () => {
     try {
-        const query = `SELECT * FROM Teams`;
+        const query = `SELECT t.team_name,u.name FROM Teams as t left join Users as u on t.captain_id =u.user_id;`;
         const [teams] = await db.query(query);
         return teams;
     } catch (error) {
@@ -27,13 +28,61 @@ const getAllTeams = async () => {
     }
 };
 
+const getTeamByName = async (teamName, options = {}) => {
+    // Validate input
+    if (!teamName || typeof teamName !== 'string') {
+      throw new Error('Team name must be a non-empty string');
+    }
+  
+    try {
+      // Default options
+      const { caseSensitive = false, exactMatch = true } = options;
+  
+      // Sanitize team name
+      const sanitizedName = teamName.trim();
+  
+      // Base query
+      let query = `
+        SELECT t.team_name, u.name AS captain, t.points 
+        FROM Teams t 
+        INNER JOIN Users u ON u.user_id = t.captain_id 
+        WHERE t.team_name ${exactMatch ? '=' : 'LIKE'} ?
+      `;
+  
+      // Prepare search parameter
+      const searchParam = exactMatch ? sanitizedName : `%${sanitizedName}%`;
+  
+      // Handle case sensitivity
+      if (!caseSensitive) {
+        query = `
+          SELECT t.team_name, u.name AS captain, t.points 
+          FROM Teams t 
+          INNER JOIN Users u ON u.user_id = t.captain_id 
+          WHERE LOWER(t.team_name) ${exactMatch ? '=' : 'LIKE'} ?
+        `;
+      }
+  
+      const searchValue = caseSensitive ? searchParam : searchParam.toLowerCase();
+  
+      // Execute query
+      const [teams] = await db.query(query, [searchValue]);
+  
+      // Return null if no team found
+      return teams.length > 0 ? teams : null;
+    } catch (error) {
+      // Log error for debugging (in production, use proper logging)
+      console.error('Team search error:', error);
+      throw new Error(`Failed to retrieve team: ${error.message}`);
+    }
+  };
+
 // Get team players by team ID
 const getTeamPlayers = async (teamId) => {
     try {
         const query = `
-            SELECT p.*, tp.role
+            SELECT u.name, tp.role
             FROM Team_Players tp
-            INNER JOIN Players p ON tp.player_id = p.player_id
+			inner join Users u on u.user_id=tp.player_id
             WHERE tp.team_id = ?
         `;
         const [players] = await db.query(query, [teamId]);

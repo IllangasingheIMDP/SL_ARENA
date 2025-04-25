@@ -1,13 +1,13 @@
 export interface Team {
     team_id: number;
     team_name: string;
-    captain_id: number;
+    captain: string;
     points: number;
 }
 
 export interface TeamPlayer {
-    player_id: number;
-    team_id: number;
+    name: string;
+    
     role: string;
 }
 
