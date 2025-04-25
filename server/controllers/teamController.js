@@ -272,6 +272,22 @@ const getMyHistoryTournaments = async (req, res) => {
     }
 };
 
+const getUpcomingTournaments = async (req, res) => {
+    try {
+        const tournaments = await Team.getUpcomingTournaments();
+        res.status(200).json({
+            success: true,
+            data: tournaments
+        });
+    } catch (error) {
+        console.log(error, 'error in getUpcomingTournaments');
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 module.exports = {
     getMyTeams,
     getPlayerTeams,
@@ -286,5 +302,6 @@ module.exports = {
     deleteTeam,
     isUserTeamCaptain,
     getFinishedTournaments,
-    getMyHistoryTournaments
+    getMyHistoryTournaments,
+    getUpcomingTournaments
 };
