@@ -503,18 +503,20 @@ const updateInningSummary = async (inning_id) => {
   
   const viewKnockoutBracket = async (tournament_id) => {
     const [rows] = await db.execute(
-      `SELECT m.match_id, m.round, m.match_number,
-              t1.team_name AS team1_name,
-              t2.team_name AS team2_name,
-              w.team_name AS winner_name
-       FROM Matches m
-       LEFT JOIN Teams t1 ON m.team1_id = t1.team_id
-       LEFT JOIN Teams t2 ON m.team2_id = t2.team_id
-       LEFT JOIN Teams w ON m.winner_id = w.team_id
-       WHERE m.tournament_id = ?
-       ORDER BY m.round, m.match_number`,
-      [tournament_id]
-    );
+        `SELECT m.match_id, m.round, m.match_number,
+                m.team1_id, m.team2_id,
+                t1.team_name AS team1_name,
+                t2.team_name AS team2_name,
+                w.team_name AS winner_name
+         FROM Matches m
+         LEFT JOIN Teams t1 ON m.team1_id = t1.team_id
+         LEFT JOIN Teams t2 ON m.team2_id = t2.team_id
+         LEFT JOIN Teams w ON m.winner_id = w.team_id
+         WHERE m.tournament_id = ?
+         ORDER BY m.round, m.match_number`,
+        [tournament_id]
+      );
+      
   
     return rows;
   };
@@ -555,11 +557,9 @@ module.exports = {
     updateTournamentStatus,
     markAttendance,
     updateTeamAttendance,
-
     generateKnockoutDraw,
     updateMatchWinner,
     viewKnockoutBracket,
-
     getUpcomingTournaments
 
 };
