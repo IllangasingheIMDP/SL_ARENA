@@ -17,6 +17,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import TeamsScreen from './TeamsScreen';
 import LeaderBoardScreen from './LeaderBoardScreen';
 import TournamentsScreen from './TournamentsScreen';
+import SportsCalendar from '../../components/SportsCalendar';
 
 const PlayerDashboard = () => {
   const { user, logout, setSelectedRole } = useAuth();
@@ -79,17 +80,7 @@ const PlayerDashboard = () => {
                 </View>
               </View>
 
-              <View style={styles.card}>
-                <Text style={styles.cardTitle}>Upcoming Events</Text>
-                <View style={styles.eventItem}>
-                  <Text style={styles.eventTitle}>Team Practice</Text>
-                  <Text style={styles.eventDate}>Today, 6:00 PM</Text>
-                </View>
-                <View style={styles.eventItem}>
-                  <Text style={styles.eventTitle}>League Match</Text>
-                  <Text style={styles.eventDate}>Saturday, 2:00 PM</Text>
-                </View>
-              </View>
+              <SportsCalendar />
 
               <TouchableOpacity style={styles.switchRoleButton} onPress={handleSwitchRole}>
                 <Text style={styles.switchRoleButtonText}>Manage Roles</Text>
@@ -160,123 +151,169 @@ const PlayerDashboard = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f9fa',
   },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f9fa',
   },
   header: {
-    padding: 20,
-    backgroundColor: '#2196F3',
+    padding: 25,
+    backgroundColor: '#1a237e',
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 8,
   },
   welcomeText: {
     fontSize: 16,
     color: '#fff',
-    opacity: 0.8,
+    opacity: 0.9,
+    letterSpacing: 0.5,
   },
   userName: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#fff',
-    marginTop: 5,
+    marginTop: 8,
+    letterSpacing: 0.5,
   },
   content: {
     flex: 1,
+    padding: 20,
   },
   card: {
     backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
+    borderRadius: 20,
+    padding: 25,
     marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  cardTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1a237e',
+    marginBottom: 20,
+    letterSpacing: 0.5,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    marginBottom: 15,
+    alignItems: 'center',
+  },
+  infoLabel: {
+    width: 100,
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '500',
+  },
+  infoValue: {
+    flex: 1,
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '600',
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 15,
+  },
+  actionButton: {
+    backgroundColor: '#1a237e',
+    padding: 18,
+    borderRadius: 15,
+    width: '48%',
+    marginBottom: 15,
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    marginBottom: 10,
-  },
-  infoLabel: {
-    width: 80,
-    fontSize: 16,
-    color: '#666',
-  },
-  infoValue: {
-    flex: 1,
-    fontSize: 16,
-    color: '#333',
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  actionButton: {
-    backgroundColor: '#2196F3',
-    padding: 15,
-    borderRadius: 10,
-    width: '48%',
-    marginBottom: 10,
-    alignItems: 'center',
+    shadowRadius: 4,
+    elevation: 3,
   },
   actionButtonText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: 'bold',
+    letterSpacing: 0.5,
   },
   eventItem: {
-    paddingVertical: 10,
+    paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
   eventTitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#1a237e',
+    marginBottom: 5,
   },
   eventDate: {
     fontSize: 14,
     color: '#666',
-    marginTop: 5,
+    fontWeight: '500',
   },
   switchRoleButton: {
-    backgroundColor: '#4CAF50',
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: '#1a237e',
+    padding: 18,
+    borderRadius: 15,
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   switchRoleButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+    letterSpacing: 0.5,
   },
   logoutButton: {
-    backgroundColor: '#f4511e',
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: '#d32f2f',
+    padding: 18,
+    borderRadius: 15,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   logoutButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+    letterSpacing: 0.5,
   },
   bottomNav: {
     flexDirection: 'row',
-    height: 60,
+    height: 70,
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
@@ -284,7 +321,8 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
+    shadowRadius: 4,
+    paddingBottom: 10,
   },
   navItem: {
     flex: 1,
@@ -293,16 +331,17 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   activeNavItem: {
-    borderTopWidth: 2,
-    borderTopColor: '#4CAF50',
+    borderTopWidth: 3,
+    borderTopColor: '#1a237e',
   },
   navText: {
     fontSize: 12,
     color: '#666',
     marginTop: 4,
+    fontWeight: '500',
   },
   activeNavText: {
-    color: '#4CAF50',
+    color: '#1a237e',
     fontWeight: 'bold',
   },
 });
