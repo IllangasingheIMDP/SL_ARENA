@@ -151,15 +151,7 @@ const TeamDetailsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Icon name="arrow-back" size={24} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.title}>{team?.team_name || 'Team Details'}</Text>
-      </View>
+      
       
       <View style={styles.teamInfoContainer}>
         <Text style={styles.teamName}>{team?.team_name}</Text>

@@ -66,6 +66,10 @@ const getPlayerProfileDetails = async (player_id) => {
           p.batting_style,
           p.bowling_style,
           p.fielding_position,
+          p.batting_points,
+          p.bowling_points,
+          p.allrounder_points,
+          p.role,
           a.achievement_type,
           m.match_type,
           v.venue_name
@@ -83,7 +87,7 @@ const getPlayerProfileDetails = async (player_id) => {
           p.player_id = ?;`,
       [player_id]
     );
-
+    
     // Check if rows is empty
     if (!rows || rows.length === 0) {
       console.log(`No profile found for player_id: ${player_id}`);
@@ -96,6 +100,10 @@ const getPlayerProfileDetails = async (player_id) => {
       batting_style: rows[0].batting_style || 'Unknown',
       bowling_style: rows[0].bowling_style || 'Unknown', // Fixed typo: was batting_style
       fielding_position: rows[0].fielding_position || 'Unknown',
+      batting_points: rows[0].batting_points || 0,
+      bowling_points: rows[0].bowling_points || 0,
+      allrounder_points: rows[0].allrounder_points || 0,
+      role: rows[0].role || 'Unknown',
       achievements: rows
         .filter((row) => row.achievement_type) // Exclude rows with null achievements
         .map((row) => ({

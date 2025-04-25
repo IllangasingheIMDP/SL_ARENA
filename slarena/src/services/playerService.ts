@@ -27,6 +27,7 @@ const getPlayerAchievements = async (): Promise<PlayerAchievement[]> => {
 const getPlayerProfile = async (): Promise<PlayerProfile> => {
   const response = await api.get(`/players/profiledetails`);
   //console.log(response,'response profile');
+  //console.log(response,'response profile');
   return response.data;
 };
 
