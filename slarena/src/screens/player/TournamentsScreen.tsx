@@ -102,10 +102,10 @@ const TournamentsScreen = () => {
     }
   };
 
-  const handleApplyTournament = async (tournamentId: number) => {
+  const handleApplyTournament = async (tournamentId: number,organizerId:number,tournamentName:string) => {
     if (!selectedTeam) return;
     try {
-      await tournamentService.applyForTournament(selectedTeam.team_id, tournamentId);
+      await tournamentService.applyForTournament(selectedTeam.team_id, tournamentId,organizerId,tournamentName,selectedTeam.team_name);
       Alert.alert('Success', 'Application submitted successfully');
       fetchTeamTournaments(); // Refresh the list
     } catch (error) {
@@ -153,7 +153,7 @@ const TournamentsScreen = () => {
       {showApplyButton && (
         <TouchableOpacity
           style={styles.applyButton}
-          onPress={() => handleApplyTournament(tournament.tournament_id)}
+          onPress={() => handleApplyTournament(tournament.tournament_id,tournament.organiser.organiser_id,tournament.name)}
         >
           <Text style={styles.applyButtonText}>Apply Now</Text>
         </TouchableOpacity>

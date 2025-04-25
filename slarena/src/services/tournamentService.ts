@@ -345,11 +345,14 @@ export const tournamentService = {
     }
   },
 
-  applyForTournament: async (teamId: number, tournamentId: number): Promise<void> => {
+  applyForTournament: async (teamId: number, tournamentId: number,organizerId:number,tournamentName:string,teamName:string): Promise<void> => {
     try {
       await api.post('/teams/apply-tournament', {
         team_id: teamId,
-        tournament_id: tournamentId
+        tournament_id: tournamentId,
+        organizer_id: organizerId,
+        tournament_name: tournamentName,
+        team_name: teamName
       });
     } catch (error) {
       console.error('Error applying for tournament:', error);

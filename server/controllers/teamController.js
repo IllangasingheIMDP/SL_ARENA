@@ -1,5 +1,5 @@
 const Team = require('../models/teamModel');
-
+const notificationModel = require('../models/notificationModel');
 // Get teams for the authenticated user
 const getMyTeams = async (req, res) => {
     try {
@@ -221,14 +221,35 @@ const getTeamsByUserId = async (req, res) => {
 
 const applyForTournament = async (req, res) => {
     try {
-        const { team_id, tournament_id } = req.body;
+        const { team_id, tournament_id, organizer_id, tournament_name, team_name } = req.body;
         await Team.applyForTournament(team_id, tournament_id);
+        
+        // Create notification for organizer
+        const notification = await notificationModel.create(
+            organizer_id,
+            `${team_name} has applied for ${tournament_name}`,
+            'tournament'
+        );
+
+        // Get updated unread count for organizer
+        const notifications = await notificationModel.getByUserId(organizer_id);
+        const unreadCount = notifications.filter(n => n.is_read === 0).length;
+
+        // Emit notification and count to organizer's room
+        const room = `user_${organizer_id}`;
+        req.io.to(room).emit('new_notification', notification);
+        req.io.to(room).emit('notification_count_update', unreadCount);
+
         res.status(200).json({
             success: true,
             message: 'Tournament applied successfully'
         });
     } catch (error) {
         console.log(error, 'error in applyForTournament');
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
 }
 // Check if a user is the captain of a team
