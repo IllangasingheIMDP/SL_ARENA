@@ -101,7 +101,7 @@ const deleteVideo = async (videoId: string): Promise<void> => {
 
 const getAllPlayers = async (): Promise<any[]> => {
   const response = await api.get(`/players/allplayers`);
-  //console.log(response.data,'response all players');
+  console.log(response.data,'response all players');
   return response.data;
 };
 

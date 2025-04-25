@@ -65,5 +65,17 @@ export const teamService = {
     createTeam,
     addPlayerToTeam,
     getTeamByName,
-    getTeamsLedByMe
+    getTeamsLedByMe,
+    removePlayerFromTeam: async (teamId: number, playerId: number): Promise<void> => {
+        try {
+            const response = await api.post('/teams/remove-player', {
+                team_id: teamId,
+                player_id: playerId
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error removing player from team:', error);
+            throw error;
+        }
+    },
 };

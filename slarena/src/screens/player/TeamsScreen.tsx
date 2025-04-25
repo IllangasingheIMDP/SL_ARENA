@@ -143,6 +143,22 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
     }
   };
 
+  const handleRemovePlayer = async (teamId: number, playerId: number) => {
+    try {
+      setLoading(true);
+      await teamService.removePlayerFromTeam(teamId, playerId);
+      // Reload team players after removal
+      const players = await teamService.getTeamPlayers(teamId);
+      setTeamPlayers(players);
+      alert('Player removed successfully');
+    } catch (error) {
+      console.error('Error removing player:', error);
+      alert('Failed to remove player');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredPlayers = players.filter(player =>
     player.name.toLowerCase().includes(playerSearchQuery.toLowerCase())
   );
@@ -261,8 +277,18 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
               <Text style={styles.playersTitle}>Players:</Text>
               {teamPlayers?.map((player, index) => (
                 <View key={index} style={styles.playerItem}>
-                  <Text style={styles.playerName}>{player.name}</Text>
-                  <Text style={styles.playerRole}>{player.role}</Text>
+                  <View style={styles.playerInfo}>
+                    <Text style={styles.playerName}>{player.name}</Text>
+                    <Text style={styles.playerRole}>{player.role}</Text>
+                  </View>
+                  {teamsLedByMe.some(t => t.team_id === selectedTeam.team_id) && (
+                    <TouchableOpacity
+                      style={styles.removeButton}
+                      onPress={() => handleRemovePlayer(selectedTeam.team_id, player.player_id)}
+                    >
+                      <Text style={styles.removeButtonText}>Remove</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               ))}
             </View>
@@ -437,22 +463,40 @@ const styles = StyleSheet.create({
   },
   playerItem: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     backgroundColor: '#fff',
     borderRadius: 8,
     marginVertical: 4,
   },
+  playerInfo: {
+    flex: 1,
+  },
   playerName: {
     fontSize: 16,
     color: '#333',
-    flex: 1,
+    fontWeight: '500',
   },
   playerRole: {
     fontSize: 14,
     color: '#666',
+    marginTop: 4,
+  },
+  removeButton: {
+    backgroundColor: '#ff3b30',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginLeft: 12,
+  },
+  removeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
   modalContainer: {
     flex: 1,

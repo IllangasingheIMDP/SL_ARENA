@@ -50,4 +50,10 @@ router.post('/add-player',
     teamController.addPlayerToTeam
 );
 
+router.post('/remove-player', 
+    authenticateToken,
+    checkRole(['player', 'admin', 'organisation', 'trainer']), 
+    teamController.removePlayerFromTeam
+);
+
 module.exports = router;
