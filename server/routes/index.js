@@ -4,7 +4,7 @@ const router = express.Router();
 const userRoutes = require('./userRoutes');
 const organizerRoutes = require('./organizerRoutes');
 const notificationRoutes = require('./notificationRoutes');
-
+const placeRoutes = require('./placeRoutes');
 // API version
 const API_VERSION = 'v1';
 const BASE_PATH = `/api/${API_VERSION}`;
@@ -24,6 +24,7 @@ module.exports = (io) => {
   router.use(`${BASE_PATH}/players`, require('./playerRoutes'));
   router.use(`${BASE_PATH}/organizers`, organizerRoutes);
   router.use(`${BASE_PATH}/notifications`, notificationRoutes(io));
+  router.use(`${BASE_PATH}/places`, placeRoutes);
 
   // Handle 404 for API routes
   router.all(`${BASE_PATH}/*`, (req, res) => {
