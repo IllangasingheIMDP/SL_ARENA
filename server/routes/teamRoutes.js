@@ -37,6 +37,13 @@ router.get('/:team_id/players',
     teamController.getTeamPlayers
 );
 
+
+router.get('/user/:user_id/teams', 
+    authenticateToken,
+    checkRole(['player', 'admin', 'general', 'organisation', 'trainer']), 
+    teamController.getTeamsByUserId
+);
+
 router.post('/delete-team', 
     authenticateToken,
     checkRole(['player', 'admin', 'organisation', 'trainer']), 

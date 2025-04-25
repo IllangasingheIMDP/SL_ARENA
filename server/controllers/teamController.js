@@ -201,6 +201,24 @@ const addPlayerToTeam = async (req, res) => {
     }
 };
 
+// Get all teams for a user (both as captain and player)
+const getTeamsByUserId = async (req, res) => {
+    try {
+        const userId = req.params.user_id;
+        const teams = await Team.getTeamsByUserId(userId);
+        res.status(200).json({
+            success: true,
+            data: teams
+        });
+    } catch (error) {
+        console.log(error, 'error in getTeamsByUserId');
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 module.exports = {
     getMyTeams,
     getPlayerTeams,
@@ -210,6 +228,7 @@ module.exports = {
     getTeamByName,
     addPlayerToTeam,
     getTeamsLedByPlayer,
+    getTeamsByUserId,
     removePlayerFromTeam,
     deleteTeam
 };
