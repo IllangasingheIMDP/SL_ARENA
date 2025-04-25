@@ -6,6 +6,7 @@ import { Team, TeamPlayer } from '../../types/team';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { Picker } from '@react-native-picker/picker';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 interface Player {
   player_id: number;
@@ -21,11 +22,8 @@ interface SelectedPlayer extends Player {
 
 type TeamsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Teams'>;
 
-interface TeamsScreenProps {
-  navigation: TeamsScreenNavigationProp;
-}
-
-const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
+const TeamsScreen: React.FC = () => {
+  const navigation = useNavigation<TeamsScreenNavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
   const [myTeams, setMyTeams] = useState<Team[]>([]);
   const [teamsLedByMe, setTeamsLedByMe] = useState<Team[]>([]);
@@ -37,10 +35,6 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [selectedPlayers, setSelectedPlayers] = useState<SelectedPlayer[]>([]);
   const [playerSearchQuery, setPlayerSearchQuery] = useState('');
-
-  useEffect(() => {
-    loadTeams();
-  }, []);
 
   const loadTeams = async () => {
     try {
@@ -57,6 +51,13 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
       setLoading(false);
     }
   };
+
+  // Use useFocusEffect to reload teams when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      loadTeams();
+    }, [])
+  );
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) {

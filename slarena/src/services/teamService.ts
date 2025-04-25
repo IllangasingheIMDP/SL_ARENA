@@ -47,9 +47,17 @@ const getTeamByName = async (teamName: string): Promise<Team[]> => {
 };
 
 const createTeam = async (teamData: CreateTeamRequest): Promise<number> => {
-    const response = await api.post('/teams', teamData);
-    console.log(response.data,'response in createTeam');
-    return response.data.data.team_id;
+    try {
+        const response = await api.post('/teams', teamData);
+        if (!response || !response.data) {
+            throw new Error('Invalid response from server');
+        }
+        console.log('Team created successfully:', response.data);
+        return response.data.team_id;
+    } catch (error) {
+        console.error('Error creating team:', error);
+        throw error;
+    }
 };
 
 const addPlayerToTeam = async (playerData: AddPlayerToTeamRequest): Promise<void> => {

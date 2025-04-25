@@ -139,6 +139,24 @@ const createTeam = async (req, res) => {
     }
 };
 
+// Delete a team
+const deleteTeam = async (req, res) => {
+    try {
+        const { team_id } = req.body;
+        await Team.deleteTeam(team_id);
+        res.status(200).json({
+            success: true,
+            message: 'Team deleted successfully'
+        });
+    } catch (error) {
+        console.log(error,'error in deleteTeam');
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 // Remove player from team
 const removePlayerFromTeam = async (req, res) => {
     try {
@@ -192,5 +210,6 @@ module.exports = {
     getTeamByName,
     addPlayerToTeam,
     getTeamsLedByPlayer,
-    removePlayerFromTeam
+    removePlayerFromTeam,
+    deleteTeam
 };

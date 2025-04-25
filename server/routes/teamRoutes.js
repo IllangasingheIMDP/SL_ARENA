@@ -37,6 +37,12 @@ router.get('/:team_id/players',
     teamController.getTeamPlayers
 );
 
+router.post('/delete-team', 
+    authenticateToken,
+    checkRole(['player', 'admin', 'organisation', 'trainer']), 
+    teamController.deleteTeam
+);
+
 // POST routes - accessible only by players
 router.post('/', 
     authenticateToken,
