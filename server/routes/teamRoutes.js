@@ -43,6 +43,11 @@ router.get('/player/teams',
     checkRole(['player']), 
     teamController.getTeamsByUserId
 );
+router.post('/apply-tournament', 
+    authenticateToken,
+    checkRole(['player']), 
+    teamController.applyForTournament
+);
 
 router.get('/:team_id/is-captain', 
     authenticateToken,

@@ -219,6 +219,18 @@ const getTeamsByUserId = async (req, res) => {
     }
 };
 
+const applyForTournament = async (req, res) => {
+    try {
+        const { team_id, tournament_id } = req.body;
+        await Team.applyForTournament(team_id, tournament_id);
+        res.status(200).json({
+            success: true,
+            message: 'Tournament applied successfully'
+        });
+    } catch (error) {
+        console.log(error, 'error in applyForTournament');
+    }
+}
 // Check if a user is the captain of a team
 const isUserTeamCaptain = async (req, res) => {
     try {
@@ -303,5 +315,6 @@ module.exports = {
     isUserTeamCaptain,
     getFinishedTournaments,
     getMyHistoryTournaments,
-    getUpcomingTournaments
+    getUpcomingTournaments,
+    applyForTournament
 };
