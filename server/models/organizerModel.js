@@ -567,7 +567,7 @@ const updateInningSummary = async (inning_id) => {
   const getApplieddRequestsByTournamentID = async (tournament_id) => {
     try{
         const [rows] = await db.execute(
-            `select T.team_name , A.payment_slip , A.created_at
+            `select T.team_name,T.team_id , A.payment_slip , A.created_at
             from Teams T join tournament_applicants A on T.team_id = A.team_id
             where A.status = 'applied' and tournament_id=?;`,
             [tournament_id]
@@ -577,6 +577,20 @@ const updateInningSummary = async (inning_id) => {
         throw error;
     }
     
+  };
+  const deleteAppliedRequest = async (tournament_id, team_id) => {
+    const [result] = await db.execute(
+      `DELETE FROM tournament_applicants WHERE tournament_id = ? AND team_id = ?`,
+      [tournament_id, team_id]
+    );
+    return result;
+  };
+  const acceptAppliedRequest = async (tournament_id, team_id) => {
+    const [result] = await db.execute(
+      `UPDATE tournament_applicants SET status = 'accepted' WHERE tournament_id = ? AND team_id = ?`,
+      [tournament_id, team_id]
+    );
+    return result;
   };
 
 module.exports = {
@@ -603,6 +617,7 @@ module.exports = {
     getUpcomingTournaments,
     insertPlaying11,
     getInningStatsById,
-    getApplieddRequestsByTournamentID
+    getApplieddRequestsByTournamentID,
+    deleteAppliedRequest
 
 };

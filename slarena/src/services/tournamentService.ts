@@ -217,4 +217,26 @@ export const tournamentService = {
       throw error;
     }
   },
+
+  acceptRequest: async (tournamentId: number, teamId: number): Promise<any> => {
+    try {
+      const response = await api.put(`/organizers/accept-req/${tournamentId}/${teamId}`, {});
+      return response.data;
+    } catch (error) {
+      console.error('Error accepting request:', error);
+      throw error;
+    }
+  },
+
+  rejectRequest: async (tournamentId: number, teamId: number): Promise<any> => {
+    console.log("tournamentId", tournamentId);
+    console.log("teamId", teamId);
+    try {
+      const response = await api.delete(`/organizers/reject-req/${tournamentId}/${teamId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error rejecting request:', error);
+      throw error;
+    }
+  },
 }; 

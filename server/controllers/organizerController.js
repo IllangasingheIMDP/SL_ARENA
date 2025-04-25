@@ -488,6 +488,27 @@ const getInningStats = async (req, res) => {
    }
   };
 
+  const deleteAppliedRequest = async (req, res) => {
+    const { tournament_id, team_id } = req.params;
+    try{
+      await OrganizerModel.deleteAppliedRequest(tournament_id, team_id);
+      res.status(200).json({ message: "Applied request deleted successfully" });
+    }catch(error){
+      console.error('Error deleting applied request:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+  const acceptAppliedRequest = async (req, res) => {
+    const { tournament_id, team_id } = req.params;
+    try{
+      await OrganizerModel.acceptAppliedRequest(tournament_id, team_id);
+      res.status(200).json({ message: "Applied request accepted successfully" });
+    }catch(error){
+      console.error('Error accepting applied request:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
 module.exports = {
     createTournament,
     getTournamentsByOrganizerController,
@@ -507,7 +528,8 @@ module.exports = {
     updateTournamentStatus,
     markAttendance,
     updateTeamAttendance,
-
+    deleteAppliedRequest,
+    acceptAppliedRequest,
     createKnockoutDraw,
     viewKnockoutBracket,
     updateMatchWinner,
@@ -515,5 +537,6 @@ module.exports = {
     getUpcomingTournaments,
     addPlaying11,
     getInningStats,
-    getApplieddRequestsByTournamentID
+    getApplieddRequestsByTournamentID,
+    deleteAppliedRequest
 };
