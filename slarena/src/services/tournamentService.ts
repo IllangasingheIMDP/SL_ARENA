@@ -184,7 +184,8 @@ export const tournamentService = {
 
   async saveMatchPlayers(matchId: number, teamId: number, playerIds: number[]): Promise<void> {
     try {
-      const response = await api.post(`/matches/${matchId}/teams/${teamId}/players`, {
+      const response = await api.post(`/organizers/playing-11`, {
+        match_id: matchId,
         player_ids: playerIds
       });
       return response.data;
@@ -196,7 +197,7 @@ export const tournamentService = {
 
   async saveMatchPhase(matchId: number, phase: string): Promise<void> {
     try {
-      const response = await api.post(`/organizers/playing-11`, {
+      const response = await api.post(`/organizers/playing11`, {
         match_id: matchId,
         phase: phase
       });
