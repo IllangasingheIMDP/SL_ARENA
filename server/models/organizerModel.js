@@ -398,6 +398,21 @@ const updateInningSummary = async (inning_id) => {
     const [result] = await db.execute(sql, ids);
     return result;
   };
+
+  const updateTeamAttendance = async (tournamentId, teamId, isPresent) => {
+    console.log("Update team attendance")
+    console.log(tournamentId,teamId,isPresent)
+    const [result] = await db.execute(
+      `UPDATE tournament_applicants 
+       SET attendance = ? 
+       WHERE tournament_id = ? AND team_id = ?`,
+      [isPresent, tournamentId, teamId]
+    );
+  
+    return result;
+  };
+
+  
   
   
 
@@ -419,5 +434,6 @@ module.exports = {
     updateInningSummary,
     updatePlayerStats,
     updateTournamentStatus,
-    markAttendance
+    markAttendance,
+    updateTeamAttendance
 };

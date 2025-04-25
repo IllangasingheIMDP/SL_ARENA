@@ -56,7 +56,7 @@ export const tournamentService = {
   updateTournamentStatus: async (tournamentId: number, status: string): Promise<Tournament> => {
     try {
       const response = await api.put(
-        '/tournaments/updatestatus',
+        '/organizers/tournaments/updatestatus',
         {
           tournament_id: tournamentId,
           status: status,
@@ -71,7 +71,7 @@ export const tournamentService = {
 
   updateTeamAttendance: async (tournamentId: number, teamId: number, isPresent: boolean): Promise<any> => {
     try {
-      const response = await api.put(`/tournaments/${tournamentId}/teams/${teamId}/attendance`, 
+      const response = await api.put(`/organizers/tournaments/${tournamentId}/teams/${teamId}/attendance`, 
         { isPresent }, true);
       return response.data;
     } catch (error) {
