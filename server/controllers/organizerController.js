@@ -415,7 +415,7 @@ const updateInningSummary = async (req, res) => {
   };
 
 
-
+  
 
 
 
@@ -445,6 +445,7 @@ module.exports = {
     viewKnockoutBracket,
     updateMatchWinner,
 
-    getUpcomingTournaments
+    getUpcomingTournaments,
+    
 
 };

@@ -232,6 +232,78 @@ const getTeamsByLeader = async (playerId) => {
   }
 };
 
+
+
+const getTournamentIdsByStatus = async (teamId, status) => {
+  const [rows] = await db.execute(
+    `SELECT tournament_id FROM tournament_applicants WHERE team_id = ? AND status = ?`,
+    [teamId, status]
+  );
+  
+  return rows.map(row => row.tournament_id);
+};
+
+// Get all tournament IDs the team is involved in (applied or accepted)
+const getAllTournamentIdsForTeam = async (teamId) => {
+  const [rows] = await db.execute(
+    `SELECT tournament_id FROM tournament_applicants WHERE team_id = ?`,
+    [teamId]
+  );
+  return rows.map(row => row.tournament_id);
+};
+
+// Fetch tournament details by list of tournament IDs
+const getTournamentDetailsByIds = async (ids) => {
+  if (ids.length === 0) return [];
+
+  const placeholders = ids.map(() => '?').join(',');
+  const [rows] = await db.execute(
+    `
+    SELECT 
+      t.tournament_id,
+      t.tournament_name,
+      t.start_date,
+      t.rules,
+      o.organizer_id,
+      o.organization_name AS organizer_name,
+      t.venue_id
+    FROM Tournaments t
+    JOIN Organizers o ON t.organizer_id = o.organizer_id
+    WHERE t.tournament_id IN (${placeholders})
+    `,
+    ids
+  );
+  
+  return rows;
+};
+
+// Get tournaments the team has NOT applied to or been accepted in
+const getTournamentsNotApplied = async (excludeIds) => {
+  let sql = `
+    SELECT 
+      t.tournament_id,
+      t.tournament_name,
+      t.start_date,
+      t.rules,
+      o.organizer_id,
+      o.organization_name AS organizer_name,
+      t.venue_id
+    FROM Tournaments t
+    JOIN Organizers o ON t.organizer_id = o.organizer_id
+    
+  `;
+
+  let rows;
+  if (excludeIds.length > 0) {
+    const placeholders = excludeIds.map(() => '?').join(',');
+    sql += ` WHERE t.tournament_id NOT IN (${placeholders})`;
+    [rows] = await db.execute(sql, excludeIds);
+  } else {
+    [rows] = await db.execute(sql);
+  }
+
+  return rows;
+
 const updatePlayerBattingStyle = async (player_id, batting_style) => {
   try {
     if (!player_id || isNaN(player_id) || player_id <= 0) {
@@ -308,6 +380,7 @@ const updatePlayerRole = async (player_id, role) => {
     console.error(`Error updating role for playerId: ${player_id}`, error);
     throw new Error(`Failed to update role: ${error.message}`);
   }
+
 };
 
 module.exports = {
@@ -320,9 +393,17 @@ module.exports = {
   updateProfileBio,
   getAllPlayers,
   getTeamsByLeader,
+
+  getTournamentIdsByStatus,
+  getAllTournamentIdsForTeam,
+  getTournamentDetailsByIds,
+  getTournamentsNotApplied
+ 
+
   updatePlayerBattingStyle,
   updatePlayerBowlingStyle,
   updatePlayerFieldingPosition,
   updatePlayerRole
+
 };
 
