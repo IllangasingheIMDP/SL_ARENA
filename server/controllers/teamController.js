@@ -239,6 +239,22 @@ const isUserTeamCaptain = async (req, res) => {
     }
 };
 
+const getFinishedTournaments = async (req, res) => {
+    try {
+        const tournaments = await Team.getFinishedTournaments();
+        res.status(200).json({
+            success: true,
+            data: tournaments
+        });
+    } catch (error) {
+        console.log(error, 'error in getFinishedTournaments');
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 module.exports = {
     getMyTeams,
     getPlayerTeams,
@@ -251,5 +267,6 @@ module.exports = {
     getTeamsByUserId,
     removePlayerFromTeam,
     deleteTeam,
-    isUserTeamCaptain
+    isUserTeamCaptain,
+    getFinishedTournaments
 };

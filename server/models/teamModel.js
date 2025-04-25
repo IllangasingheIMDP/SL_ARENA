@@ -196,6 +196,30 @@ const isUserTeamCaptain = async (teamId, userId) => {
     }
 };
 
+const getFinishedTournaments = async () => {
+    try {
+        const query = `
+            SELECT 
+                t.tournament_id,
+                t.tournament_name,
+                t.start_date,
+                t.end_date,
+                t.tournament_type,
+                t.rules,
+                t.venue_id,
+                o.organization_name
+            FROM Tournaments t
+            LEFT JOIN Organizers o ON t.organizer_id = o.organizer_id
+            WHERE t.status = 'finished'
+            ORDER BY t.end_date DESC
+        `;
+        const [tournaments] = await db.query(query);
+        return tournaments;
+    } catch (error) {
+        throw new Error(`Error getting tournaments with organizations: ${error.message}`);
+    }
+};
+
 module.exports = {
     getPlayerTeams,
     getAllTeams,
@@ -207,6 +231,7 @@ module.exports = {
     getTeamsByUserId,
     removePlayerFromTeam,
     deleteTeam,
-    isUserTeamCaptain
+    isUserTeamCaptain,
+    getFinishedTournaments
 };
 
