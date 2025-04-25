@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { Team } from "../../types/tournamentTypes";
 import { Checkbox } from 'react-native-paper';
-import { tournamentService } from "../../services/tournamentService";
+import { matchService } from "../../services/matchService";
 
 interface TeamSelectionProps {
   team1: Team | null;
@@ -19,6 +19,7 @@ interface TeamSelectionProps {
   team1Name: string;
   team2Name: string;
   matchId: number;
+  inningId?: number; // Add this new prop
   onComplete: (team1Players: number[], team2Players: number[]) => void;
 }
 
@@ -28,6 +29,7 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
   team1Name,
   team2Name,
   matchId,
+  inningId,
   onComplete,
 }) => {
   const [selectedTeam1Players, setSelectedTeam1Players] = useState<number[]>([]);
@@ -52,6 +54,17 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
   //   savePhase();
   // }, [matchId]);
 
+  useEffect(() => {
+    const savePhase = async () => {
+      try {
+        await matchService.saveMatchPhase(matchId, "team_selection", { inningId }); // Update if your API accepts extra data
+      } catch (error) {
+        console.error("Error saving match phase:", error);
+      }
+    };
+    savePhase();
+  }, [matchId, inningId]);
+
   const handlePlayerSelection = (playerId: number, isSelected: boolean) => {
     if (currentTeam === "team1") {
       setSelectedTeam1Players((prev) =>
@@ -73,7 +86,7 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
 
       try {
         setIsSubmitting(true);
-        await tournamentService.saveMatchPlayers(
+        await matchService.saveMatchPlayers(
           matchId,
           team1?.team_id!,
           selectedTeam1Players
@@ -96,7 +109,7 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
 
       try {
         setIsSubmitting(true);
-        await tournamentService.saveMatchPlayers(
+        await matchService.saveMatchPlayers(
           matchId,
           team2?.team_id!,
           selectedTeam2Players
