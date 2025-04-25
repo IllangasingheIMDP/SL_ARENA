@@ -24,9 +24,12 @@ router.post('/uploadPhoto', authenticateToken, checkRole(['player']), upload.sin
 router.post('/uploadPhotoForMatch', authenticateToken, checkRole(['player']), upload.single('photo'), playerController.uploadPhotoForMatch);
 router.delete('/deletePhoto/:photoId', authenticateToken, checkRole(['player','admin']), playerController.deletePhoto);
 router.get('/getteams', authenticateToken, checkRole(['player']), playerController.getTeamsByLeader);
+router.get('/team/:teamId/tournaments', playerController.getTeamTournaments);
 
-
-
-
+// New routes for updating player attributes
+router.put('/batting-style', authenticateToken, checkRole(['player']), playerController.updatePlayerBattingStyle);
+router.put('/bowling-style', authenticateToken, checkRole(['player']), playerController.updatePlayerBowlingStyle);
+router.put('/fielding-position', authenticateToken, checkRole(['player']), playerController.updatePlayerFieldingPosition);
+router.put('/role', authenticateToken, checkRole(['player']), playerController.updatePlayerRole);
 
 module.exports = router;

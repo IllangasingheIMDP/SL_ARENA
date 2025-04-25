@@ -400,9 +400,25 @@ const getUpcomingTournaments = async (req, res) => {
   }
 };
 
+ const addPlaying11 = async (req, res) => {
+    try {
+      const players = req.body.players; // Expecting an array of { match_id, player_id }
+  
+      if (!Array.isArray(players) || players.length === 0) {
+        return res.status(400).json({ error: 'players array is required' });
+      }
+  
+      await OrganizerModel.insertPlaying11(players);
+  
+      res.status(201).json({ message: 'Playing 11 inserted successfully' });
+    } catch (err) {
+      console.error('Error inserting playing 11:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
 const createKnockoutDraw = async (req, res) => {
   const { tournament_id } = req.body;
-
   try {
     await OrganizerModel.generateKnockoutDraw(tournament_id);
     res.status(200).json({ message: "Knockout draw created successfully" });
@@ -441,28 +457,29 @@ const updateMatchWinner = async (req, res) => {
 };
 
 module.exports = {
-  createTournament,
-  getTournamentsByOrganizerController,
-  getAppliedTeamsToOngoingTournaments,
-  acceptTournamentApplicant,
-  rejectTournamentApplicant,
-  getAcceptedTeamsByTournament,
-  getPlayersWithStats,
-  getTeamsNotApplied,
-  sendTournamentInvite,
-  addInning,
-  addDelivery,
-  getCurrentBatsmenRuns,
-  getNextBallController,
-  updateInningSummary,
-  updatePlayerStats,
-  updateTournamentStatus,
-  markAttendance,
-  updateTeamAttendance,
+    createTournament,
+    getTournamentsByOrganizerController,
+    getAppliedTeamsToOngoingTournaments,
+    acceptTournamentApplicant,
+    rejectTournamentApplicant,
+    getAcceptedTeamsByTournament,
+    getPlayersWithStats,
+    getTeamsNotApplied,
+    sendTournamentInvite,
+    addInning,
+    addDelivery,
+    getCurrentBatsmenRuns,
+    getNextBallController,
+    updateInningSummary,
+    updatePlayerStats,
+    updateTournamentStatus,
+    markAttendance,
+    updateTeamAttendance,
 
-  createKnockoutDraw,
-  viewKnockoutBracket,
-  updateMatchWinner,
+    createKnockoutDraw,
+    viewKnockoutBracket,
+    updateMatchWinner,
 
-  getUpcomingTournaments,
+    getUpcomingTournaments,
+    addPlaying11
 };

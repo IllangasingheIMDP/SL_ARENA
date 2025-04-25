@@ -24,7 +24,7 @@ router.post('/tournaments/generateKnockoutDraw',organizerController.createKnocko
 router.get('/tournaments/knockoutBracket/:tournament_id',organizerController.viewKnockoutBracket);
 router.post('/tournaments/updateMatchWinner',organizerController.updateMatchWinner)
 router.get('/upcoming-tournaments', authenticateToken,checkRole(['organisation']), organizerController.getUpcomingTournaments);
-
+router.post('/playing-11', organizerController.addPlaying11);
 
 
 module.exports = router;

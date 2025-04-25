@@ -162,6 +162,91 @@ const addPlayerToTeam = async (teamId, playerId, role) => {
     }
 };
 
+// Get all teams associated with a user (both as captain and player)
+const getTeamsByUserId = async (userId) => {
+    try {
+        const query = `
+            (SELECT DISTINCT t.team_id, t.team_name
+            FROM Teams t
+            WHERE t.captain_id = ?)
+            UNION
+            (SELECT DISTINCT t.team_id, t.team_name
+            FROM Teams t
+            INNER JOIN Team_Players tp ON t.team_id = tp.team_id
+            WHERE tp.player_id = ?)
+        `;
+        const [teams] = await db.query(query, [userId, userId]);
+        return teams;
+    } catch (error) {
+        throw new Error(`Error getting teams by user ID: ${error.message}`);
+    }
+};
+
+const isUserTeamCaptain = async (teamId, userId) => {
+    try {
+        const query = `
+            SELECT COUNT(*) as count
+            FROM Teams
+            WHERE team_id = ? AND captain_id = ?
+        `;
+        const [result] = await db.query(query, [teamId, userId]);
+        return result[0].count > 0;
+    } catch (error) {
+        throw new Error(`Error checking if user is team captain: ${error.message}`);
+    }
+};
+
+const getFinishedTournaments = async () => {
+    try {
+        const query = `
+            SELECT 
+                t.tournament_id,
+                t.tournament_name,
+                t.start_date,
+                t.end_date,
+                t.tournament_type,
+                t.rules,
+                t.venue_id,
+                o.organization_name
+            FROM Tournaments t
+            LEFT JOIN Organizers o ON t.organizer_id = o.organizer_id
+            WHERE t.status = 'finished'
+            ORDER BY t.end_date DESC
+        `;
+        const [tournaments] = await db.query(query);
+        return tournaments;
+    } catch (error) {
+        throw new Error(`Error getting tournaments with organizations: ${error.message}`);
+    }
+};
+
+const getMyHistoryTournaments = async (teamId) => {
+    try {
+        const query = `
+            SELECT 
+                t.tournament_id,
+                t.tournament_name,
+                t.start_date,
+                t.end_date,
+                t.tournament_type,
+                t.rules,
+                t.venue_id,
+                o.organization_name
+            FROM tournament_applicants ta
+            INNER JOIN Tournaments t ON ta.tournament_id = t.tournament_id
+            LEFT JOIN Organizers o ON t.organizer_id = o.organizer_id
+            WHERE ta.team_id = ?
+            AND ta.status = 'accepted'
+            AND ta.payment = 'complete'
+            AND ta.attendance = 1
+        `;
+        const [tournaments] = await db.query(query, [teamId]);
+        return tournaments;
+    } catch (error) {
+        throw new Error(`Error getting team tournaments: ${error.message}`);
+    }
+};
+
 module.exports = {
     getPlayerTeams,
     getAllTeams,
@@ -170,7 +255,11 @@ module.exports = {
     addPlayerToTeam,
     getTeamByName,
     getTeamsLeadByPlayer,
+    getTeamsByUserId,
     removePlayerFromTeam,
-    deleteTeam
+    deleteTeam,
+    isUserTeamCaptain,
+    getFinishedTournaments,
+    getMyHistoryTournaments
 };
 
