@@ -88,7 +88,7 @@ const LeaderBoardScreen = () => {
     }
   };
 
-  const renderPlayerItem = ({ item }: { item: Player }) => (
+  const renderPlayerItem = ({ item, index }: { item: Player; index: number }) => (
     <TouchableOpacity
       style={styles.playerItem}
       onPress={() => toggleExpand(item.player_id)}
@@ -98,6 +98,9 @@ const LeaderBoardScreen = () => {
         style={styles.playerItemGradient}
       >
         <View style={styles.playerHeader}>
+          <View style={styles.rankContainer}>
+            <Text style={styles.rankText}>#{index + 1}</Text>
+          </View>
           <Text style={styles.playerName}>{item.name}</Text>
           <View style={styles.pointsContainer}>
             <Text style={styles.playerPoints}>
@@ -167,7 +170,7 @@ const LeaderBoardScreen = () => {
               <>
                 <View style={styles.modalHeader}>
                   <Text style={styles.modalTitle}>{selectedPlayer.name}</Text>
-                  <View style={styles.pointsContainer}>
+                  <View style={styles.pointsRow}>
                     <View style={styles.pointItem}>
                       <Text style={styles.pointLabel}>Batting</Text>
                       <Text style={styles.pointValue}>{selectedPlayer.batting_points || '0'}</Text>
@@ -327,7 +330,7 @@ const styles = StyleSheet.create({
   },
   playerItem: {
     borderRadius: 12,
-    marginBottom: 15,
+    marginBottom: 10,
     overflow: 'hidden',
     ...Platform.select({
       ios: {
@@ -346,26 +349,42 @@ const styles = StyleSheet.create({
   },
   playerHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
+    padding: 12,
   },
-  playerName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#2c3e50',
+  rankContainer: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(74, 144, 226, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
   },
-  playerPoints: {
-    fontSize: 18,
+  rankText: {
+    fontSize: 12,
     fontWeight: 'bold',
     color: '#007AFF',
   },
+  playerName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2c3e50',
+    flex: 1,
+    marginRight: 8,
+  },
   pointsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginTop: 15,
-    paddingHorizontal: 10,
+    backgroundColor: 'rgba(74, 144, 226, 0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    minWidth: 60,
+    alignItems: 'center',
+  },
+  playerPoints: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#007AFF',
   },
   pointItem: {
     alignItems: 'center',
@@ -528,6 +547,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
     fontSize: 16,
+  },
+  pointsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 15,
+    paddingHorizontal: 10,
   },
 });
 
