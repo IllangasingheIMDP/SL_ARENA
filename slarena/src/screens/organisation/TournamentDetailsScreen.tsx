@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/AppNavigator';
+import GoogleMapView from '../../components/maps/GoogleMapView';
 
 type TournamentDetailsRouteProp = RouteProp<RootStackParamList, 'TournamentDetails'>;
 
@@ -9,33 +10,27 @@ const TournamentDetailsScreen = () => {
   const route = useRoute<TournamentDetailsRouteProp>();
   const { tournament } = route.params;
 
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.section}>
-        <Text style={styles.title}>{tournament.tournament_name}</Text>
+        <Text style={styles.title}>{tournament.name}</Text>
         <Text style={styles.subtitle}>Tournament Details</Text>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Location</Text>
         <View style={styles.mapPlaceholder}>
-          <Text style={styles.placeholderText}>Map will be displayed here</Text>
-          <Text style={styles.coordinates}>
-            Latitude: {tournament.latitude || 'Not available'}
-            {'\n'}
-            Longitude: {tournament.longitude || 'Not available'}
-          </Text>
+          <GoogleMapView
+            placeId={tournament.venue.venue_id}
+            height={200}
+          />
         </View>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Rules</Text>
         <Text style={styles.content}>{tournament.rules || 'No rules specified'}</Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Venue Capacity</Text>
-        <Text style={styles.content}>{tournament.capacity || 'Not specified'} people</Text>
       </View>
     </ScrollView>
   );

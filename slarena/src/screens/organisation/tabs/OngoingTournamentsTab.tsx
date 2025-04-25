@@ -58,6 +58,8 @@ const OngoingTournamentsTab = () => {
   };
 
   const handleStartPress = async (tournament: Tournament) => {
+    if (!tournament.tournament_id) return;
+    
     try {
       setLoading(true);
       const teams = await tournamentService.getTournamentTeams(tournament.tournament_id);
@@ -77,7 +79,7 @@ const OngoingTournamentsTab = () => {
   };
 
   const handleViewTeamsPress = (tournament: Tournament) => {
-    // Navigate to teams view
+    if (!tournament.tournament_id) return;
     navigation.navigate('TournamentTeams', { tournamentId: tournament.tournament_id });
   };
 
@@ -98,9 +100,9 @@ const OngoingTournamentsTab = () => {
   const renderTournamentItem = ({ item }: { item: Tournament }) => (
     <TournamentCard
       tournament={item}
-      onStartPress={() => handleStartPress(item)}
+      onStartPress={() => item.tournament_id && handleStartPress(item)}
       onDrawPress={() => handleDrawPress(item)}
-      onViewTeamsPress={() => handleViewTeamsPress(item)}
+      onViewTeamsPress={() => item.tournament_id && handleViewTeamsPress(item)}
       onDetailsPress={() => handleDetailsPress(item)}
     />
   );
@@ -121,7 +123,7 @@ const OngoingTournamentsTab = () => {
         <FlatList
           data={tournaments}
           renderItem={renderTournamentItem}
-          keyExtractor={item => item.tournament_id.toString()}
+          keyExtractor={item => item.tournament_id?.toString() ?? ''}
           contentContainerStyle={styles.listContent}
           refreshing={refreshing}
           onRefresh={handleRefresh}
@@ -140,7 +142,7 @@ const OngoingTournamentsTab = () => {
         animationType="slide"
         onRequestClose={() => setShowAttendanceForm(false)}
       >
-        {selectedTournament && (
+        {selectedTournament?.tournament_id && (
           <TeamAttendanceForm
             tournamentId={selectedTournament.tournament_id}
             teams={selectedTournament.teams}
@@ -175,20 +177,6 @@ const OngoingTournamentsTab = () => {
             tournament={selectedTournament}
             onClose={() => setShowDetails(false)}
             onViewMap={handleViewMap}
-          />
-        )}
-      </Modal>
-
-      {/* Venue Map Modal */}
-      <Modal
-        visible={showMap}
-        animationType="slide"
-        onRequestClose={() => setShowMap(false)}
-      >
-        {selectedTournament && (
-          <VenueMap
-            venue={selectedTournament.venue}
-            onClose={() => setShowMap(false)}
           />
         )}
       </Modal>

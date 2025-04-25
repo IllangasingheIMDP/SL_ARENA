@@ -38,18 +38,9 @@ const getTournamentsByOrganizer = async (organizer_id) => {
             t.venue_id,
             u.user_id AS organizer_id,
             u.name AS organizer_name,
-            u.email AS organizer_email,
-            v.venue_name,
-            v.address,
-            v.city,
-            v.state,
-            v.country,
-            v.latitude,
-            v.longitude,
-            v.capacity
+            u.email AS organizer_email
         FROM Tournaments t
         JOIN Users u ON t.organizer_id = u.user_id
-        LEFT JOIN Venues v ON t.venue_id = v.venue_id
         WHERE t.organizer_id = ?
           AND t.status IN ('start', 'matches');
         `,
@@ -512,18 +503,20 @@ const updateInningSummary = async (inning_id) => {
   
   const viewKnockoutBracket = async (tournament_id) => {
     const [rows] = await db.execute(
-      `SELECT m.match_id, m.round, m.match_number,
-              t1.team_name AS team1_name,
-              t2.team_name AS team2_name,
-              w.team_name AS winner_name
-       FROM Matches m
-       LEFT JOIN Teams t1 ON m.team1_id = t1.team_id
-       LEFT JOIN Teams t2 ON m.team2_id = t2.team_id
-       LEFT JOIN Teams w ON m.winner_id = w.team_id
-       WHERE m.tournament_id = ?
-       ORDER BY m.round, m.match_number`,
-      [tournament_id]
-    );
+        `SELECT m.match_id, m.round, m.match_number,
+                m.team1_id, m.team2_id,
+                t1.team_name AS team1_name,
+                t2.team_name AS team2_name,
+                w.team_name AS winner_name
+         FROM Matches m
+         LEFT JOIN Teams t1 ON m.team1_id = t1.team_id
+         LEFT JOIN Teams t2 ON m.team2_id = t2.team_id
+         LEFT JOIN Teams w ON m.winner_id = w.team_id
+         WHERE m.tournament_id = ?
+         ORDER BY m.round, m.match_number`,
+        [tournament_id]
+      );
+      
   
     return rows;
   };
@@ -536,7 +529,7 @@ const updateInningSummary = async (inning_id) => {
   const getUpcomingTournaments = async () => {
     try{
         const [rows] = await db.execute(
-            `select T.organizer_id , T.tournament_name , T.start_date , T.end_date , T.tournament_type , T.rules
+            `select T.organizer_id , T.tournament_name , T.start_date , T.end_date , T.tournament_type , T.rules, T.venue_id
             from Tournaments T
             where T.status='upcoming';`
         );
@@ -564,11 +557,9 @@ module.exports = {
     updateTournamentStatus,
     markAttendance,
     updateTeamAttendance,
-
     generateKnockoutDraw,
     updateMatchWinner,
     viewKnockoutBracket,
-
     getUpcomingTournaments
 
 };

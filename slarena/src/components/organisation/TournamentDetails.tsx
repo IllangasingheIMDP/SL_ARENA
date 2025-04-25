@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Tournament, Venue } from '../../types/tournamentTypes';
+import GoogleMapView from '../maps/GoogleMapView';
 
 type TournamentDetailsProps = {
   tournament: Tournament;
@@ -52,11 +53,11 @@ const TournamentDetails: React.FC<TournamentDetailsProps> = ({
           <Text style={styles.sectionTitle}>Basic Information</Text>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Name:</Text>
-            <Text style={styles.value}>{tournament.name}</Text>
+            <Text style={styles.value}>{tournament.tournament_name}</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Type:</Text>
-            <Text style={styles.value}>{tournament.type}</Text>
+            <Text style={styles.value}>{tournament.tournament_name}</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Status:</Text>
@@ -76,69 +77,14 @@ const TournamentDetails: React.FC<TournamentDetailsProps> = ({
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Venue</Text>
-          <View style={styles.infoRow}>
-            <Text style={styles.label}>Name:</Text>
-            <Text style={styles.value}>{tournament.venue.venue_name}</Text>
-          </View>
-          {tournament.venue.address && (
-            <View style={styles.infoRow}>
-              <Text style={styles.label}>Address:</Text>
-              <Text style={styles.value}>{tournament.venue.address}</Text>
-            </View>
-          )}
-          {tournament.venue.city && (
-            <View style={styles.infoRow}>
-              <Text style={styles.label}>City:</Text>
-              <Text style={styles.value}>{tournament.venue.city}</Text>
-            </View>
-          )}
-          {tournament.venue.state && (
-            <View style={styles.infoRow}>
-              <Text style={styles.label}>State:</Text>
-              <Text style={styles.value}>{tournament.venue.state}</Text>
-            </View>
-          )}
-          {tournament.venue.country && (
-            <View style={styles.infoRow}>
-              <Text style={styles.label}>Country:</Text>
-              <Text style={styles.value}>{tournament.venue.country}</Text>
-            </View>
-          )}
-          {tournament.venue.capacity && (
-            <View style={styles.infoRow}>
-              <Text style={styles.label}>Capacity:</Text>
-              <Text style={styles.value}>{tournament.venue.capacity}</Text>
-            </View>
-          )}
-          
-          {onViewMap && tournament.venue.latitude && tournament.venue.longitude && (
-            <TouchableOpacity 
-              style={styles.mapButton}
-              onPress={() => onViewMap(tournament.venue)}
-            >
-              <Icon name="map" size={20} color="#fff" />
-              <Text style={styles.mapButtonText}>View on Map</Text>
-            </TouchableOpacity>
-          )}
-        </View>
+        <GoogleMapView
+          placeId={tournament.venue.venue_id}
+          height={300}
+        />
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Rules</Text>
           <Text style={styles.rulesText}>{tournament.rules}</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Teams ({tournament.teams.length})</Text>
-          {tournament.teams.map((team) => (
-            <View key={team.team_id} style={styles.teamItem}>
-              <Text style={styles.teamName}>{team.team_name}</Text>
-              {team.captain_id && (
-                <Text style={styles.captainText}>Captain ID: {team.captain_id}</Text>
-              )}
-            </View>
-          ))}
         </View>
       </ScrollView>
     </View>

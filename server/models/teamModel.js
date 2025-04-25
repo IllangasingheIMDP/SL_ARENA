@@ -96,7 +96,7 @@ const getTeamByName = async (teamName, options = {}) => {
 const getTeamPlayers = async (teamId) => {
     try {
         const query = `
-            SELECT u.name, tp.role
+            SELECT u.name,u.user_id as player_id,tp.role
             FROM Team_Players tp
 			inner join Users u on u.user_id=tp.player_id
             WHERE tp.team_id = ?
@@ -117,10 +117,7 @@ const createTeam = async (teamName, captainId) => {
         `;
         const [result] = await db.query(query, [teamName, captainId]);
         
-        // Add captain to Team_Players
-        if (result.insertId) {
-            await addPlayerToTeam(result.insertId, captainId, 'Captain');
-        }
+       
         
         return result.insertId;
     } catch (error) {
@@ -128,6 +125,29 @@ const createTeam = async (teamName, captainId) => {
     }
 };
 
+const deleteTeam = async (teamId) => {
+    try {
+        const query = `
+            DELETE FROM Teams WHERE team_id = ?
+        `;
+        const [result] = await db.query(query, [teamId]);
+        return result;
+    } catch (error) {
+        throw new Error(`Error deleting team: ${error.message}`);
+    }
+}
+
+const removePlayerFromTeam = async (teamId, playerId) => {
+    try {
+        const query = `
+            DELETE FROM Team_Players WHERE team_id = ? AND player_id = ?
+        `;
+        const [result] = await db.query(query, [teamId, playerId]);
+        return result;
+    } catch (error) {
+        throw new Error(`Error removing player from team: ${error.message}`);
+    }
+}   
 // Add player to team
 const addPlayerToTeam = async (teamId, playerId, role) => {
     try {
@@ -170,6 +190,8 @@ module.exports = {
     addPlayerToTeam,
     getTeamByName,
     getTeamsLeadByPlayer,
-    getTeamsByUserId
+    getTeamsByUserId,
+    removePlayerFromTeam,
+    deleteTeam
 };
 
