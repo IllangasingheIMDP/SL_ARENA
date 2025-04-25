@@ -412,12 +412,6 @@ const updateInningSummary = async (inning_id) => {
     return result;
   };
 
-  
-  
-  
-
-
-
 module.exports = {
     createTournament,
     getTournamentsByOrganizer,
