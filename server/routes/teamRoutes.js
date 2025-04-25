@@ -8,6 +8,11 @@ router.get('/my-teams',
     checkRole(['player', 'admin', 'general', 'organisation', 'trainer']), 
     teamController.getMyTeams
 );
+router.get('/teams-led-by-player', 
+    authenticateToken,
+    checkRole(['player', 'admin', 'general', 'organisation', 'trainer'] ), 
+    teamController.getTeamsLedByPlayer
+);
 router.get('/team-by-name/:team_name', 
     authenticateToken,
     checkRole(['player', 'admin', 'general', 'organisation', 'trainer']), 

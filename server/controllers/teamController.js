@@ -18,6 +18,25 @@ const getMyTeams = async (req, res) => {
     }
 };
 
+// Get teams led by a specific player
+const getTeamsLedByPlayer = async (req, res) => {
+    try {
+        const playerId = req.user.user_id;
+        const teams = await Team.getTeamsLeadByPlayer(playerId);
+        res.status(200).json({
+            success: true,
+            data: teams
+        });
+    } catch (error) {
+
+        console.log(error,'error in getTeamsLedByPlayer');
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 // Get teams for a specific player
 const getPlayerTeams = async (req, res) => {
     try {
@@ -40,6 +59,7 @@ const getPlayerTeams = async (req, res) => {
 const getTeamByName = async (req, res) => {
     try {
         const teamName = req.params.team_name;
+        //console.log(teamName,'teamName in getTeamByName');
         const team = await Team.getTeamByName(teamName);
         res.status(200).json({
             success: true,
@@ -152,5 +172,6 @@ module.exports = {
     getTeamPlayers,
     createTeam,
     getTeamByName,
-    addPlayerToTeam
+    addPlayerToTeam,
+    getTeamsLedByPlayer
 };

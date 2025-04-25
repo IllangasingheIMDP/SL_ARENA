@@ -17,6 +17,21 @@ const getPlayerTeams = async (playerId) => {
     }
 };
 
+const getTeamsLeadByPlayer = async (playerId) => {
+    try {
+        const query = `
+            SELECT DISTINCT t.team_id, t.team_name, t.points, u.name AS captain
+            FROM Teams t
+            INNER JOIN Users u ON t.captain_id = u.user_id
+            WHERE t.captain_id = ?
+        `;
+        const [teams] = await db.query(query, [playerId]);
+        return teams;
+    } catch (error) {
+        throw new Error(`Error getting teams led by player: ${error.message}`);
+    }
+};
+
 // Get all teams
 const getAllTeams = async () => {
     try {
@@ -65,6 +80,7 @@ const getTeamByName = async (teamName, options = {}) => {
       const searchValue = caseSensitive ? searchParam : searchParam.toLowerCase();
   
       // Execute query
+      console.log(query,'query in getTeamByName');
       const [teams] = await db.query(query, [searchValue]);
   
       // Return null if no team found
@@ -131,6 +147,8 @@ module.exports = {
     getAllTeams,
     getTeamPlayers,
     createTeam,
-    addPlayerToTeam
+    addPlayerToTeam,
+    getTeamByName,
+    getTeamsLeadByPlayer
 };
 

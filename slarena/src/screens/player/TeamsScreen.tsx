@@ -1,29 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ActivityIndicator, ScrollView } from 'react-native';
 import { teamService } from '../../services/teamService';
 import { Team, TeamPlayer } from '../../types/team';
-
-
-
-
 
 const TeamsScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [myTeams, setMyTeams] = useState<Team[]>([]);
+  const [teamsLedByMe, setTeamsLedByMe] = useState<Team[]>([]);
   const [searchResults, setSearchResults] = useState<Team[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [teamPlayers, setTeamPlayers] = useState<TeamPlayer[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    loadMyTeams();
+    loadTeams();
   }, []);
 
-  const loadMyTeams = async () => {
+  const loadTeams = async () => {
     try {
       setLoading(true);
-      const teams = await teamService.getMyTeams();
-      setMyTeams(teams as Team[]);
+      const [teams, ledTeams] = await Promise.all([
+        teamService.getMyTeams(),
+        teamService.getTeamsLedByMe()
+      ]);
+      setMyTeams(teams);
+      setTeamsLedByMe(ledTeams);
     } catch (error) {
       console.error('Error loading teams:', error);
     } finally {
@@ -32,15 +33,15 @@ const TeamsScreen = () => {
   };
 
   const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
     
     try {
       setLoading(true);
-      const results = await teamService.getAllTeams();
-      const filteredResults = results?.filter(team => 
-        team.team_name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setSearchResults(filteredResults as Team[]);
+      const results = await teamService.getTeamByName(searchQuery);
+      setSearchResults(results || []);
     } catch (error) {
       console.error('Error searching teams:', error);
     } finally {
@@ -53,7 +54,7 @@ const TeamsScreen = () => {
       setLoading(true);
       setSelectedTeam(team);
       const players = await teamService.getTeamPlayers(team.team_id);
-      setTeamPlayers(players as TeamPlayer[]);
+      setTeamPlayers(players);
     } catch (error) {
       console.error('Error loading team players:', error);
     } finally {
@@ -91,6 +92,22 @@ const TeamsScreen = () => {
     );
   };
 
+  const renderTeamSection = (title: string, teams: Team[]) => {
+    if (teams.length === 0) return null;
+    
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        <FlatList
+          data={teams}
+          renderItem={renderTeamItem}
+          keyExtractor={(item) => item.team_name}
+          scrollEnabled={false}
+        />
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
@@ -111,24 +128,12 @@ const TeamsScreen = () => {
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
-        <>
-          {searchResults.length > 0 ? (
-            <FlatList
-              data={searchResults}
-              renderItem={renderTeamItem}
-              keyExtractor={(item) => item.team_name}
-              style={styles.list}
-            />
-          ) : (
-            <FlatList
-              data={myTeams}
-              renderItem={renderTeamItem}
-              keyExtractor={(item) => item.team_name}
-              style={styles.list}
-            />
-          )}
+        <ScrollView style={styles.scrollView}>
+          {searchResults.length > 0 && renderTeamSection('Search Results', searchResults)}
+          {renderTeamSection('Teams Led By Me', teamsLedByMe)}
+          {renderTeamSection('My Teams', myTeams)}
           {renderTeamDetails()}
-        </>
+        </ScrollView>
       )}
     </View>
   );
@@ -163,8 +168,17 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  list: {
+  scrollView: {
     flex: 1,
+  },
+  section: {
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
   },
   teamItem: {
     padding: 16,
