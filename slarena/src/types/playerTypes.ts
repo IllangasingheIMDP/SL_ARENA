@@ -16,6 +16,10 @@ export interface PlayerProfile {
   batting_style: string;
   bowling_style: string;
   fielding_position: string;
+  batting_points: number;
+  bowling_points: number;
+  allrounder_points: number;
+  role: string;
   achievements: {
     achievement_type: string;
     match_type: string;

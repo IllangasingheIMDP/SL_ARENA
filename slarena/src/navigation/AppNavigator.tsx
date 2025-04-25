@@ -130,7 +130,7 @@ const AppNavigator = () => {
                         options={{
                           title: 'Organisation Dashboard',
                           headerBackVisible: false,
-                          headerShown: false,
+                          
                         }}
                       />
                       <Stack.Screen
@@ -138,7 +138,7 @@ const AppNavigator = () => {
                         component={TournamentTeamsScreen}
                         options={{
                           title: 'Tournament Teams',
-                          headerShown: false,
+                          
                         }}
                       />
                       <Stack.Screen
@@ -146,7 +146,7 @@ const AppNavigator = () => {
                         component={TeamDetailsScreen}
                         options={{
                           title: 'Team Details',
-                          headerShown: false,
+                          
                         }}
                       />
                       <Stack.Screen
