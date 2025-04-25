@@ -11,7 +11,7 @@ router.get('/performance', authenticateToken, checkRole(['player']),playerContro
 router.get('/reminders', authenticateToken,checkRole(['player']), playerController.fetchTrainingReminders);
 
 //player profile
-router.get('/publicplayers/:player_id', authenticateToken,checkRole(['player','admin','general','organisation']), playerController.getPublicPlayerProfileDetails);
+router.get('/publicplayers/:player_id', authenticateToken,checkRole(['player','admin','general','organisation','trainer']), playerController.getPublicPlayerProfileDetails);
 router.get('/allplayers', authenticateToken,checkRole(['player']), playerController.getAllPlayers);
 router.get('/profiledetails',authenticateToken,checkRole(['player']), playerController.getPlayerProfileDetails);
 router.get('/getPlayerVideos/:userId', authenticateToken, checkRole(['player','admin','general','organisation']), playerController.getPlayerVideos);
