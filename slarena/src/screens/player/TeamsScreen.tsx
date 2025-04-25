@@ -186,18 +186,19 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
   );
 
   const renderSelectedPlayer = (player: SelectedPlayer) => (
-    <View style={styles.selectedPlayerContainer}>
+    <View key={player.player_id} style={styles.selectedPlayerContainer}>
       <Text style={styles.selectedPlayerName}>{player.name}</Text>
       <View style={styles.rolePickerContainer}>
         <Picker
           selectedValue={player.role}
           onValueChange={(value) => handleRoleChange(player.player_id, value as PlayerRole)}
           style={styles.rolePicker}
+          dropdownIconColor="#2196f3"
         >
-          <Picker.Item label="Batsman" value="Batsman" />
-          <Picker.Item label="Bowler" value="Bowler" />
-          <Picker.Item label="All-Rounder" value="All-Rounder" />
-          <Picker.Item label="Wicket-Keeper" value="Wicket-Keeper" />
+          <Picker.Item label="Batsman" value="Batsman" color="#333" />
+          <Picker.Item label="Bowler" value="Bowler" color="#333" />
+          <Picker.Item label="All-Rounder" value="All-Rounder" color="#333" />
+          <Picker.Item label="Wicket-Keeper" value="Wicket-Keeper" color="#333" />
         </Picker>
       </View>
     </View>
@@ -534,36 +535,52 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#f8f8f8',
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   selectedPlayersTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 12,
+    marginBottom: 16,
     color: '#333',
+    textAlign: 'center',
   },
   selectedPlayerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   selectedPlayerName: {
     fontSize: 16,
     color: '#333',
     flex: 1,
+    fontWeight: '500',
   },
   rolePickerContainer: {
-    width: 150,
-    height: 40,
-    backgroundColor: '#fff',
+    width: 160,
+    height: 50,
+    backgroundColor: '#f8f8f8',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#2196f3',
+    overflow: 'hidden',
   },
   rolePicker: {
-    height: 40,
+    height: 50,
+    color: '#2196f3',
+    fontWeight: '500',
   },
 });
 
