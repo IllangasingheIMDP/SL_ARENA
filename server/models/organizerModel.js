@@ -8,42 +8,19 @@ const createTournament = async (tournamentData) => {
         end_date,
         tournament_type,
         rules,
-        venue_name,
-        city,
-        country,
-        capacity
+        venue_id
     } = tournamentData;
 
-    // Start a transaction
-    const connection = await db.getConnection();
-    await connection.beginTransaction();
-
     try {
-        // First, create the venue
-        const [venueResult] = await connection.execute(
-            `INSERT INTO Venues 
-            (venue_name, city, country, capacity) 
-            VALUES (?, ?, ?, ?)`,
-            [venue_name, city, country, capacity]
-        );
-
-        const venue_id = venueResult.insertId;
-
-        // Then create the tournament with the venue_id
-        const [tournamentResult] = await connection.execute(
+        const [tournamentResult] = await db.execute(
             `INSERT INTO Tournaments 
             (organizer_id, tournament_name, start_date, end_date, tournament_type, rules, status, venue_id) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
             [organizer_id, tournament_name, start_date, end_date, tournament_type, rules, 'upcoming', venue_id]
         );
-
-        await connection.commit();
         return tournamentResult.insertId;
     } catch (error) {
-        await connection.rollback();
         throw error;
-    } finally {
-        connection.release();
     }
 };
 

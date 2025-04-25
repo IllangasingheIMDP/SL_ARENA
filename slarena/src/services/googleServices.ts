@@ -19,7 +19,8 @@ export const googleServices = {
       }
 
       const response = await api.get(`/places/search?${params.toString()}`);
-      return response.data.data;
+
+      return response.data;
     } catch (error) {
       console.error('Error searching places:', error);
       throw error;
@@ -30,7 +31,7 @@ export const googleServices = {
   getPlaceDetails: async (placeId: string): Promise<PlaceDetails> => {
     try {
       const response = await api.get(`/places/details/${placeId}`);
-      return response.data.data;
+      return response.data;
     } catch (error) {
       console.error('Error getting place details:', error);
       throw error;
@@ -130,5 +131,5 @@ export const googleServices = {
     }
   },
 
-  
+
 }; 

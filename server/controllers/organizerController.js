@@ -5,8 +5,6 @@ const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/constants');
 const createTournament = async (req, res) => {
     try {
         const userId = req.user.user_id; // organizer_id
-        console.log('in controller');
-        console.log('fromdata', req.body);
     
 
         const {
@@ -15,18 +13,12 @@ const createTournament = async (req, res) => {
             end_date,
             tournament_type,
             rules,
-            venue_name,
-            city,
-            country,
+            venue_id,
             capacity
         } = req.body;
 
         if (!tournament_name) {
             return res.status(400).json({ message: 'Tournament name is required' });
-        }
-
-        if (!venue_name || !city || !country || !capacity) {
-            return res.status(400).json({ message: 'Venue information is required' });
         }
 
         const newTournamentId = await OrganizerModel.createTournament({
@@ -36,9 +28,7 @@ const createTournament = async (req, res) => {
             end_date,
             tournament_type,
             rules,
-            venue_name,
-            city,
-            country,
+            venue_id,
             capacity
         });
 

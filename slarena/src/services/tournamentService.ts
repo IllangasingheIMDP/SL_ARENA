@@ -97,8 +97,13 @@ export const tournamentService = {
     console.log("in service");
     console.log('tournamentData', tournamentData);
     try {
-      const response = await api.post('/organizers/createtournament', tournamentData);
-      return response.data;
+      console.log('Creating tournament with data:', tournamentData);
+      const response = await api.post('/organizers/createtournament', {
+        ...tournamentData,
+        organizer_id: tournamentData.organizer_id
+      });
+      console.log('Tournament created successfully:', response);
+      return response;
     } catch (error) {
       console.error('Error creating tournament:', error);
       throw error;
