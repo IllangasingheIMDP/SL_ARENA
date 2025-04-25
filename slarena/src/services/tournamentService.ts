@@ -196,7 +196,8 @@ export const tournamentService = {
 
   async saveMatchPhase(matchId: number, phase: string): Promise<void> {
     try {
-      const response = await api.post(`/matches/${matchId}/phase`, {
+      const response = await api.post(`/organizers/playing-11`, {
+        match_id: matchId,
         phase: phase
       });
       return response.data;
