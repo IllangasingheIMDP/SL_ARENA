@@ -303,6 +303,7 @@ const getTournamentsNotApplied = async (excludeIds) => {
   }
 
   return rows;
+};
 
 const updatePlayerBattingStyle = async (player_id, batting_style) => {
   try {
@@ -397,7 +398,7 @@ module.exports = {
   getTournamentIdsByStatus,
   getAllTournamentIdsForTeam,
   getTournamentDetailsByIds,
-  getTournamentsNotApplied
+  getTournamentsNotApplied,
  
 
   updatePlayerBattingStyle,
