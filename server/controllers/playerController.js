@@ -175,6 +175,7 @@ const getPlayerStats = async (req, res) => {
   const getAllPlayers = async (req, res) => {
     try {
         const players = await PlayerModel.getAllPlayers();
+        console.log(players,'players');
         res.json({
             success: true,
             data: players

@@ -37,6 +37,12 @@ router.get('/:team_id/players',
     teamController.getTeamPlayers
 );
 
+router.post('/delete-team', 
+    authenticateToken,
+    checkRole(['player', 'admin', 'organisation', 'trainer']), 
+    teamController.deleteTeam
+);
+
 // POST routes - accessible only by players
 router.post('/', 
     authenticateToken,
@@ -48,6 +54,12 @@ router.post('/add-player',
     authenticateToken,
     checkRole(['player']), 
     teamController.addPlayerToTeam
+);
+
+router.post('/remove-player', 
+    authenticateToken,
+    checkRole(['player', 'admin', 'organisation', 'trainer']), 
+    teamController.removePlayerFromTeam
 );
 
 module.exports = router;

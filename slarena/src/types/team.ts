@@ -7,7 +7,7 @@ export interface Team {
 
 export interface TeamPlayer {
     name: string;
-    
+    player_id: number;
     role: string;
 }
 
