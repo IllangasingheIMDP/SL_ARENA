@@ -116,7 +116,7 @@ const PlayerDashboard = () => {
           style={[styles.navItem, activeTab === 'home' && styles.activeNavItem]} 
           onPress={() => setActiveTab('home')}
         >
-          <Icon name="home" size={24} color={activeTab === 'home' ? '#4CAF50' : '#666'} />
+          <Icon name="home" size={24} color={activeTab === 'home' ? '#000080' : '#5f6368'} />
           <Text style={[styles.navText, activeTab === 'home' && styles.activeNavText]}>Home</Text>
         </TouchableOpacity>
 
@@ -124,7 +124,7 @@ const PlayerDashboard = () => {
           style={[styles.navItem, activeTab === 'teams' && styles.activeNavItem]} 
           onPress={() => setActiveTab('teams')}
         >
-          <Icon name="group" size={24} color={activeTab === 'teams' ? '#4CAF50' : '#666'} />
+          <Icon name="group" size={24} color={activeTab === 'teams' ? '#000080' : '#5f6368'} />
           <Text style={[styles.navText, activeTab === 'teams' && styles.activeNavText]}>Teams</Text>
         </TouchableOpacity>
 
@@ -132,7 +132,7 @@ const PlayerDashboard = () => {
           style={[styles.navItem, activeTab === 'tournaments' && styles.activeNavItem]} 
           onPress={() => setActiveTab('tournaments')}
         >
-          <Icon name="emoji-events" size={24} color={activeTab === 'tournaments' ? '#4CAF50' : '#666'} />
+          <Icon name="emoji-events" size={24} color={activeTab === 'tournaments' ? '#000080' : '#5f6368'} />
           <Text style={[styles.navText, activeTab === 'tournaments' && styles.activeNavText]}>Tournaments</Text>
         </TouchableOpacity>
 
@@ -140,7 +140,7 @@ const PlayerDashboard = () => {
           style={[styles.navItem, activeTab === 'leaderboard' && styles.activeNavItem]} 
           onPress={() => setActiveTab('leaderboard')}
         >
-          <Icon name="leaderboard" size={24} color={activeTab === 'leaderboard' ? '#4CAF50' : '#666'} />
+          <Icon name="leaderboard" size={24} color={activeTab === 'leaderboard' ? '#000080' : '#5f6368'} />
           <Text style={[styles.navText, activeTab === 'leaderboard' && styles.activeNavText]}>LeaderBoard</Text>
         </TouchableOpacity>
       </View>
@@ -151,38 +151,41 @@ const PlayerDashboard = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f0f4f8',
   },
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f0f4f8',
   },
   header: {
     padding: 25,
-    backgroundColor: '#1a237e',
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    backgroundColor: '#000080', // Navy blue
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 2,
     },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 8,
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   welcomeText: {
     fontSize: 16,
-    color: '#fff',
+    color: '#FFD700', // Gold
     opacity: 0.9,
     letterSpacing: 0.5,
   },
   userName: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#FFD700', // Gold
     marginTop: 8,
     letterSpacing: 0.5,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   content: {
     flex: 1,
@@ -205,7 +208,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1a237e',
+    color: '#000080', // Navy blue
     marginBottom: 20,
     letterSpacing: 0.5,
   },
@@ -217,13 +220,13 @@ const styles = StyleSheet.create({
   infoLabel: {
     width: 100,
     fontSize: 16,
-    color: '#666',
+    color: '#5f6368',
     fontWeight: '500',
   },
   infoValue: {
     flex: 1,
     fontSize: 16,
-    color: '#333',
+    color: '#000080', // Navy blue
     fontWeight: '600',
   },
   actionButtons: {
@@ -233,7 +236,7 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   actionButton: {
-    backgroundColor: '#1a237e',
+    backgroundColor: '#000080', // Navy blue
     padding: 18,
     borderRadius: 15,
     width: '48%',
@@ -249,7 +252,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   actionButtonText: {
-    color: '#fff',
+    color: '#FFD700', // Gold
     fontSize: 15,
     fontWeight: 'bold',
     letterSpacing: 0.5,
@@ -257,21 +260,21 @@ const styles = StyleSheet.create({
   eventItem: {
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#e8eaed',
   },
   eventTitle: {
     fontSize: 17,
     fontWeight: 'bold',
-    color: '#1a237e',
+    color: '#000080', // Navy blue
     marginBottom: 5,
   },
   eventDate: {
     fontSize: 14,
-    color: '#666',
+    color: '#5f6368',
     fontWeight: '500',
   },
   switchRoleButton: {
-    backgroundColor: '#1a237e',
+    backgroundColor: '#000080', // Navy blue
     padding: 18,
     borderRadius: 15,
     alignItems: 'center',
@@ -286,7 +289,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   switchRoleButtonText: {
-    color: '#fff',
+    color: '#FFD700', // Gold
     fontSize: 16,
     fontWeight: 'bold',
     letterSpacing: 0.5,
@@ -316,7 +319,7 @@ const styles = StyleSheet.create({
     height: 70,
     backgroundColor: '#fff',
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: '#e8eaed',
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
@@ -332,16 +335,16 @@ const styles = StyleSheet.create({
   },
   activeNavItem: {
     borderTopWidth: 3,
-    borderTopColor: '#1a237e',
+    borderTopColor: '#000080',
   },
   navText: {
     fontSize: 12,
-    color: '#666',
+    color: '#5f6368',
     marginTop: 4,
     fontWeight: '500',
   },
   activeNavText: {
-    color: '#1a237e',
+    color: '#000080',
     fontWeight: 'bold',
   },
 });

@@ -286,8 +286,113 @@ const getPlayerStats = async (req, res) => {
     }
   };
 
+const updatePlayerBattingStyle = async (req, res) => {
+  try {
+    const playerId = req.user.user_id;
+    const { batting_style } = req.body;
 
+    if (!batting_style) {
+      return res.status(400).json({
+        success: false,
+        message: 'Batting style is required'
+      });
+    }
 
+    const result = await PlayerModel.updatePlayerBattingStyle(playerId, batting_style);
+    res.json({
+      success: true,
+      message: 'Batting style updated successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('Error updating batting style:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Server error' 
+    });
+  }
+};
+
+const updatePlayerBowlingStyle = async (req, res) => {
+  try {
+    const playerId = req.user.user_id;
+    const { bowling_style } = req.body;
+
+    if (!bowling_style) {
+      return res.status(400).json({
+        success: false,
+        message: 'Bowling style is required'
+      });
+    }
+
+    const result = await PlayerModel.updatePlayerBowlingStyle(playerId, bowling_style);
+    res.json({
+      success: true,
+      message: 'Bowling style updated successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('Error updating bowling style:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Server error' 
+    });
+  }
+};
+
+const updatePlayerFieldingPosition = async (req, res) => {
+  try {
+    const playerId = req.user.user_id;
+    const { fielding_position } = req.body;
+
+    if (!fielding_position) {
+      return res.status(400).json({
+        success: false,
+        message: 'Fielding position is required'
+      });
+    }
+
+    const result = await PlayerModel.updatePlayerFieldingPosition(playerId, fielding_position);
+    res.json({
+      success: true,
+      message: 'Fielding position updated successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('Error updating fielding position:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Server error' 
+    });
+  }
+};
+
+const updatePlayerRole = async (req, res) => {
+  try {
+    const playerId = req.user.user_id;
+    const { role } = req.body;
+
+    if (!role) {
+      return res.status(400).json({
+        success: false,
+        message: 'Role is required'
+      });
+    }
+
+    const result = await PlayerModel.updatePlayerRole(playerId, role);
+    res.json({
+      success: true,
+      message: 'Player role updated successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('Error updating player role:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Server error' 
+    });
+  }
+};
 
 module.exports ={
   deletePhoto,
@@ -306,6 +411,9 @@ module.exports ={
     uploadVideoForMatch,
     getAllPlayers,
     getPublicPlayerProfileDetails,
-    getTeamsByLeader
-
+    getTeamsByLeader,
+    updatePlayerBattingStyle,
+    updatePlayerBowlingStyle,
+    updatePlayerFieldingPosition,
+    updatePlayerRole
 }

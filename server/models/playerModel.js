@@ -1,5 +1,6 @@
 const db = require("../config/dbconfig"); // assuming you use MySQL2 or similar
 
+
 const getPlayerStats = async (userId) => {
   const [rows] = await db.execute(
     `
@@ -231,6 +232,84 @@ const getTeamsByLeader = async (playerId) => {
   }
 };
 
+const updatePlayerBattingStyle = async (player_id, batting_style) => {
+  try {
+    if (!player_id || isNaN(player_id) || player_id <= 0) {
+      throw new Error('Invalid player_id. Must be a positive number.');
+    }
+
+    await db.execute(
+      `UPDATE Players SET batting_style = ? WHERE player_id = ?`,
+      [batting_style, player_id]
+    );
+
+    return { message: 'Batting style updated successfully' };
+  } catch (error) {
+    console.error(`Error updating batting style for playerId: ${player_id}`, error);
+    throw new Error(`Failed to update batting style: ${error.message}`);
+  }
+};
+
+const updatePlayerBowlingStyle = async (player_id, bowling_style) => {
+  try {
+    if (!player_id || isNaN(player_id) || player_id <= 0) {
+      throw new Error('Invalid player_id. Must be a positive number.');
+    }
+
+    await db.execute(
+      `UPDATE Players SET bowling_style = ? WHERE player_id = ?`,
+      [bowling_style, player_id]
+    );
+
+    return { message: 'Bowling style updated successfully' };
+  } catch (error) {
+    console.error(`Error updating bowling style for playerId: ${player_id}`, error);
+    throw new Error(`Failed to update bowling style: ${error.message}`);
+  }
+};
+
+const updatePlayerFieldingPosition = async (player_id, fielding_position) => {
+  try {
+    if (!player_id || isNaN(player_id) || player_id <= 0) {
+      throw new Error('Invalid player_id. Must be a positive number.');
+    }
+
+    await db.execute(
+      `UPDATE Players SET fielding_position = ? WHERE player_id = ?`,
+      [fielding_position, player_id]
+    );
+
+    return { message: 'Fielding position updated successfully' };
+  } catch (error) {
+    console.error(`Error updating fielding position for playerId: ${player_id}`, error);
+    throw new Error(`Failed to update fielding position: ${error.message}`);
+  }
+};
+
+const updatePlayerRole = async (player_id, role) => {
+  try {
+    if (!player_id || isNaN(player_id) || player_id <= 0) {
+      throw new Error('Invalid player_id. Must be a positive number.');
+    }
+
+    // Validate role
+    const validRoles = ['batting', 'bowling', 'allrounder'];
+    if (!validRoles.includes(role)) {
+      throw new Error('Invalid role. Must be one of: batting, bowling, allrounder');
+    }
+
+    await db.execute(
+      `UPDATE Players SET role = ? WHERE player_id = ?`,
+      [role, player_id]
+    );
+
+    return { message: 'Player role updated successfully' };
+  } catch (error) {
+    console.error(`Error updating role for playerId: ${player_id}`, error);
+    throw new Error(`Failed to update role: ${error.message}`);
+  }
+};
+
 module.exports = {
   getPlayerStats,
   getPlayerAchievements,
@@ -240,6 +319,10 @@ module.exports = {
   getTrainingSessionsByPlayer,
   updateProfileBio,
   getAllPlayers,
-  getTeamsByLeader
+  getTeamsByLeader,
+  updatePlayerBattingStyle,
+  updatePlayerBowlingStyle,
+  updatePlayerFieldingPosition,
+  updatePlayerRole
 };
 
