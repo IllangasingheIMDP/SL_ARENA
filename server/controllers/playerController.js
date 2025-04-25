@@ -287,6 +287,40 @@ const getPlayerStats = async (req, res) => {
   };
 
 
+const getTeamTournaments = async (req, res) => {
+  const { teamId } = req.params;
+
+  try {
+    const [acceptedIds, appliedIds, allIds] = await Promise.all([
+      PlayerModel.getTournamentIdsByStatus(teamId, 'accepted'),
+      PlayerModel.getTournamentIdsByStatus(teamId, 'applied'),
+      PlayerModel.getAllTournamentIdsForTeam(teamId)
+    ]);
+     
+
+    console.log(appliedIds)
+    
+
+    const [registered, applied, notApplied] = await Promise.all([
+      PlayerModel.getTournamentDetailsByIds(acceptedIds),
+      PlayerModel.getTournamentDetailsByIds(appliedIds),
+      PlayerModel.getTournamentsNotApplied(allIds)
+    ]);
+
+    res.json({
+      registered,
+      applied,
+      notApplied
+    });
+  } catch (err) {
+    console.error('Error fetching tournaments:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+
+
 
 
 module.exports ={
@@ -306,6 +340,7 @@ module.exports ={
     uploadVideoForMatch,
     getAllPlayers,
     getPublicPlayerProfileDetails,
-    getTeamsByLeader
+    getTeamsByLeader,
+    getTeamTournaments
 
 }

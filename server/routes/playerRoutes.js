@@ -24,6 +24,7 @@ router.post('/uploadPhoto', authenticateToken, checkRole(['player']), upload.sin
 router.post('/uploadPhotoForMatch', authenticateToken, checkRole(['player']), upload.single('photo'), playerController.uploadPhotoForMatch);
 router.delete('/deletePhoto/:photoId', authenticateToken, checkRole(['player','admin']), playerController.deletePhoto);
 router.get('/getteams', authenticateToken, checkRole(['player']), playerController.getTeamsByLeader);
+router.get('/team/:teamId/tournaments', playerController.getTeamTournaments);
 
 
 
