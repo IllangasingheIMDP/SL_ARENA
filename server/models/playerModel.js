@@ -62,6 +62,8 @@ const getPlayerProfileDetails = async (player_id) => {
     const [rows] = await db.execute(
       `SELECT 
 		  u.name,
+          p.player_id,
+          u.name, 
           p.bio,
           p.batting_style,
           p.bowling_style,
@@ -96,6 +98,8 @@ const getPlayerProfileDetails = async (player_id) => {
 
     // Transform data for frontend
     const profile = {
+      player_id: rows[0].player_id,
+      name: rows[0].name,
       bio: rows[0].bio || 'No bio available',
       batting_style: rows[0].batting_style || 'Unknown',
       bowling_style: rows[0].bowling_style || 'Unknown', // Fixed typo: was batting_style
