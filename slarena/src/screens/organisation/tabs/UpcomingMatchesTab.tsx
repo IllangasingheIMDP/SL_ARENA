@@ -29,7 +29,13 @@ const UpcomingMatchesTab = () => {
   };
 
   const handleViewDetails = (tournament: Tournament) => {
-    navigation.navigate('TournamentDetails', { tournament });
+    // Ensure we have all required data
+    const tournamentWithToss = {
+      ...tournament,
+      toss: tournament.toss || null,
+      venue: tournament.venue || null
+    };
+    navigation.navigate('TournamentDetails', { tournament: tournamentWithToss });
   };
 
   const renderTournamentItem = ({ item }: { item: Tournament }) => (

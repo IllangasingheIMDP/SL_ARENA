@@ -62,3 +62,5 @@ export interface Match {
   team2_name: string | null;
   winner_name: string | null;
 }
+
+export type MatchPhase = 'toss' | 'team_selection' | 'inning_one' | 'inning_two' | 'finished';

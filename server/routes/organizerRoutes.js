@@ -26,6 +26,15 @@ router.post('/tournaments/updateMatchWinner',authenticateToken,checkRole(['organ
 router.get('/upcoming-tournaments', authenticateToken,checkRole(['organisation']), organizerController.getUpcomingTournaments);
 router.post('/playing-11',authenticateToken,checkRole(['organisation']), organizerController.addPlaying11);
 router.get('/innings/:inning_id', authenticateToken,checkRole(['organisation']),organizerController.getInningStats);
+router.get('/match-phase/:matchId', authenticateToken, checkRole(['organisation']), organizerController.getMatchPhaseController);
+router.post('/update-match-phase', authenticateToken, checkRole(['organisation']), organizerController.updateMatchPhaseController);
+router.get('/matches/:matchId', authenticateToken, checkRole(['organisation']), organizerController.getMatchDetailsController);
+router.get('/teams/:teamId', authenticateToken, checkRole(['organisation']), organizerController.getTeamDetailsController);
+router.post('/save-match-result', authenticateToken, checkRole(['organisation']), organizerController.saveMatchResultController);
+router.get('/match-score/:matchId', authenticateToken, checkRole(['organisation']), organizerController.getMatchScoreController);
+router.post('/save-inning-result', authenticateToken, checkRole(['organisation']), organizerController.saveInningResultController);
+router.get('/match-state/:matchId', authenticateToken, checkRole(['organisation']), organizerController.getMatchStateController);
+
 
 
 module.exports = router;

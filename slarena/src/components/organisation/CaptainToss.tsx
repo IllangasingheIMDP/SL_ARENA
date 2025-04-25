@@ -48,14 +48,14 @@ const CaptainTossComponent: React.FC<CaptainTossComponentProps> = ({
   // Get team image source safely
   const getTeamImageSource = (team: Team | null) => {
     try {
-        if(flag == 0){
-            flag = 1;
-            return require('../../../assets/images/default-team.png');
-        }
-        else{
-            flag = 0;
-            return require('../../../assets/images/default-team1.png');
-        }
+      if (!team) return require('../../../assets/images/default-team.png');
+      
+      // Use default-team.png for team1 and default-team1.png for team2
+      if (team.team_id === team1?.team_id) {
+        return require('../../../assets/images/default-team.png');
+      } else {
+        return require('../../../assets/images/default-team1.png');
+      }
     } catch (error) {
       console.log('Error getting team image source:', error);
       return require('../../../assets/images/default-team.png');

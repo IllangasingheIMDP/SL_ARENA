@@ -6,7 +6,7 @@ import { tournamentService } from '../../services/tournamentService';
 import { Team } from '../../types/tournamentTypes';
 import TeamSelection from '../../components/organisation/TeamSelection';
 import ScoreCard from '../../components/organisation/ScoreCard';
-import CaptainTossComponent from '../../components/organisation/CaptainTossComponent';
+import CaptainTossComponent from '../../components/organisation/CaptainToss';
 
 type MatchDetailsRouteProp = RouteProp<RootStackParamList, 'MatchDetails'>;
 

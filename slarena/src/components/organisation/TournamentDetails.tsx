@@ -53,11 +53,11 @@ const TournamentDetails: React.FC<TournamentDetailsProps> = ({
           <Text style={styles.sectionTitle}>Basic Information</Text>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Name:</Text>
-            <Text style={styles.value}>{tournament.tournament_name}</Text>
+            <Text style={styles.value}>{tournament.name}</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Type:</Text>
-            <Text style={styles.value}>{tournament.tournament_name}</Text>
+            <Text style={styles.value}>{tournament.type}</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Status:</Text>
