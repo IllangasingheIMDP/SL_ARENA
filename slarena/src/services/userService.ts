@@ -1,4 +1,5 @@
 import { api } from '../utils/api';
+import { FeedResponse } from '../types/feedTypes';
 
 interface ChooseRoleResponse {
   status: string;
@@ -54,6 +55,16 @@ class UserService {
       return response;
     } catch (error) {
       console.error('Error submitting role request:', error);
+      throw error;
+    }
+  }
+
+  async getFeed(page: number = 1, limit: number = 50): Promise<FeedResponse> {
+    try {
+      const response = await api.get(`/feed/getfeed?page=${page}&limit=${limit}`, true);
+      return response;
+    } catch (error) {
+      console.error('Error fetching feed:', error);
       throw error;
     }
   }
