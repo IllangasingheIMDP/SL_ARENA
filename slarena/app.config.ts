@@ -8,5 +8,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   extra: {
     apiUrl: process.env.API_URL,
     socketUrl: process.env.SOCKET_URL,
+    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
   },
 }); 

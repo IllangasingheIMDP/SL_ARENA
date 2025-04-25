@@ -27,6 +27,7 @@ const getPlayerAchievements = async (): Promise<PlayerAchievement[]> => {
 const getPlayerProfile = async (): Promise<PlayerProfile> => {
   const response = await api.get(`/players/profiledetails`);
   //console.log(response,'response profile');
+  //console.log(response,'response profile');
   return response.data;
 };
 
@@ -98,6 +99,16 @@ const deleteVideo = async (videoId: string): Promise<void> => {
   await api.delete(`/players/deleteVideo/${videoId}`);
 };
 
+const getAllPlayers = async (): Promise<any[]> => {
+  const response = await api.get(`/players/allplayers`);
+  return response.data;
+};
+
+const getPublicPlayerProfile = async (playerId: string): Promise<PlayerProfile> => {
+  const response = await api.get(`/players/publicplayers/${playerId}`);
+  return response.data;
+};
+
 export const playerService = {
   getPlayerStats,
   getPlayerAchievements,
@@ -111,5 +122,7 @@ export const playerService = {
   uploadVideo,
   uploadVideoForMatch,
   deletePhoto,
-  deleteVideo
+  deleteVideo,
+  getAllPlayers,
+  getPublicPlayerProfile
 }; 

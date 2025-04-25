@@ -14,18 +14,12 @@ const createTournament = async (req, res) => {
             end_date,
             tournament_type,
             rules,
-            venue_name,
-            city,
-            country,
+            venue_id,
             capacity
         } = req.body;
 
         if (!tournament_name) {
             return res.status(400).json({ message: 'Tournament name is required' });
-        }
-
-        if (!venue_name || !city || !country || !capacity) {
-            return res.status(400).json({ message: 'Venue information is required' });
         }
 
         const newTournamentId = await OrganizerModel.createTournament({
@@ -35,9 +29,7 @@ const createTournament = async (req, res) => {
             end_date,
             tournament_type,
             rules,
-            venue_name,
-            city,
-            country,
+            venue_id,
             capacity
         });
 
@@ -382,6 +374,19 @@ const updateInningSummary = async (req, res) => {
     }
   };
 
+  const getUpcomingTournaments = async (req, res) => {
+    try{
+        const tournaments = await OrganizerModel.getUpcomingTournaments();
+        res.status(200).json({
+            message: 'Upcoming tournaments fetched successfully',
+            data: tournaments
+        });
+    }catch(error){
+        console.error('Error fetching upcoming tournaments:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+  };
+
 
   const createKnockoutDraw = async (req, res) => {
     const { tournament_id } = req.body;
@@ -443,7 +448,11 @@ module.exports = {
     updateTournamentStatus,
     markAttendance,
     updateTeamAttendance,
+
     createKnockoutDraw,
     viewKnockoutBracket,
-    updateMatchWinner
+    updateMatchWinner,
+
+    getUpcomingTournaments
+
 };

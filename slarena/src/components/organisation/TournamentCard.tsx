@@ -6,6 +6,7 @@ import { Tournament, TournamentStatus } from '../../types/tournamentTypes';
 type TournamentCardProps = {
   tournament: Tournament;
   onStartPress?: () => void;
+  onDrawPress?: () => void;
   onViewTeamsPress?: () => void;
   onDetailsPress?: () => void;
   showFullDetails?: boolean;
@@ -14,6 +15,7 @@ type TournamentCardProps = {
 const TournamentCard: React.FC<TournamentCardProps> = ({
   tournament,
   onStartPress,
+  onDrawPress,
   onViewTeamsPress,
   onDetailsPress,
   showFullDetails = false,
@@ -109,7 +111,7 @@ const TournamentCard: React.FC<TournamentCardProps> = ({
           )}
           
           {tournament.status === 'matches' && (
-            <TouchableOpacity style={styles.button} onPress={onStartPress}>
+            <TouchableOpacity style={styles.button} onPress={onDrawPress}>
               <Icon name="format-list-bulleted" size={20} color="#fff" />
               <Text style={styles.buttonText}>View Draw</Text>
             </TouchableOpacity>

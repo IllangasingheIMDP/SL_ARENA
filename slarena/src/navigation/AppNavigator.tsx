@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../context/AuthContext';
+import { Tournament } from '../types/tournamentTypes';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import RoleScreen from '../screens/RoleScreen';
@@ -20,6 +21,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Route } from '@react-navigation/native';
 import TournamentTeamsScreen from '../screens/organisation/TournamentTeamsScreen';
 import TeamDetailsScreen from '../screens/organisation/TeamDetailsScreen';
+import RoleManagementScreen from '../screens/organisation/RoleManagementScreen';
+import CreateTournamentScreen from '../screens/organisation/CreateTournamentScreen';
+import TournamentDetailsScreen from '../screens/organisation/TournamentDetailsScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -36,6 +40,9 @@ export type RootStackParamList = {
   Notifications: undefined;
   TournamentTeams: { tournamentId: number };
   TeamDetails: { teamId: number };
+  RoleManagement: undefined;
+  CreateTournament: undefined;
+  TournamentDetails: { tournament: Tournament };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -126,7 +133,7 @@ const AppNavigator = () => {
                         options={{
                           title: 'Organisation Dashboard',
                           headerBackVisible: false,
-                          headerShown: false,
+                          
                         }}
                       />
                       <Stack.Screen
@@ -134,7 +141,7 @@ const AppNavigator = () => {
                         component={TournamentTeamsScreen}
                         options={{
                           title: 'Tournament Teams',
-                          headerShown: false,
+                          
                         }}
                       />
                       <Stack.Screen
@@ -142,6 +149,22 @@ const AppNavigator = () => {
                         component={TeamDetailsScreen}
                         options={{
                           title: 'Team Details',
+                          
+                        }}
+                      />
+                      <Stack.Screen
+                        name="RoleManagement"
+                        component={RoleManagementScreen}
+                        options={{
+                          title: 'Role Management',
+                          headerShown: false,
+                        }}
+                      />
+                      <Stack.Screen
+                        name="TournamentDetails"
+                        component={TournamentDetailsScreen}
+                        options={{
+                          title: 'Tournament Details',
                           headerShown: false,
                         }}
                       />
@@ -150,6 +173,14 @@ const AppNavigator = () => {
                         component={NotificationScreen}
                         options={{
                           title: 'Notifications',
+                        }}
+                      />
+                      <Stack.Screen
+                        name="CreateTournament"
+                        component={CreateTournamentScreen}
+                        options={{
+                          title: 'Create Tournament',
+                          headerShown: false,
                         }}
                       />
                     </>

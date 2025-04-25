@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS saved_places (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  place_id VARCHAR(255) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  formatted_address TEXT,
+  latitude DECIMAL(10, 8) NOT NULL,
+  longitude DECIMAL(11, 8) NOT NULL,
+  photo_reference VARCHAR(255),
+  rating DECIMAL(2, 1),
+  types JSON,
+  vicinity TEXT,
+  website VARCHAR(255),
+  phone_number VARCHAR(50),
+  opening_hours JSON,
+  user_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  UNIQUE KEY unique_place_user (place_id, user_id)
+); 

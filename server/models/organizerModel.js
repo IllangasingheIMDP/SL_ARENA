@@ -8,42 +8,19 @@ const createTournament = async (tournamentData) => {
         end_date,
         tournament_type,
         rules,
-        venue_name,
-        city,
-        country,
-        capacity
+        venue_id
     } = tournamentData;
 
-    // Start a transaction
-    const connection = await db.getConnection();
-    await connection.beginTransaction();
-
     try {
-        // First, create the venue
-        const [venueResult] = await connection.execute(
-            `INSERT INTO Venues 
-            (venue_name, city, country, capacity) 
-            VALUES (?, ?, ?, ?)`,
-            [venue_name, city, country, capacity]
-        );
-
-        const venue_id = venueResult.insertId;
-
-        // Then create the tournament with the venue_id
-        const [tournamentResult] = await connection.execute(
+        const [tournamentResult] = await db.execute(
             `INSERT INTO Tournaments 
             (organizer_id, tournament_name, start_date, end_date, tournament_type, rules, status, venue_id) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
             [organizer_id, tournament_name, start_date, end_date, tournament_type, rules, 'upcoming', venue_id]
         );
-
-        await connection.commit();
         return tournamentResult.insertId;
     } catch (error) {
-        await connection.rollback();
         throw error;
-    } finally {
-        connection.release();
     }
 };
 
@@ -413,6 +390,7 @@ const updateInningSummary = async (inning_id) => {
   };
 
 
+
   const generateKnockoutDraw = async (tournament_id) => {
     const [teams] = await db.execute(
       `SELECT team_id FROM tournament_applicants WHERE tournament_id = ? AND attendance = TRUE`,
@@ -555,6 +533,19 @@ const updateInningSummary = async (inning_id) => {
 
 
 
+  const getUpcomingTournaments = async () => {
+    try{
+        const [rows] = await db.execute(
+            `select T.organizer_id , T.tournament_name , T.start_date , T.end_date , T.tournament_type , T.rules
+            from Tournaments T
+            where T.status='upcoming';`
+        );
+        return rows;
+    }catch(error){
+        throw error;
+    }
+  }
+
 module.exports = {
     createTournament,
     getTournamentsByOrganizer,
@@ -573,7 +564,11 @@ module.exports = {
     updateTournamentStatus,
     markAttendance,
     updateTeamAttendance,
+
     generateKnockoutDraw,
     updateMatchWinner,
-    viewKnockoutBracket
+    viewKnockoutBracket,
+
+    getUpcomingTournaments
+
 };
