@@ -16,6 +16,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 // Import new screens
 import TeamsScreen from './TeamsScreen';
 import LeaderBoardScreen from './LeaderBoardScreen';
+import TournamentsScreen from './TournamentsScreen';
 
 const PlayerDashboard = () => {
   const { user, logout, setSelectedRole } = useAuth();
@@ -104,6 +105,8 @@ const PlayerDashboard = () => {
         return <TeamsScreen />;
       case 'leaderboard':
         return <LeaderBoardScreen />;
+      case 'tournaments':
+        return <TournamentsScreen />;
       default:
         return null;
     }
@@ -132,6 +135,14 @@ const PlayerDashboard = () => {
         >
           <Icon name="group" size={24} color={activeTab === 'teams' ? '#4CAF50' : '#666'} />
           <Text style={[styles.navText, activeTab === 'teams' && styles.activeNavText]}>Teams</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.navItem, activeTab === 'tournaments' && styles.activeNavItem]} 
+          onPress={() => setActiveTab('tournaments')}
+        >
+          <Icon name="emoji-events" size={24} color={activeTab === 'tournaments' ? '#4CAF50' : '#666'} />
+          <Text style={[styles.navText, activeTab === 'tournaments' && styles.activeNavText]}>Tournaments</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
