@@ -390,6 +390,149 @@ const updateInningSummary = async (inning_id) => {
   };
 
 
+
+  const generateKnockoutDraw = async (tournament_id) => {
+    const [teams] = await db.execute(
+      `SELECT team_id FROM tournament_applicants WHERE tournament_id = ? AND attendance = TRUE`,
+      [tournament_id]
+    );
+  
+    const teamIds = teams.map(t => t.team_id);
+    const totalTeams = teamIds.length;
+  
+    if (totalTeams < 2) throw new Error("Not enough teams to generate draw");
+  
+    // Shuffle
+    for (let i = teamIds.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [teamIds[i], teamIds[j]] = [teamIds[j], teamIds[i]];
+    }
+  
+    const nextPowerOfTwo = Math.pow(2, Math.ceil(Math.log2(totalTeams)));
+    const byes = nextPowerOfTwo - totalTeams;
+  
+    const round1Matches = [];
+    const byeTeams = [];
+  
+    let matchNumber = 1;
+  
+    // Step 1: Assign byes
+    for (let i = 0; i < byes; i++) {
+      const team = teamIds.shift();
+      byeTeams.push(team);
+    }
+  
+    // Step 2: Create Round 1 matches
+    while (teamIds.length >= 2) {
+      const team1 = teamIds.shift();
+      const team2 = teamIds.shift();
+      round1Matches.push([tournament_id, 1, matchNumber++, team1, team2, null]);
+    }
+  
+    const matches = [...round1Matches];
+  
+    // Step 3: Create Round 2 placeholders
+    let round = 2;
+    let teamsInRound = round1Matches.length + byeTeams.length;
+    const round2Matches = [];
+  
+    const round2Count = Math.floor(teamsInRound / 2);
+    for (let i = 0; i < round2Count; i++) {
+      round2Matches.push({ tournament_id, round, match_number: matchNumber++, team1_id: null, team2_id: null, winner_id: null });
+    }
+  
+    // Step 4: Assign bye teams to round 2
+    for (const team of byeTeams) {
+      for (let match of round2Matches) {
+        if (!match.team1_id) {
+          match.team1_id = team;
+          break;
+        } else if (!match.team2_id) {
+          match.team2_id = team;
+          break;
+        }
+      }
+    }
+  
+    // Add Round 2 matches to matches array
+    for (let m of round2Matches) {
+      matches.push([
+        m.tournament_id,
+        m.round,
+        m.match_number,
+        m.team1_id,
+        m.team2_id,
+        m.winner_id
+      ]);
+    }
+  
+    // Step 5: Generate placeholders for further rounds
+    teamsInRound = round2Matches.length;
+  
+    while (teamsInRound > 1) {
+      const matchesInRound = Math.floor(teamsInRound / 2);
+      for (let i = 0; i < matchesInRound; i++) {
+        matches.push([tournament_id, ++round, matchNumber++, null, null, null]);
+      }
+      teamsInRound = matchesInRound;
+    }
+  
+    // Final insert
+    if (matches.length > 0) {
+      await db.query(
+        `INSERT INTO Matches (tournament_id, round, match_number, team1_id, team2_id, winner_id) VALUES ?`,
+        [matches]
+      );
+    } else {
+      throw new Error("No matches generated.");
+    }
+  };
+  
+  const updateMatchWinner = async (match_id, winner_id) => {
+    await db.execute('UPDATE Matches SET winner_id = ? WHERE match_id = ?', [winner_id, match_id]);
+  
+    const [[match]] = await db.execute('SELECT * FROM Matches WHERE match_id = ?', [match_id]);
+    const { tournament_id, round } = match;
+  
+    const [nextRoundMatches] = await db.execute(
+      'SELECT * FROM Matches WHERE tournament_id = ? AND round = ? ORDER BY match_number ASC',
+      [tournament_id, round + 1]
+    );
+  
+    for (const nextMatch of nextRoundMatches) {
+      if (!nextMatch.team1_id) {
+        await db.execute('UPDATE Matches SET team1_id = ? WHERE match_id = ?', [winner_id, nextMatch.match_id]);
+        break;
+      } else if (!nextMatch.team2_id) {
+        await db.execute('UPDATE Matches SET team2_id = ? WHERE match_id = ?', [winner_id, nextMatch.match_id]);
+        break;
+      }
+    }
+  };
+  
+  const viewKnockoutBracket = async (tournament_id) => {
+    const [rows] = await db.execute(
+      `SELECT m.match_id, m.round, m.match_number,
+              t1.team_name AS team1_name,
+              t2.team_name AS team2_name,
+              w.team_name AS winner_name
+       FROM Matches m
+       LEFT JOIN Teams t1 ON m.team1_id = t1.team_id
+       LEFT JOIN Teams t2 ON m.team2_id = t2.team_id
+       LEFT JOIN Teams w ON m.winner_id = w.team_id
+       WHERE m.tournament_id = ?
+       ORDER BY m.round, m.match_number`,
+      [tournament_id]
+    );
+  
+    return rows;
+  };
+  
+  
+  
+
+
+
   const getUpcomingTournaments = async () => {
     try{
         const [rows] = await db.execute(
@@ -421,5 +564,11 @@ module.exports = {
     updateTournamentStatus,
     markAttendance,
     updateTeamAttendance,
+
+    generateKnockoutDraw,
+    updateMatchWinner,
+    viewKnockoutBracket,
+
     getUpcomingTournaments
+
 };

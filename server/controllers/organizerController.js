@@ -1,6 +1,7 @@
 const OrganizerModel = require('../models/organizerModel');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/constants');
+const db = require("../config/dbconfig");
 
 const createTournament = async (req, res) => {
     try {
@@ -387,6 +388,44 @@ const updateInningSummary = async (req, res) => {
   };
 
 
+  const createKnockoutDraw = async (req, res) => {
+    const { tournament_id } = req.body;
+  
+    try {
+      await OrganizerModel.generateKnockoutDraw(tournament_id);
+      res.status(200).json({ message: 'Knockout draw created successfully' });
+    } catch (err) {
+      console.error('Error creating draw:', err);
+      res.status(500).json({ error: 'Failed to create knockout draw' });
+    }
+  };
+  
+  const viewKnockoutBracket = async (req, res) => {
+    const { tournament_id } = req.params;
+    try {
+      const bracket = await OrganizerModel.viewKnockoutBracket(tournament_id);
+      res.status(200).json(bracket);
+    } catch (err) {
+      console.error('Error fetching bracket:', err);
+      res.status(500).json({ error: 'Failed to fetch bracket' });
+    }
+  };
+  
+  const updateMatchWinner = async (req, res) => {
+    const { match_id, winner_id } = req.body;
+    try {
+      await OrganizerModel.updateMatchWinner(match_id, winner_id);
+      res.status(200).json({ message: 'Winner updated and draw advanced' });
+    } catch (err) {
+      console.error('Error updating winner:', err);
+      res.status(500).json({ error: 'Failed to update winner' });
+    }
+  };
+
+
+
+
+
 
 
 
@@ -409,5 +448,11 @@ module.exports = {
     updateTournamentStatus,
     markAttendance,
     updateTeamAttendance,
+
+    createKnockoutDraw,
+    viewKnockoutBracket,
+    updateMatchWinner,
+
     getUpcomingTournaments
+
 };
