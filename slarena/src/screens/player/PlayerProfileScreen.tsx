@@ -257,16 +257,46 @@ const PlayerProfileScreen = () => {
         <Text style={styles.sectionTitle}>Statistics</Text>
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>{stats?.matches_played || 0}</Text>
+            <View style={styles.statValueContainer}>
+              <Text style={styles.statValue}>{stats?.matches_played || 0}</Text>
+            </View>
             <Text style={styles.statLabel}>Matches</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>{stats?.total_runs || 0}</Text>
+            <View style={styles.statValueContainer}>
+              <Text style={styles.statValue}>{stats?.total_runs || 0}</Text>
+            </View>
             <Text style={styles.statLabel}>Runs</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>{stats?.total_wickets || 0}</Text>
+            <View style={styles.statValueContainer}>
+              <Text style={styles.statValue}>{stats?.total_wickets || 0}</Text>
+            </View>
             <Text style={styles.statLabel}>Wickets</Text>
+          </View>
+          <View style={styles.statItem}>
+            <View style={styles.statValueContainer}>
+              <Text style={styles.statValue}>{profile?.batting_points || 0}</Text>
+            </View>
+            <Text style={styles.statLabel}>Batting Points</Text>
+          </View>
+          <View style={styles.statItem}>
+            <View style={styles.statValueContainer}>
+              <Text style={styles.statValue}>{profile?.bowling_points || 0}</Text>
+            </View>
+            <Text style={styles.statLabel}>Bowling Points</Text>
+          </View>
+          <View style={styles.statItem}>
+            <View style={styles.statValueContainer}>
+              <Text style={styles.statValue}>{profile?.allrounder_points || 0}</Text>
+            </View>
+            <Text style={styles.statLabel}>Allrounder Points</Text>
+          </View>
+          <View style={[styles.statItem, styles.roleStatItem]}>
+            <View style={styles.statValueContainer}>
+              <Text style={styles.statValue}>{(profile?.role || 'Role').charAt(0).toUpperCase() + (profile?.role || 'Role').slice(1).toLowerCase()}</Text>
+            </View>
+            <Text style={styles.statLabel}>Role</Text>
           </View>
         </View>
       </View>
@@ -607,19 +637,57 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    padding: 10,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   statItem: {
+    width: '30%',
+    marginBottom: 20,
     alignItems: 'center',
   },
+  roleStatItem: {
+    width: 'auto',
+    minWidth: '30%',
+    paddingHorizontal: 15,
+  },
+  statValueContainer: {
+    backgroundColor: '#fff',
+    padding: 12,
+    borderRadius: 10,
+    width: '100%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 2.22,
+    elevation: 3,
+    marginBottom: 8,
+  },
   statValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: '700',
     color: '#f4511e',
+    textAlign: 'center',
   },
   statLabel: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#666',
+    fontWeight: '500',
+    textAlign: 'center',
   },
   bioText: {
     fontSize: 16,

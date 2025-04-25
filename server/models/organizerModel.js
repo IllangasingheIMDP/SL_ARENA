@@ -412,6 +412,7 @@ const updateInningSummary = async (inning_id) => {
     return result;
   };
 
+
   const getUpcomingTournaments = async () => {
     try{
         const [rows] = await db.execute(
@@ -425,12 +426,6 @@ const updateInningSummary = async (inning_id) => {
         throw error;
     }
   }
-
-  
-  
-  
-
-
 
 module.exports = {
     createTournament,

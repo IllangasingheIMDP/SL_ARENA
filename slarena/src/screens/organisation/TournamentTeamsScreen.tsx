@@ -64,7 +64,7 @@ const TournamentTeamsScreen = () => {
       onPress={() => handleViewTeamDetails(item)}
     >
       <View style={styles.teamInfo}>
-        <Text style={styles.teamName}>{item.team_name}</Text>
+        <Text style={styles.teamName}>Team {item.team_name}</Text>
       </View>
       <Icon name="chevron-right" size={24} color="#666" />
     </TouchableOpacity>
@@ -81,12 +81,7 @@ const TournamentTeamsScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Icon name="arrow-back" size={24} color="#333" />
-        </TouchableOpacity>
+        
         <Text style={styles.title}>Tournament Teams</Text>
       </View>
       

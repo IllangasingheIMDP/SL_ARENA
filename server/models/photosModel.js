@@ -29,6 +29,9 @@ const deletePhoto = async (photoId) => {
   );
   return rows;
 };
+
+
+
 module.exports = {
   getPlayerPhotos,
   uploadPhoto,
