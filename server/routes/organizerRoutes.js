@@ -23,7 +23,6 @@ router.put('/tournaments/updatestatus', organizerController.updateTournamentStat
 router.post('/tournaments/generateKnockoutDraw',organizerController.createKnockoutDraw);
 router.get('/tournaments/knockoutBracket/:tournament_id',organizerController.viewKnockoutBracket);
 router.post('/tournaments/updateMatchWinner',organizerController.updateMatchWinner)
-
 router.get('/upcoming-tournaments', authenticateToken,checkRole(['organisation']), organizerController.getUpcomingTournaments);
 
 

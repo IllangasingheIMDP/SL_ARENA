@@ -26,6 +26,7 @@ import CreateTournamentScreen from '../screens/organisation/CreateTournamentScre
 import TournamentDetailsScreen from '../screens/organisation/TournamentDetailsScreen';
 import TeamsScreen from '../screens/player/TeamsScreen';
 import CreateTeamScreen from '../screens/player/CreateTeamScreen';
+import MatchDetails from '../screens/organisation/MatchDetails';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -47,6 +48,14 @@ export type RootStackParamList = {
   TournamentDetails: { tournament: Tournament };
   Teams: undefined;
   CreateTeam: undefined;
+  MatchDetails: {
+    matchId: number;
+    tournamentId: number;
+    team1Id: number;
+    team2Id: number;
+    team1Name: string;
+    team2Name: string;
+  };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -313,6 +322,11 @@ const AppNavigator = () => {
             />
           </>
         )}
+        <Stack.Screen 
+          name="MatchDetails" 
+          component={MatchDetails}
+          options={{ title: 'Match Details' }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

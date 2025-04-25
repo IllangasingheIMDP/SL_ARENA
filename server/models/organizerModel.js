@@ -384,7 +384,7 @@ const updateInningSummary = async (inning_id) => {
 
   const generateKnockoutDraw = async (tournament_id) => {
     const [teams] = await db.execute(
-      `SELECT team_id FROM tournament_applicants WHERE tournament_id = ? AND attendance = TRUE`,
+      `SELECT team_id FROM tournament_applicants WHERE tournament_id = ? AND attendance = TRUE AND status = 'accepted'`,
       [tournament_id]
     );
   
