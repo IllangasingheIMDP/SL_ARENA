@@ -336,7 +336,50 @@ const updateInningSummary = async (req, res) => {
       res.status(500).json({ error: 'Failed to update tournament status' });
     }
   };
+
+  const markAttendance = async (req, res) => {
+    try {
+      const { ids } = req.body;
   
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: 'Invalid or empty list of IDs.' });
+      }
+  
+      const result = await OrganizerModel.markAttendance(ids);
+      res.status(200).json({ message: 'Attendance marked successfully', result });
+    } catch (err) {
+      console.error('Error marking attendance:', err);
+      res.status(500).json({ message: 'Server error while marking attendance.' });
+    }
+  };
+  
+
+  const updateTeamAttendance = async (req, res) => {
+    try {
+      const { tournamentId, teamId } = req.params;
+      const { isPresent } = req.body;
+  
+      if (typeof isPresent !== 'boolean') {
+        return res.status(400).json({ message: '`isPresent` must be a boolean' });
+      }
+  
+      const result = await OrganizerModel.updateTeamAttendance(tournamentId, teamId, isPresent);
+  
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: 'No matching record found' });
+      }
+  
+      res.status(200).json({
+        message: 'Attendance updated successfully',
+        tournamentId,
+        teamId,
+        isPresent,
+      });
+    } catch (error) {
+      console.error('Error updating attendance:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
 
 
 
@@ -358,5 +401,7 @@ module.exports = {
     getNextBallController,
     updateInningSummary,
     updatePlayerStats,
-    updateTournamentStatus
+    updateTournamentStatus,
+    markAttendance,
+    updateTeamAttendance
 };

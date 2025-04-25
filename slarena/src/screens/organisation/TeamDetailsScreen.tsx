@@ -39,7 +39,6 @@ const TeamDetailsScreen = () => {
       
       // Fetch player stats from the backend
       const stats = await tournamentService.getTeamPlayerStats(team_.team_id);
-      console.log('Player stats:', stats);
       
       // Create a team object from the first player's data
       if (stats && stats.length > 0) {
@@ -63,8 +62,8 @@ const TeamDetailsScreen = () => {
       } else {
         // If no stats available, create a basic team object
         const teamData: Team = {
-          team_id: teamId,
-          team_name: `Team ${teamId}`,
+          team_id: team_.team_id,
+          team_name: `Team ${team_.team_id}`,
           captain_id: undefined,
         };
         
@@ -91,13 +90,6 @@ const TeamDetailsScreen = () => {
     fetchTeamDetails();
   };
 
-  const handleViewPlayerDetails = (playerId: number) => {
-    // Navigate to player details screen
-    // Comment out or remove this navigation until PlayerDetails screen is implemented
-    // navigation.navigate('PlayerDetails', { playerId });
-    Alert.alert('Coming Soon', 'Player details screen will be available soon.');
-  };
-
   const renderPlayerItem = ({ item }: { item: TeamPlayer }) => {
     // Find player stats if available
     const stats = playerStats.find(stat => stat.player_id === item.player_id);
@@ -111,7 +103,6 @@ const TeamDetailsScreen = () => {
           styles.playerItem,
           isCaptain && styles.captainItem
         ]}
-        onPress={() => handleViewPlayerDetails(item.player_id)}
       >
         <View style={styles.playerInfo}>
           <View style={styles.nameContainer}>
@@ -136,7 +127,6 @@ const TeamDetailsScreen = () => {
             </View>
           )}
         </View>
-        <Icon name="chevron-right" size={24} color="#666" />
       </TouchableOpacity>
     );
   };

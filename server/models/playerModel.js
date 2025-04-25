@@ -211,6 +211,22 @@ const getAllPlayers = async () => {
   }
 };
 
+const getTeamsByLeader = async (playerId) => {
+  try {
+    const [rows] = await db.execute(
+      `SELECT team_name 
+       FROM Teams 
+       WHERE captain_id = ?`,
+      [playerId]
+    );
+
+    return rows;
+  } catch (error) {
+    console.error(`Error fetching teams for leader: ${playerId}`, error);
+    throw new Error(`Failed to fetch teams: ${error.message}`);
+  }
+};
+
 module.exports = {
   getPlayerStats,
   getPlayerAchievements,
@@ -220,5 +236,6 @@ module.exports = {
   getTrainingSessionsByPlayer,
   updateProfileBio,
   getAllPlayers
+  getTeamsByLeader
 };
 

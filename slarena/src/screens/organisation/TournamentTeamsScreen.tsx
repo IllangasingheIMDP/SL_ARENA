@@ -55,7 +55,7 @@ const TournamentTeamsScreen = () => {
 
   const handleViewTeamDetails = (team_: Team) => {
     // Navigate to team details screen
-    navigation.navigate('TeamDetails', { team_ });
+    navigation.navigate('TeamDetails',  {team_} );
   };
 
   const renderTeamItem = ({ item }: { item: Team }) => (

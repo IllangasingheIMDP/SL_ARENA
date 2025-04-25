@@ -387,9 +387,30 @@ const updateInningSummary = async (inning_id) => {
     );
     return result;
   };
+
+  const markAttendance = async (ids) => {
+    const placeholders = ids.map(() => '?').join(',');
+    const sql = `
+      UPDATE tournament_applicants
+      SET attendance = TRUE
+      WHERE id IN (${placeholders})
+    `;
+    const [result] = await db.execute(sql, ids);
+    return result;
+  };
+
+  const updateTeamAttendance = async (tournamentId, teamId, isPresent) => {
+    console.log("Update team attendance")
+    console.log(tournamentId,teamId,isPresent)
+    const [result] = await db.execute(
+      `UPDATE tournament_applicants 
+       SET attendance = ? 
+       WHERE tournament_id = ? AND team_id = ?`,
+      [isPresent, tournamentId, teamId]
+    );
   
-
-
+    return result;
+  };
 
 module.exports = {
     createTournament,
@@ -406,5 +427,7 @@ module.exports = {
     getNextBall,
     updateInningSummary,
     updatePlayerStats,
-    updateTournamentStatus
+    updateTournamentStatus,
+    markAttendance,
+    updateTeamAttendance
 };
