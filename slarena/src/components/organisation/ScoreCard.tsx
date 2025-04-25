@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Team } from '../../types/tournamentTypes';
-import { tournamentService } from '../../services/tournamentService';
+import { matchService } from '../../services/matchService';
 
 interface ScoreCardProps {
   matchId: number;
@@ -12,6 +12,7 @@ interface ScoreCardProps {
     team1: number[];
     team2: number[];
   };
+  onInningComplete: () => Promise<void>;
 }
 
 interface PlayerScore {
@@ -48,7 +49,8 @@ const ScoreCard: React.FC<ScoreCardProps> = ({
   team1,
   team2,
   battingTeam,
-  selectedPlayers
+  selectedPlayers,
+  onInningComplete
 }) => {
   const [battingTeamScore, setBattingTeamScore] = useState<TeamScore | null>(null);
   const [bowlingTeamScore, setBowlingTeamScore] = useState<TeamScore | null>(null);
@@ -61,7 +63,7 @@ const ScoreCard: React.FC<ScoreCardProps> = ({
   const fetchScores = async () => {
     try {
       setLoading(true);
-      const scores = await tournamentService.getMatchScores(matchId);
+      const scores = await matchService.getMatchScore(matchId);
       if (battingTeam === team1?.team_id) {
         setBattingTeamScore(scores.team1);
         setBowlingTeamScore(scores.team2);

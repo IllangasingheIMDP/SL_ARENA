@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import CaptainTossComponent from './CaptainTossComponent';
 import TeamSelection from './TeamSelection';
+import ScoreCard from './ScoreCard';
 import { Team } from '../../types/tournamentTypes';
 import { matchService } from '../../services/matchService';
+import { useMatch, MatchProvider } from '../../context/MatchContext';
 
 interface MatchFlowProps {
   matchId: number;
@@ -12,101 +14,145 @@ interface MatchFlowProps {
   onComplete: (inningId: number, team1Players: number[], team2Players: number[]) => void;
 }
 
-const MatchFlow: React.FC<MatchFlowProps> = ({
+const MatchFlowContent: React.FC<MatchFlowProps> = ({
   matchId,
   team1,
   team2,
   onComplete
 }) => {
-  // Track the current step in the match flow
-  const [currentStep, setCurrentStep] = useState<'toss' | 'team_selection' | 'loading'>('toss');
-  
-  // Store the batting and bowling team IDs after toss
-  const [battingTeamId, setBattingTeamId] = useState<number | null>(null);
-  const [bowlingTeamId, setBowlingTeamId] = useState<number | null>(null);
-  
-  // Store the inning ID after creation
-  const [inningId, setInningId] = useState<number | null>(null);
+  const { 
+    matchState, 
+    setMatchPhase, 
+    setInningId, 
+    setBattingTeam, 
+    setSelectedPlayers 
+  } = useMatch();
 
-  // Handle the completion of toss and batting choice
+  useEffect(() => {
+    // Check current phase when component mounts
+    const checkCurrentPhase = async () => {
+      try {
+        const response = await matchService.getMatchPhase(matchId);
+        if (response.phase) {
+          setMatchPhase(response.phase as any);
+        }
+      } catch (error) {
+        console.error('Error checking match phase:', error);
+      }
+    };
+    checkCurrentPhase();
+  }, [matchId]);
+
   const handleTossComplete = (winnerId: number) => {
-    // This is just for tracking purposes - not used for inning creation
     console.log(`Team ${winnerId} won the toss`);
   };
 
-  // Handle the batting team choice
   const handleBattingChoice = async (battingId: number) => {
-    // Determine bowling team ID based on batting team ID
     const bowlingId = battingId === team1.team_id ? team2.team_id : team1.team_id;
     
-    // Set the batting and bowling team IDs
-    setBattingTeamId(battingId);
-    setBowlingTeamId(bowlingId);
-    
-    // Show loading while creating inning
-    setCurrentStep('loading');
-    
     try {
-      // Call API to create inning
+      // Create inning in background
       const response = await matchService.createInning(matchId, battingId, bowlingId);
-      
-      // Store the inning ID returned from API
       setInningId(response.inning_id);
+      setBattingTeam(battingId, bowlingId);
       
-      // Proceed to team selection
-      setCurrentStep('team_selection');
+      // Move to team selection
+      await setMatchPhase('team_selection');
     } catch (error) {
       console.error('Error creating inning:', error);
       Alert.alert(
         'Error',
         'Failed to create inning. Please try again.',
-        [{ text: 'OK', onPress: () => setCurrentStep('toss') }]
+        [{ text: 'OK', onPress: () => setMatchPhase('toss') }]
       );
     }
   };
 
-  // Handle completion of team selection
-  const handleTeamSelectionComplete = (team1Players: number[], team2Players: number[]) => {
-    // Pass inning ID along with selected players to parent component
-    if (inningId) {
-      onComplete(inningId, team1Players, team2Players);
-    } else {
-      Alert.alert('Error', 'No inning ID available. Please restart the process.');
+  const handleTeamSelectionComplete = async (team1Players: number[], team2Players: number[]) => {
+    try {
+      setSelectedPlayers(team1Players, team2Players);
+      await setMatchPhase('inning_one');
+      onComplete(matchState.inningId!, team1Players, team2Players);
+    } catch (error) {
+      console.error('Error completing team selection:', error);
+      Alert.alert('Error', 'Failed to complete team selection. Please try again.');
     }
   };
 
-  // Render the appropriate component based on current step
+  const renderCurrentPhase = () => {
+    switch (matchState.currentPhase) {
+      case 'toss':
+        return (
+          <CaptainTossComponent
+            team1={team1}
+            team2={team2}
+            team1Name={team1.team_name}
+            team2Name={team2.team_name}
+            onComplete={handleTossComplete}
+            onBattingChoice={handleBattingChoice}
+          />
+        );
+      
+      case 'team_selection':
+        return (
+          <TeamSelection
+            team1={matchState.battingTeamId === team1.team_id ? team1 : team2}
+            team2={matchState.bowlingTeamId === team2.team_id ? team2 : team1}
+            team1Name={matchState.battingTeamId === team1.team_id ? `${team1.team_name} (Batting)` : `${team2.team_name} (Batting)`}
+            team2Name={matchState.bowlingTeamId === team2.team_id ? `${team2.team_name} (Bowling)` : `${team1.team_name} (Bowling)`}
+            matchId={matchId}
+            inningId={matchState.inningId || 0}
+            onComplete={handleTeamSelectionComplete}
+          />
+        );
+      
+      case 'inning_one':
+      case 'inning_two':
+        return (
+          <ScoreCard
+            matchId={matchId}
+            team1={team1}
+            team2={team2}
+            battingTeam={matchState.battingTeamId}
+            selectedPlayers={matchState.selectedPlayers}
+            onInningComplete={async () => {
+              if (matchState.currentPhase === 'inning_one') {
+                await setMatchPhase('inning_two');
+              } else {
+                await setMatchPhase('finished');
+              }
+            }}
+          />
+        );
+      
+      case 'finished':
+        return (
+          <View style={styles.container}>
+            <Text style={styles.finishedText}>Match Completed</Text>
+          </View>
+        );
+      
+      default:
+        return (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#4CAF50" />
+          </View>
+        );
+    }
+  };
+
   return (
     <View style={styles.container}>
-      {currentStep === 'toss' && (
-        <CaptainTossComponent
-          team1={team1}
-          team2={team2}
-          team1Name={team1.team_name}
-          team2Name={team2.team_name}
-          onComplete={handleTossComplete}
-          onBattingChoice={handleBattingChoice}
-        />
-      )}
-      
-      {currentStep === 'loading' && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#4CAF50" />
-        </View>
-      )}
-      
-      {currentStep === 'team_selection' && battingTeamId && bowlingTeamId && (
-        <TeamSelection
-          team1={battingTeamId === team1.team_id ? team1 : team2}
-          team2={bowlingTeamId === team2.team_id ? team2 : team1}
-          team1Name={battingTeamId === team1.team_id ? `${team1.team_name} (Batting)` : `${team2.team_name} (Batting)`}
-          team2Name={bowlingTeamId === team2.team_id ? `${team2.team_name} (Bowling)` : `${team1.team_name} (Bowling)`}
-          matchId={matchId}
-          inningId={inningId || 0}
-          onComplete={handleTeamSelectionComplete}
-        />
-      )}
+      {renderCurrentPhase()}
     </View>
+  );
+};
+
+const MatchFlow: React.FC<MatchFlowProps> = (props) => {
+  return (
+    <MatchProvider matchId={props.matchId}>
+      <MatchFlowContent {...props} />
+    </MatchProvider>
   );
 };
 
@@ -118,6 +164,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  finishedText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#4CAF50',
   }
 });
 
