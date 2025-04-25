@@ -3,7 +3,7 @@ const router = express.Router();
 const organizerController = require('../controllers/organizerController');
 const { authenticateToken, checkRole } = require('../middleware/auth');
 
-router.get('/createtournament', authenticateToken,checkRole(['organisation']), organizerController.createTournament);
+router.post('/createtournament', authenticateToken,checkRole(['organisation']), organizerController.createTournament);
 router.get('/ongoingtournaments', authenticateToken,checkRole(['organisation']),organizerController.getTournamentsByOrganizerController);
 router.get('/applied-teams',authenticateToken,checkRole(['organisation']), organizerController.getAppliedTeamsToOngoingTournaments);
 router.post('/applicants/accept',authenticateToken,checkRole(['organisation']), organizerController.acceptTournamentApplicant);
@@ -20,6 +20,9 @@ router.post('/updateInningSummary',authenticateToken,checkRole(['organisation'])
 router.post('/updatePlayerStats',authenticateToken,checkRole(['organisation']), organizerController.updatePlayerStats);
 router.put('/tournaments/:tournamentId/teams/:teamId/attendance', organizerController.updateTeamAttendance);
 router.put('/tournaments/updatestatus', organizerController.updateTournamentStatus);
+router.post('/tournaments/generateKnockoutDraw',organizerController.createKnockoutDraw);
+router.get('/tournaments/knockoutBracket/:tournament_id',organizerController.viewKnockoutBracket);
+router.post('/tournaments/updateMatchWinner',organizerController.updateMatchWinner)
 
 
 module.exports = router;
