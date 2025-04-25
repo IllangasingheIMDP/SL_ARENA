@@ -1,8 +1,13 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import MatchCard from '../../../components/organisation/MatchCard';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../../navigation/AppNavigator';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const UpcomingMatchesTab = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const matches = [
     { 
       id: '1', 
@@ -51,28 +56,62 @@ const UpcomingMatchesTab = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.tabTitle}>Upcoming Matches</Text>
-      <FlatList
-        data={matches}
-        renderItem={renderMatchItem}
-        keyExtractor={item => item.id}
-        showsVerticalScrollIndicator={false}
-      />
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.tabTitle}>Upcoming Matches</Text>
+        <FlatList
+          data={matches}
+          renderItem={renderMatchItem}
+          keyExtractor={item => item.id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContainer}
+        />
+        <TouchableOpacity 
+          style={styles.fab}
+          onPress={() => navigation.navigate('CreateTournament')}
+        >
+          <Icon name="add" size={24} color="#fff" />
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   container: {
     flex: 1,
     padding: 16,
+    position: 'relative',
+  },
+  listContainer: {
+    paddingBottom: 80, // Add padding to prevent FAB from covering content
   },
   tabTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 16,
     color: '#333',
+  },
+  fab: {
+    position: 'absolute',
+    right: 16,
+    bottom: 16,
+    backgroundColor: '#f4511e',
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    zIndex: 1000, // Ensure FAB is above other elements
   },
 });
 
