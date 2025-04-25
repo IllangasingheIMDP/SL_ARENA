@@ -415,6 +415,23 @@ const updateInningSummary = async (req, res) => {
   };
 
 
+  const addPlaying11 = async (req, res) => {
+    try {
+      const players = req.body.players; // Expecting an array of { match_id, player_id }
+  
+      if (!Array.isArray(players) || players.length === 0) {
+        return res.status(400).json({ error: 'players array is required' });
+      }
+  
+      await OrganizerModel.insertPlaying11(players);
+  
+      res.status(201).json({ message: 'Playing 11 inserted successfully' });
+    } catch (err) {
+      console.error('Error inserting playing 11:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
   
 
 
@@ -446,6 +463,7 @@ module.exports = {
     updateMatchWinner,
 
     getUpcomingTournaments,
+    addPlaying11
     
 
 };

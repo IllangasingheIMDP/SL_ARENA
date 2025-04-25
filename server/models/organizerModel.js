@@ -537,7 +537,22 @@ const updateInningSummary = async (inning_id) => {
     }catch(error){
         throw error;
     }
-  }
+  };
+
+
+  const insertPlaying11 = async (players) => {
+    if (!players.length) return;
+  
+    const values = players.map(() => '(?, ?)').join(', ');
+    const params = players.flatMap(p => [p.match_id, p.player_id]);
+  
+    const sql = `
+      INSERT INTO playing_11 (match_id, player_id)
+      VALUES ${values}
+    `;
+  
+    await db.execute(sql, params);
+  };
 
 module.exports = {
     createTournament,
@@ -560,6 +575,7 @@ module.exports = {
     generateKnockoutDraw,
     updateMatchWinner,
     viewKnockoutBracket,
-    getUpcomingTournaments
+    getUpcomingTournaments,
+    insertPlaying11
 
 };
