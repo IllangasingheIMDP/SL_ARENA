@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator, RefreshControl, TouchableOpacity, Dimensions } from 'react-native';
 import userService from '../../services/userService';
 import { FeedItem, FeedGroup } from '../../types/feedTypes';
@@ -8,13 +8,28 @@ import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
+interface FeedItemWithKey extends FeedItem {
+  uniqueKey: string;
+  isLiked?: boolean;
+}
+
+interface FeedGroupWithKeys {
+  [date: string]: FeedItemWithKey[];
+}
+
 const FeedScreen = () => {
-  const [feedData, setFeedData] = useState<FeedGroup>({});
+  const [feedData, setFeedData] = useState<FeedGroupWithKeys>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
+  const keyCounter = useRef(0);
+
+  const getNextKey = () => {
+    keyCounter.current += 1;
+    return `item-${keyCounter.current}`;
+  };
 
   const extractVideoId = (url: string) => {
     if (!url) return null;
@@ -31,14 +46,37 @@ const FeedScreen = () => {
     });
   };
 
+  const processFeedData = (data: FeedGroup): FeedGroupWithKeys => {
+    const processedData: FeedGroupWithKeys = {};
+    Object.entries(data).forEach(([date, items]) => {
+      processedData[date] = items.map(item => ({
+        ...item,
+        uniqueKey: getNextKey()
+      }));
+    });
+    return processedData;
+  };
+
   const fetchFeed = async (pageNum: number = 1, shouldRefresh: boolean = false) => {
     try {
       const response = await userService.getFeed(pageNum);
       if (response.success) {
+        const processedData = processFeedData(response.data.items);
         if (shouldRefresh) {
-          setFeedData(response.data.items);
+          keyCounter.current = 0; // Reset counter on refresh
+          setFeedData(processedData);
         } else {
-          setFeedData(prev => ({ ...prev, ...response.data.items }));
+          setFeedData(prev => {
+            const newData = { ...prev };
+            Object.entries(processedData).forEach(([date, items]) => {
+              if (newData[date]) {
+                newData[date] = [...newData[date], ...items];
+              } else {
+                newData[date] = items;
+              }
+            });
+            return newData;
+          });
         }
         setHasMore(response.data.pagination.has_more);
       }
@@ -72,7 +110,33 @@ const FeedScreen = () => {
     setPlayingVideoId(playingVideoId === videoId ? null : videoId);
   };
 
-  const renderFeedItem = ({ item }: { item: FeedItem }) => {
+  const handleLikePress = (date: string, itemKey: string) => {
+    setFeedData(prev => {
+      const newData = { ...prev };
+      // Find the date key that contains the item
+      const dateKey = Object.keys(newData).find(key => 
+        newData[key].some(item => item.uniqueKey === itemKey)
+      );
+      
+      if (dateKey) {
+        const items = newData[dateKey];
+        const itemIndex = items.findIndex(item => item.uniqueKey === itemKey);
+        
+        if (itemIndex !== -1) {
+          const updatedItems = [...items];
+          updatedItems[itemIndex] = {
+            ...updatedItems[itemIndex],
+            isLiked: !updatedItems[itemIndex].isLiked
+          };
+          newData[dateKey] = updatedItems;
+        }
+      }
+      
+      return newData;
+    });
+  };
+
+  const renderFeedItem = ({ item }: { item: FeedItemWithKey }) => {
     const videoId = item.media_type === 'video' ? extractVideoId(item.media_url) : null;
     const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null;
 
@@ -134,9 +198,18 @@ const FeedScreen = () => {
           <Text style={styles.description}>{item.description}</Text>
         </View>
         <View style={styles.actions}>
-          <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="heart-outline" size={24} color="#666" />
-            <Text style={styles.actionText}>Like</Text>
+          <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={() => handleLikePress(item.upload_date, item.uniqueKey)}
+          >
+            <Ionicons 
+              name={item.isLiked ? "heart" : "heart-outline"} 
+              size={24} 
+              color={item.isLiked ? "#ff3b30" : "#666"} 
+            />
+            <Text style={[styles.actionText, item.isLiked && styles.likedText]}>
+              {item.isLiked ? 'Liked' : 'Like'}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -154,8 +227,9 @@ const FeedScreen = () => {
       <FlatList
         data={feedData[date]}
         renderItem={renderFeedItem}
-        keyExtractor={(item) => `feed-${item.id}`}
+        keyExtractor={(item) => item.uniqueKey}
         showsVerticalScrollIndicator={false}
+        scrollEnabled={false}
       />
     </View>
   );
@@ -332,6 +406,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#495057',
     fontWeight: '500',
+  },
+  likedText: {
+    color: '#ff3b30',
   },
 });
 
