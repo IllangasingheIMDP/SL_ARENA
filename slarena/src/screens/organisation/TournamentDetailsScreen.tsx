@@ -14,7 +14,7 @@ const TournamentDetailsScreen = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.section}>
-        <Text style={styles.title}>{tournament.tournament_name}</Text>
+        <Text style={styles.title}>{tournament.name}</Text>
         <Text style={styles.subtitle}>Tournament Details</Text>
       </View>
 
@@ -22,7 +22,7 @@ const TournamentDetailsScreen = () => {
         <Text style={styles.sectionTitle}>Location</Text>
         <View style={styles.mapPlaceholder}>
           <GoogleMapView
-            placeId={tournament.venue_id}
+            placeId={tournament.venue.venue_id}
             height={200}
           />
         </View>

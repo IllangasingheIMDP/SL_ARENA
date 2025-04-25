@@ -37,6 +37,25 @@ router.get('/:team_id/players',
     teamController.getTeamPlayers
 );
 
+
+router.get('/player/teams', 
+    authenticateToken,
+    checkRole(['player']), 
+    teamController.getTeamsByUserId
+);
+
+router.get('/:team_id/is-captain', 
+    authenticateToken,
+    checkRole(['player', 'admin', 'general', 'organisation', 'trainer']), 
+    teamController.isUserTeamCaptain
+);
+
+router.get('/finished-tournaments', 
+    authenticateToken,
+    checkRole(['player', 'admin', 'general', 'organisation', 'trainer']), 
+    teamController.getFinishedTournaments
+);
+
 router.post('/delete-team', 
     authenticateToken,
     checkRole(['player', 'admin', 'organisation', 'trainer']), 

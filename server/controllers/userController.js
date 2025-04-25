@@ -303,7 +303,7 @@ const updateVerificationStatus = async (req, res) => {
 };
 
 async function getLeaderboard(req, res) {
-  const { role } = req.body;
+  const { role } = req.params;
 
   if (!role) {
     return res.status(400).json({ success: false, message: 'Role is required in the request body.' });

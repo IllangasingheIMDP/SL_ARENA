@@ -110,6 +110,22 @@ const getPublicPlayerProfile = async (playerId: string): Promise<PlayerProfile> 
   return response.data;
 };
 
+const updatePlayerBattingStyle = async (batting_style: string): Promise<void> => {
+  await api.put(`/players/batting-style`, { batting_style });
+};
+
+const updatePlayerBowlingStyle = async (bowling_style: string): Promise<void> => {
+  await api.put(`/players/bowling-style`, { bowling_style });
+};
+
+const updatePlayerFieldingPosition = async (fielding_position: string): Promise<void> => {
+  await api.put(`/players/fielding-position`, { fielding_position });
+};
+
+const updatePlayerRole = async (role: 'batting' | 'bowling' | 'allrounder'): Promise<void> => {
+  await api.put(`/players/role`, { role });
+};
+
 export const playerService = {
   getPlayerStats,
   getPlayerAchievements,
@@ -125,5 +141,9 @@ export const playerService = {
   deletePhoto,
   deleteVideo,
   getAllPlayers,
-  getPublicPlayerProfile
+  getPublicPlayerProfile,
+  updatePlayerBattingStyle,
+  updatePlayerBowlingStyle,
+  updatePlayerFieldingPosition,
+  updatePlayerRole
 }; 

@@ -201,6 +201,60 @@ const addPlayerToTeam = async (req, res) => {
     }
 };
 
+// Get all teams for a user (both as captain and player)
+const getTeamsByUserId = async (req, res) => {
+    try {
+        const userId = req.user.user_id;
+        const teams = await Team.getTeamsByUserId(userId);
+        res.status(200).json({
+            success: true,
+            data: teams
+        });
+    } catch (error) {
+        console.log(error, 'error in getTeamsByUserId');
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+// Check if a user is the captain of a team
+const isUserTeamCaptain = async (req, res) => {
+    try {
+        const { team_id } = req.params;
+        const userId = req.user.user_id;
+        const isCaptain = await Team.isUserTeamCaptain(team_id, userId);
+        
+        res.status(200).json({
+            success: true,
+            isCaptain: isCaptain
+        });
+    } catch (error) {
+        console.log(error, 'error in isUserTeamCaptain');
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+const getFinishedTournaments = async (req, res) => {
+    try {
+        const tournaments = await Team.getFinishedTournaments();
+        res.status(200).json({
+            success: true,
+            data: tournaments
+        });
+    } catch (error) {
+        console.log(error, 'error in getFinishedTournaments');
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 module.exports = {
     getMyTeams,
     getPlayerTeams,
@@ -210,6 +264,9 @@ module.exports = {
     getTeamByName,
     addPlayerToTeam,
     getTeamsLedByPlayer,
+    getTeamsByUserId,
     removePlayerFromTeam,
-    deleteTeam
+    deleteTeam,
+    isUserTeamCaptain,
+    getFinishedTournaments
 };

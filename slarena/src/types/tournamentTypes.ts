@@ -1,7 +1,7 @@
 export type Venue = {
   venue_id: string;
   venue_name: string;
-  address: string;
+  address?: string;
 };
 
 export type Team = {
@@ -28,7 +28,7 @@ export type Tournament = {
   organizer_id: number;
   venue: Venue;
   teams: Team[];
-  status: TournamentStatus;
+  status?: TournamentStatus;
 }; 
 
 export type PlayerStats = {
