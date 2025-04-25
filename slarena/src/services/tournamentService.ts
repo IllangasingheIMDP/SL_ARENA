@@ -94,6 +94,8 @@ export const tournamentService = {
   },
 
   createTournament: async (tournamentData: any): Promise<any> => {
+    console.log("in service");
+    console.log('tournamentData', tournamentData);
     try {
       const response = await api.post('/organizers/createtournament', tournamentData);
       return response.data;
