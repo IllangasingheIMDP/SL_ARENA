@@ -63,12 +63,12 @@ const TournamentCard: React.FC<TournamentCardProps> = ({
     <View style={styles.card}>
       <View style={styles.header}>
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>{tournament.name}</Text>
+          <Text style={styles.title}>{tournament.tournament_name}</Text>
           <View style={[styles.statusBadge, { backgroundColor: getStatusColor(tournament.status) }]}>
             <Text style={styles.statusText}>{getStatusText(tournament.status)}</Text>
           </View>
         </View>
-        <Text style={styles.type}>{tournament.type}</Text>
+        <Text style={styles.type}>{tournament.tournament_type}</Text>
       </View>
 
       <View style={styles.venueContainer}>
