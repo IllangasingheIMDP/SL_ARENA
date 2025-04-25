@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ActivityIndicator, ScrollView, Modal } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ActivityIndicator, ScrollView, Modal, Alert } from 'react-native';
 import { teamService } from '../../services/teamService';
 import { playerService } from '../../services/playerService';
 import { Team, TeamPlayer } from '../../types/team';
@@ -35,6 +35,8 @@ const TeamsScreen: React.FC = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [selectedPlayers, setSelectedPlayers] = useState<SelectedPlayer[]>([]);
   const [playerSearchQuery, setPlayerSearchQuery] = useState('');
+  const [deleteConfirmationVisible, setDeleteConfirmationVisible] = useState(false);
+  const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
 
   const loadTeams = async () => {
     try {
@@ -160,6 +162,29 @@ const TeamsScreen: React.FC = () => {
     }
   };
 
+  const handleDeleteTeam = async (team: Team) => {
+    setTeamToDelete(team);
+    setDeleteConfirmationVisible(true);
+  };
+
+  const confirmDeleteTeam = async () => {
+    if (!teamToDelete) return;
+
+    try {
+      setLoading(true);
+      await teamService.deleteTeam(teamToDelete.team_id);
+      setDeleteConfirmationVisible(false);
+      setTeamToDelete(null);
+      // Reload teams after deletion
+      loadTeams();
+    } catch (error) {
+      console.error('Error deleting team:', error);
+      Alert.alert('Error', 'Failed to delete team');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredPlayers = players.filter(player =>
     player.name.toLowerCase().includes(playerSearchQuery.toLowerCase())
   );
@@ -169,15 +194,25 @@ const TeamsScreen: React.FC = () => {
       style={styles.teamItem}
       onPress={() => handleTeamPress(item)}
     >
-      <Text style={styles.teamName}>{item.team_name}</Text>
-      <Text style={styles.captainName}>Captain: {item.captain}</Text>
+      <View style={styles.teamInfo}>
+        <Text style={styles.teamName}>{item.team_name}</Text>
+        <Text style={styles.captainName}>Captain: {item.captain}</Text>
+      </View>
       {teamsLedByMe.some(t => t.team_id === item.team_id) && (
-        <TouchableOpacity
-          style={styles.addPlayerButton}
-          onPress={() => handleAddPlayers(item)}
-        >
-          <Text style={styles.addPlayerButtonText}>Add Players</Text>
-        </TouchableOpacity>
+        <View style={styles.teamActions}>
+          <TouchableOpacity
+            style={styles.addPlayerButton}
+            onPress={() => handleAddPlayers(item)}
+          >
+            <Text style={styles.addPlayerButtonText}>Add Players</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => handleDeleteTeam(item)}
+          >
+            <Text style={styles.deleteButtonText}>Delete</Text>
+          </TouchableOpacity>
+        </View>
       )}
     </TouchableOpacity>
   );
@@ -352,6 +387,38 @@ const TeamsScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
+
+      <Modal
+        visible={deleteConfirmationVisible}
+        transparent={true}
+        animationType="fade"
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Delete Team</Text>
+            <Text style={styles.modalText}>
+              Are you sure you want to delete {teamToDelete?.team_name}? This action cannot be undone.
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => {
+                  setDeleteConfirmationVisible(false);
+                  setTeamToDelete(null);
+                }}
+              >
+                <Text style={styles.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.deleteButton]}
+                onPress={confirmDeleteTeam}
+              >
+                <Text style={styles.buttonText}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -419,9 +486,20 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   teamItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
+  },
+  teamInfo: {
+    flex: 1,
+  },
+  teamActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   teamName: {
     fontSize: 18,
@@ -441,6 +519,17 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   addPlayerButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  deleteButton: {
+    backgroundColor: '#ff3b30',
+    padding: 8,
+    borderRadius: 4,
+    marginLeft: 8,
+  },
+  deleteButtonText: {
     color: '#fff',
     fontSize: 12,
     fontWeight: 'bold',
@@ -626,6 +715,12 @@ const styles = StyleSheet.create({
     height: 50,
     color: '#2196f3',
     fontWeight: '500',
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 24,
   },
 });
 

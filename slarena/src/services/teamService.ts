@@ -65,6 +65,16 @@ const addPlayerToTeam = async (playerData: AddPlayerToTeamRequest): Promise<void
     console.log('Player added to team successfully');
 };
 
+const deleteTeam = async (teamId: number): Promise<void> => {
+    try {
+        await api.post('/teams/delete-team', { team_id: teamId });
+        console.log('Team deleted successfully');
+    } catch (error) {
+        console.error('Error deleting team:', error);
+        throw error;
+    }
+};
+
 export const teamService = {
     getMyTeams,
     getPlayerTeams,
@@ -74,6 +84,7 @@ export const teamService = {
     addPlayerToTeam,
     getTeamByName,
     getTeamsLedByMe,
+    deleteTeam,
     removePlayerFromTeam: async (teamId: number, playerId: number): Promise<void> => {
         try {
             const response = await api.post('/teams/remove-player', {
