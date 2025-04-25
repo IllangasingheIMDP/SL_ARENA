@@ -27,6 +27,7 @@ const TournamentsScreen = () => {
   const [upcomingTournaments, setUpcomingTournaments] = useState<Tournament[]>([]);
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [loading, setLoading] = useState(true);
+  const [teamTournamentsLoading, setTeamTournamentsLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [activeTab, setActiveTab] = useState<TournamentTab>('all');
   const [teams, setTeams] = useState<Team[]>([]);
@@ -89,12 +90,14 @@ const TournamentsScreen = () => {
 
   const fetchTeamTournaments = async () => {
     if (!selectedTeam) return;
+    setTeamTournamentsLoading(true);
     try {
       const tournaments = await tournamentService.getTeamTournaments(selectedTeam.team_id);
       setTeamTournaments(tournaments);
     } catch (error) {
       console.error('Error fetching team tournaments:', error);
     } finally {
+      setTeamTournamentsLoading(false);
       setLoading(false);
     }
   };
@@ -220,6 +223,11 @@ const TournamentsScreen = () => {
           <View style={styles.content}>
             {!selectedTeam ? (
               <Text style={styles.noTournamentsText}>Please select a team</Text>
+            ) : teamTournamentsLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#2196F3" />
+                <Text style={styles.loadingText}>Loading team tournaments...</Text>
+              </View>
             ) : (
               <>
                 {teamTournaments.registered.length > 0 && (
@@ -319,6 +327,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
   header: {
     padding: 20,
