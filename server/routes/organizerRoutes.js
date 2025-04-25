@@ -26,6 +26,7 @@ router.post('/tournaments/updateMatchWinner',authenticateToken,checkRole(['organ
 router.get('/upcoming-tournaments', authenticateToken,checkRole(['organisation']), organizerController.getUpcomingTournaments);
 router.post('/playing-11',authenticateToken,checkRole(['organisation']), organizerController.addPlaying11);
 router.get('/innings/:inning_id', authenticateToken,checkRole(['organisation']),organizerController.getInningStats);
+router.get('/applied-requests/:tournament_id',authenticateToken,checkRole(['organisation']),organizerController.getApplieddRequestsByTournamentID);
 
 
 module.exports = router;

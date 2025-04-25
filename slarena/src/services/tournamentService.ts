@@ -206,5 +206,15 @@ export const tournamentService = {
       console.error('Error saving match phase:', error);
       throw error;
     }
-  }
+  },
+
+  getAppliedRequests: async (tournamentId: number): Promise<any[]> => {
+    try {
+      const response = await api.get(`/organizers/applied-requests/${tournamentId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching applied requests:', error);
+      throw error;
+    }
+  },
 }; 

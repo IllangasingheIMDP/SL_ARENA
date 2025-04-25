@@ -529,7 +529,7 @@ const updateInningSummary = async (inning_id) => {
   const getUpcomingTournaments = async () => {
     try{
         const [rows] = await db.execute(
-            `select T.organizer_id , T.tournament_name , T.start_date , T.end_date , T.tournament_type , T.rules, T.venue_id
+            `select T.organizer_id ,T.tournament_id, T.tournament_name , T.start_date , T.end_date , T.tournament_type , T.rules, T.venue_id
             from Tournaments T
             where T.status='upcoming';`
         );
@@ -564,6 +564,21 @@ const updateInningSummary = async (inning_id) => {
     return rows[0];
   };
 
+  const getApplieddRequestsByTournamentID = async (tournament_id) => {
+    try{
+        const [rows] = await db.execute(
+            `select T.team_name , A.payment_slip , A.created_at
+            from Teams T join tournament_applicants A on T.team_id = A.team_id
+            where A.status = 'applied' and tournament_id=?;`,
+            [tournament_id]
+          );
+          return rows;
+    }catch(error){
+        throw error;
+    }
+    
+  };
+
 module.exports = {
     createTournament,
     getTournamentsByOrganizer,
@@ -587,6 +602,7 @@ module.exports = {
     viewKnockoutBracket,
     getUpcomingTournaments,
     insertPlaying11,
-    getInningStatsById
+    getInningStatsById,
+    getApplieddRequestsByTournamentID
 
 };

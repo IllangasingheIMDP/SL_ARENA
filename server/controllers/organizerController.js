@@ -477,6 +477,17 @@ const getInningStats = async (req, res) => {
     }
   };
 
+  const getApplieddRequestsByTournamentID = async (req, res) => {
+    const { tournament_id } = req.params;
+   try{
+    const requests = await OrganizerModel.getApplieddRequestsByTournamentID(tournament_id);
+    res.status(200).json({ message: "Applied requests fetched successfully", data: requests });
+   }catch(error){
+    console.error('Error fetching applied requests:', error);
+    res.status(500).json({ error: 'Internal server error' });
+   }
+  };
+
 module.exports = {
     createTournament,
     getTournamentsByOrganizerController,
@@ -503,5 +514,6 @@ module.exports = {
 
     getUpcomingTournaments,
     addPlaying11,
-    getInningStats
+    getInningStats,
+    getApplieddRequestsByTournamentID
 };
