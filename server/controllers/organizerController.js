@@ -400,15 +400,15 @@ const getUpcomingTournaments = async (req, res) => {
   }
 };
 
- const addPlaying11 = async (req, res) => {
+const addPlaying11 = async (req, res) => {
     try {
-      const players = req.body.players; // Expecting an array of { match_id, player_id }
+      const { match_id, player_ids } = req.body;
   
-      if (!Array.isArray(players) || players.length === 0) {
-        return res.status(400).json({ error: 'players array is required' });
+      if (!match_id || !Array.isArray(player_ids) || player_ids.length === 0) {
+        return res.status(400).json({ error: 'match_id and player_ids are required' });
       }
   
-      await OrganizerModel.insertPlaying11(players);
+      await OrganizerModel.insertPlaying11(match_id, player_ids);
   
       res.status(201).json({ message: 'Playing 11 inserted successfully' });
     } catch (err) {
@@ -416,7 +416,6 @@ const getUpcomingTournaments = async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
     }
   };
-
 const createKnockoutDraw = async (req, res) => {
   const { tournament_id } = req.body;
   try {

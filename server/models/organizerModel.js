@@ -540,11 +540,11 @@ const updateInningSummary = async (inning_id) => {
   };
 
 
-  const insertPlaying11 = async (players) => {
-    if (!players.length) return;
+  const insertPlaying11 = async (match_id, player_ids) => {
+    if (!player_ids.length) return;
   
-    const values = players.map(() => '(?, ?)').join(', ');
-    const params = players.flatMap(p => [p.match_id, p.player_id]);
+    const values = player_ids.map(() => '(?, ?)').join(', ');
+    const params = player_ids.flatMap(player_id => [match_id, player_id]);
   
     const sql = `
       INSERT INTO playing_11 (match_id, player_id)
