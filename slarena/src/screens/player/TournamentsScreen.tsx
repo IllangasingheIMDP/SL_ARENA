@@ -117,8 +117,9 @@ const TournamentsScreen = () => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+      month: 'short',
+      day: 'numeric',
+      timeZone: 'UTC'
     });
   };
 
@@ -133,17 +134,28 @@ const TournamentsScreen = () => {
       style={styles.tournamentCard}
       onPress={() => handleTournamentPress(tournament)}
     >
-      <Text style={styles.tournamentName}>{tournament.name}</Text>
+      <View style={styles.cardHeader}>
+        <Text style={styles.tournamentName}>{tournament.name}</Text>
+        <View style={styles.tournamentTypeContainer}>
+          <Text style={styles.tournamentType}>{tournament.type}</Text>
+        </View>
+      </View>
       <View style={styles.dateContainer}>
-        <Text style={styles.dateText}>Start: {formatDate(tournament.start_date)}</Text>
-        <Text style={styles.dateText}>End: {formatDate(tournament.end_date)}</Text>
+        <View style={styles.dateItem}>
+          <Text style={styles.dateLabel}>Start Date</Text>
+          <Text style={styles.dateText}>{formatDate(tournament.start_date)}</Text>
+        </View>
+        <View style={styles.dateItem}>
+          <Text style={styles.dateLabel}>End Date</Text>
+          <Text style={styles.dateText}>{formatDate(tournament.end_date)}</Text>
+        </View>
       </View>
       {showApplyButton && (
         <TouchableOpacity
           style={styles.applyButton}
           onPress={() => handleApplyTournament(tournament.tournament_id)}
         >
-          <Text style={styles.applyButtonText}>Apply</Text>
+          <Text style={styles.applyButtonText}>Apply Now</Text>
         </TouchableOpacity>
       )}
     </TouchableOpacity>
@@ -277,34 +289,42 @@ const TournamentsScreen = () => {
           <View style={styles.modalContent}>
             {selectedTournament && (
               <>
-                <Text style={styles.modalTitle}>{selectedTournament.name}</Text>
-                <Text style={styles.modalText}>
-                  Organization: {selectedTournament.organiser.name}
-                </Text>
-                <Text style={styles.modalText}>
-                  Type: {selectedTournament.type}
-                </Text>
-                <Text style={styles.modalText}>
-                  Rules: {selectedTournament.rules}
-                </Text>
+                <View style={styles.modalHeader}>
+                  <Text style={styles.modalTitle}>{selectedTournament.name}</Text>
+                  <TouchableOpacity
+                    style={styles.closeButton}
+                    onPress={() => setModalVisible(false)}
+                  >
+                    <Text style={styles.closeButtonText}>×</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.modalSection}>
+                  <Text style={styles.modalSectionTitle}>Organization</Text>
+                  <Text style={styles.modalText}>{selectedTournament.organiser.name}</Text>
+                </View>
+                <View style={styles.modalSection}>
+                  <Text style={styles.modalSectionTitle}>Tournament Type</Text>
+                  <Text style={styles.modalText}>{selectedTournament.type}</Text>
+                </View>
+                <View style={styles.modalSection}>
+                  <Text style={styles.modalSectionTitle}>Rules</Text>
+                  <Text style={styles.modalText}>{selectedTournament.rules}</Text>
+                </View>
                 {selectedTournament.venue && (
-                  <View style={styles.mapContainer}>
-                    <GoogleMapView
-                      placeId={selectedTournament.venue.venue_id.toString()}
-                      showUserLocation={true}
-                      showSearch={false}
-                      showDirections={true}
-                      height={200}
-                      width={300}
-                    />
+                  <View style={styles.modalSection}>
+                    <Text style={styles.modalSectionTitle}>Venue Location</Text>
+                    <View style={styles.mapContainer}>
+                      <GoogleMapView
+                        placeId={selectedTournament.venue.venue_id.toString()}
+                        showUserLocation={true}
+                        showSearch={false}
+                        showDirections={true}
+                        height={200}
+                        width={300}
+                      />
+                    </View>
                   </View>
                 )}
-                <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text style={styles.closeButtonText}>Close</Text>
-                </TouchableOpacity>
               </>
             )}
           </View>
@@ -406,28 +426,58 @@ const styles = StyleSheet.create({
     color: '#2196F3',
   },
   tournamentCard: {
-    backgroundColor: '#f5f5f5',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
-    elevation: 3,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    borderLeftWidth: 4,
+    borderLeftColor: '#2196F3',
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   tournamentName: {
     fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontWeight: '600',
+    color: '#1a237e',
+    flex: 1,
+  },
+  tournamentTypeContainer: {
+    backgroundColor: '#e3f2fd',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  tournamentType: {
+    fontSize: 12,
+    color: '#1976d2',
+    fontWeight: '500',
   },
   dateContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 8,
+  },
+  dateItem: {
+    flex: 1,
+  },
+  dateLabel: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 4,
   },
   dateText: {
     fontSize: 14,
-    color: '#666',
+    color: '#333',
+    fontWeight: '500',
   },
   noTournamentsText: {
     fontSize: 16,
@@ -443,47 +493,76 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: 'white',
-    borderRadius: 20,
+    borderRadius: 16,
     padding: 20,
     width: '90%',
     maxHeight: '80%',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    paddingBottom: 12,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 15,
-  },
-  modalText: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  mapContainer: {
-    marginVertical: 15,
-    borderRadius: 10,
-    overflow: 'hidden',
+    color: '#1a237e',
+    flex: 1,
   },
   closeButton: {
-    backgroundColor: '#2196F3',
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 15,
+    padding: 4,
   },
   closeButtonText: {
-    color: 'white',
-    textAlign: 'center',
+    fontSize: 24,
+    color: '#666',
+    fontWeight: '300',
+  },
+  modalSection: {
+    marginBottom: 16,
+  },
+  modalSectionTitle: {
     fontSize: 16,
+    fontWeight: '600',
+    color: '#1976d2',
+    marginBottom: 8,
+  },
+  modalText: {
+    fontSize: 15,
+    color: '#333',
+    lineHeight: 22,
+  },
+  mapContainer: {
+    marginTop: 8,
+    borderRadius: 12,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
   },
   applyButton: {
     backgroundColor: '#4CAF50',
-    padding: 8,
-    borderRadius: 5,
-    marginTop: 10,
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 12,
     alignSelf: 'flex-end',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   applyButtonText: {
     color: 'white',
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
   },
 });
 
