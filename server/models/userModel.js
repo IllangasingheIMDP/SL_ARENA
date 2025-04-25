@@ -160,6 +160,7 @@ class UserModel {
   }
 
   static async  getLeaderboardByRole(role) {
+    //console.log(role);
     const validRoles = ['batting', 'bowling', 'allrounder'];
     if (!validRoles.includes(role)) {
       throw new Error('Invalid role');
@@ -185,7 +186,7 @@ class UserModel {
       WHERE p.role = ? 
       ORDER BY p.${sortColumn} DESC
     `, [role]);
-  
+    //console.log(rows);
     return rows;
   }
 }

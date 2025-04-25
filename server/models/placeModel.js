@@ -30,6 +30,8 @@ const placeModel = {
         throw new Error(response.data.error_message || 'Failed to search places');
       }
 
+      console.log('Search results:', response.data.results);
+
       return response.data.results;
     } catch (error) {
       console.error('Error searching places:', error);

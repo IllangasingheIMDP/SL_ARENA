@@ -47,14 +47,32 @@ const getTeamByName = async (teamName: string): Promise<Team[]> => {
 };
 
 const createTeam = async (teamData: CreateTeamRequest): Promise<number> => {
-    const response = await api.post('/teams', teamData);
-    console.log(response.data,'response in createTeam');
-    return response.data.data.team_id;
+    try {
+        const response = await api.post('/teams', teamData);
+        if (!response || !response.data) {
+            throw new Error('Invalid response from server');
+        }
+        console.log('Team created successfully:', response.data);
+        return response.data.team_id;
+    } catch (error) {
+        console.error('Error creating team:', error);
+        throw error;
+    }
 };
 
 const addPlayerToTeam = async (playerData: AddPlayerToTeamRequest): Promise<void> => {
     await api.post('/teams/add-player', playerData);
     console.log('Player added to team successfully');
+};
+
+const deleteTeam = async (teamId: number): Promise<void> => {
+    try {
+        await api.post('/teams/delete-team', { team_id: teamId });
+        console.log('Team deleted successfully');
+    } catch (error) {
+        console.error('Error deleting team:', error);
+        throw error;
+    }
 };
 
 export const teamService = {
@@ -65,5 +83,18 @@ export const teamService = {
     createTeam,
     addPlayerToTeam,
     getTeamByName,
-    getTeamsLedByMe
+    getTeamsLedByMe,
+    deleteTeam,
+    removePlayerFromTeam: async (teamId: number, playerId: number): Promise<void> => {
+        try {
+            const response = await api.post('/teams/remove-player', {
+                team_id: teamId,
+                player_id: playerId
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error removing player from team:', error);
+            throw error;
+        }
+    },
 };
