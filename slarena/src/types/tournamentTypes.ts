@@ -1,12 +1,19 @@
 export type Venue = {
-  venue_id: string;
+  venue_id: number;
   venue_name: string;
   address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  latitude?: number;
+  longitude?: number;
+  capacity?: number;
 };
 
 export type Team = {
   team_id: number;
   team_name: string;
+  team_logo?: string;
   captain_id?: number;
   players?: TeamPlayer[];
 };
@@ -19,16 +26,19 @@ export type TeamPlayer = {
 export type TournamentStatus = 'upcoming' | 'start' | 'matches' | 'finished';
 
 export type Tournament = {
-  tournament_id?: number;
-  tournament_name: string;
+  tournament_id: number;
+  name: string;
   start_date: string;
   end_date: string;
-  tournament_type: string;
+  type: string;
   rules: string;
-  organizer_id: number;
   venue: Venue;
+  organiser: {
+    organiser_id: number;
+    name: string;
+  };
   teams: Team[];
-  status?: TournamentStatus;
+  status: TournamentStatus;
 }; 
 
 export type PlayerStats = {
@@ -40,4 +50,15 @@ export type PlayerStats = {
   total_wickets: string;
   batting_average: string;
   bowling_economy: string;
+}
+
+export interface Match {
+  match_id: number;
+  round: number;
+  match_number: number;
+  team1_id: number | null;
+  team2_id: number | null;
+  team1_name: string | null;
+  team2_name: string | null;
+  winner_name: string | null;
 }

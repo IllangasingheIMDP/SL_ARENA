@@ -1,5 +1,5 @@
 import { api } from '../utils/api';
-import { Team, Tournament } from '../types/tournamentTypes';
+import { Team, Tournament, Match } from '../types/tournamentTypes';
 import { googleServices } from './googleServices'
 
 export const tournamentService = {
@@ -159,5 +159,52 @@ export const tournamentService = {
       throw error;
     }
   },
-  
+
+  getKnockoutBracket: async (tournamentId: number): Promise<Match[]> => {
+    try {
+      const response = await api.get(`/organizers/tournaments/knockoutBracket/${tournamentId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching knockout bracket for tournament ID ${tournamentId}:`, error);
+      throw error;
+    }
+  },
+
+  createKnockoutDraw: async (tournamentId: number): Promise<any> => {
+    try {
+      const response = await api.post(`/organizers/tournaments/generateKnockoutDraw`,
+        { tournament_id: tournamentId }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(`Error creating knockout draw for tournament ID ${tournamentId}:`, error);  
+      throw error;
+    }
+  },
+
+  async saveMatchPlayers(matchId: number, teamId: number, playerIds: number[]): Promise<void> {
+    try {
+      const response = await api.post(`/organizers/playing-11`, {
+        match_id: matchId,
+        player_ids: playerIds
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error saving match players:', error);
+      throw error;
+    }
+  },
+
+  async saveMatchPhase(matchId: number, phase: string): Promise<void> {
+    try {
+      const response = await api.post(`/organizers/playing11`, {
+        match_id: matchId,
+        phase: phase
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error saving match phase:', error);
+      throw error;
+    }
+  }
 }; 

@@ -384,7 +384,7 @@ const updateInningSummary = async (inning_id) => {
 
   const generateKnockoutDraw = async (tournament_id) => {
     const [teams] = await db.execute(
-      `SELECT team_id FROM tournament_applicants WHERE tournament_id = ? AND attendance = TRUE`,
+      `SELECT team_id FROM tournament_applicants WHERE tournament_id = ? AND attendance = TRUE AND status = 'accepted'`,
       [tournament_id]
     );
   
@@ -537,7 +537,32 @@ const updateInningSummary = async (inning_id) => {
     }catch(error){
         throw error;
     }
-  }
+  };
+
+
+  const insertPlaying11 = async (match_id, player_ids) => {
+    if (!player_ids.length) return;
+  
+    const values = player_ids.map(() => '(?, ?)').join(', ');
+    const params = player_ids.flatMap(player_id => [match_id, player_id]);
+  
+    const sql = `
+      INSERT INTO playing_11 (match_id, player_id)
+      VALUES ${values}
+    `;
+  
+    await db.execute(sql, params);
+  };
+
+  const getInningStatsById = async (inning_id) => {
+    const [rows] = await db.execute(
+      `SELECT total_runs, total_wickets 
+       FROM Innings 
+       WHERE inning_id = ?`,
+      [inning_id]
+    );
+    return rows[0];
+  };
 
 module.exports = {
     createTournament,
@@ -560,6 +585,8 @@ module.exports = {
     generateKnockoutDraw,
     updateMatchWinner,
     viewKnockoutBracket,
-    getUpcomingTournaments
+    getUpcomingTournaments,
+    insertPlaying11,
+    getInningStatsById
 
 };

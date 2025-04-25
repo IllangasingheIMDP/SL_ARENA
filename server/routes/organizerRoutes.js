@@ -18,14 +18,14 @@ router.post('/current-batsmen-runs',authenticateToken,checkRole(['organisation']
 router.post('/get-next-ball', authenticateToken,checkRole(['organisation']),organizerController.getNextBallController);
 router.post('/updateInningSummary',authenticateToken,checkRole(['organisation']), organizerController.updateInningSummary);
 router.post('/updatePlayerStats',authenticateToken,checkRole(['organisation']), organizerController.updatePlayerStats);
-router.put('/tournaments/:tournamentId/teams/:teamId/attendance', organizerController.updateTeamAttendance);
-router.put('/tournaments/updatestatus', organizerController.updateTournamentStatus);
-router.post('/tournaments/generateKnockoutDraw',organizerController.createKnockoutDraw);
-router.get('/tournaments/knockoutBracket/:tournament_id',organizerController.viewKnockoutBracket);
-router.post('/tournaments/updateMatchWinner',organizerController.updateMatchWinner)
-
+router.put('/tournaments/:tournamentId/teams/:teamId/attendance', authenticateToken,checkRole(['organisation']),organizerController.updateTeamAttendance);
+router.put('/tournaments/updatestatus', authenticateToken,checkRole(['organisation']),organizerController.updateTournamentStatus);
+router.post('/tournaments/generateKnockoutDraw',authenticateToken,checkRole(['organisation']),organizerController.createKnockoutDraw);
+router.get('/tournaments/knockoutBracket/:tournament_id',authenticateToken,checkRole(['organisation']),organizerController.viewKnockoutBracket);
+router.post('/tournaments/updateMatchWinner',authenticateToken,checkRole(['organisation']),organizerController.updateMatchWinner)
 router.get('/upcoming-tournaments', authenticateToken,checkRole(['organisation']), organizerController.getUpcomingTournaments);
-
+router.post('/playing-11',authenticateToken,checkRole(['organisation']), organizerController.addPlaying11);
+router.get('/innings/:inning_id', authenticateToken,checkRole(['organisation']),organizerController.getInningStats);
 
 
 module.exports = router;

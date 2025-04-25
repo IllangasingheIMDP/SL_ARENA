@@ -92,8 +92,10 @@ const OngoingTournamentsTab = () => {
     setShowMap(true);
   };
 
-  const handleAttendanceComplete = () => {
+  const handleAttendanceComplete = async (tournamentId: number) => {
+    if (!tournamentId) return;
     setShowAttendanceForm(false);
+    await tournamentService.createKnockoutDraw(tournamentId);
     fetchTournaments(); // Refresh to get updated status
   };
 
@@ -146,7 +148,7 @@ const OngoingTournamentsTab = () => {
           <TeamAttendanceForm
             tournamentId={selectedTournament.tournament_id}
             teams={selectedTournament.teams}
-            onComplete={handleAttendanceComplete}
+            onComplete={() => selectedTournament.tournament_id && handleAttendanceComplete(selectedTournament.tournament_id)}
           />
         )}
       </Modal>

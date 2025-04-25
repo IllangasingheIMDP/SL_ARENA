@@ -220,6 +220,33 @@ const getFinishedTournaments = async () => {
     }
 };
 
+const getMyHistoryTournaments = async (teamId) => {
+    try {
+        const query = `
+            SELECT 
+                t.tournament_id,
+                t.tournament_name,
+                t.start_date,
+                t.end_date,
+                t.tournament_type,
+                t.rules,
+                t.venue_id,
+                o.organization_name
+            FROM tournament_applicants ta
+            INNER JOIN Tournaments t ON ta.tournament_id = t.tournament_id
+            LEFT JOIN Organizers o ON t.organizer_id = o.organizer_id
+            WHERE ta.team_id = ?
+            AND ta.status = 'accepted'
+            AND ta.payment = 'complete'
+            AND ta.attendance = 1
+        `;
+        const [tournaments] = await db.query(query, [teamId]);
+        return tournaments;
+    } catch (error) {
+        throw new Error(`Error getting team tournaments: ${error.message}`);
+    }
+};
+
 module.exports = {
     getPlayerTeams,
     getAllTeams,
@@ -232,6 +259,7 @@ module.exports = {
     removePlayerFromTeam,
     deleteTeam,
     isUserTeamCaptain,
-    getFinishedTournaments
+    getFinishedTournaments,
+    getMyHistoryTournaments
 };
 
