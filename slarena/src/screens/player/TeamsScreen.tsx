@@ -196,6 +196,7 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
           placeholder="Search teams..."
           value={searchQuery}
           onChangeText={setSearchQuery}
+          placeholderTextColor="#999"
         />
         <TouchableOpacity 
           style={styles.searchButton}
@@ -246,13 +247,15 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Add Players to {selectedTeam?.team_name}</Text>
             
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search players..."
-              value={playerSearchQuery}
-              onChangeText={setPlayerSearchQuery}
-              placeholderTextColor="#999"
-            />
+            <View style={[styles.searchContainer, { marginBottom: 20 }]}>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search players..."
+                value={playerSearchQuery}
+                onChangeText={setPlayerSearchQuery}
+                placeholderTextColor="#999"
+              />
+            </View>
 
             <FlatList
               data={filteredPlayers}
@@ -300,25 +303,34 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     marginBottom: 16,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    height: 48,
   },
   searchInput: {
     flex: 1,
-    height: 40,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    marginRight: 8,
+    fontSize: 16,
+    color: '#333',
+    paddingHorizontal: 8,
   },
   searchButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#2196f3',
     paddingHorizontal: 16,
+    height: '100%',
     justifyContent: 'center',
-    borderRadius: 8,
+    alignItems: 'center',
+    borderTopRightRadius: 12,
+    borderBottomRightRadius: 12,
+    marginRight: -12,
   },
   searchButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 16,
   },
   createTeamButton: {
     backgroundColor: '#34C759',
@@ -431,16 +443,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
     color: '#333',
-  },
-  searchInput: {
-    height: 48,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    marginBottom: 16,
-    fontSize: 16,
-    backgroundColor: '#f8f8f8',
   },
   playerList: {
     maxHeight: 400,
