@@ -19,6 +19,7 @@ interface Match {
 }
 
 const SportsCalendar = () => {
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   // Sample matches data
