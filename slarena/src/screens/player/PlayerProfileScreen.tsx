@@ -209,6 +209,20 @@ const PlayerProfileScreen = () => {
     return match ? match[1] : null;
   };
 
+  const isValidYouTubeUrl = (url: string): boolean => {
+    // Remove any leading @ symbol
+    const cleanUrl = url.replace(/^@/, '');
+    
+    // Match various YouTube URL formats
+    const patterns = [
+      /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})(\S*)?$/,  // Standard watch URL with optional parameters
+      /^(https?:\/\/)?(www\.)?(youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})(\S*)?$/,    // Embed URL with optional parameters
+      /^(https?:\/\/)?(www\.)?(youtu\.be\/)([a-zA-Z0-9_-]{11})(\S*)?$/              // Short URL with optional parameters
+    ];
+    
+    return patterns.some(pattern => pattern.test(cleanUrl));
+  };
+
   const handlePhotoUpload = async () => {
     try {
       setIsUploadingPhoto(true);
@@ -255,18 +269,26 @@ const PlayerProfileScreen = () => {
         Alert.alert('Error', 'Please enter a video URL');
         return;
       }
+
+      // Clean the URL before validation
+      const cleanUrl = videoUrl.replace(/^@/, '');
+      if (!isValidYouTubeUrl(cleanUrl)) {
+        Alert.alert('Error', 'Please enter a valid YouTube URL');
+        return;
+      }
+
       if (videoMatchId) {
         await playerService.uploadVideoForMatch({
           match_id: videoMatchId,
           title: videoTitle,
           description: videoDescription,
-          videoUrl,
+          videoUrl: cleanUrl,
         });
       } else {
         await playerService.uploadVideo({
           title: videoTitle,
           description: videoDescription,
-          videoUrl,
+          videoUrl: cleanUrl,
         });
       }
       Alert.alert('Success', 'Video uploaded successfully');
@@ -715,16 +737,28 @@ const PlayerProfileScreen = () => {
                     editable={!isUploadingVideo}
                   />
                   <TextInput
-                    style={styles.simpleInput}
-                    placeholder="Video URL"
+                    style={[
+                      styles.simpleInput,
+                      videoUrl && !isValidYouTubeUrl(videoUrl) && styles.invalidInput
+                    ]}
+                    placeholder="YouTube Video URL (e.g., https://www.youtube.com/watch?v=VIDEO_ID)"
                     value={videoUrl}
                     onChangeText={setVideoUrl}
                     editable={!isUploadingVideo}
                   />
+                  {videoUrl && !isValidYouTubeUrl(videoUrl) && (
+                    <Text style={styles.errorText}>
+                      Please enter a valid YouTube URL
+                    </Text>
+                  )}
                   <TouchableOpacity 
-                    style={[styles.simpleButton, isUploadingVideo && styles.disabledButton]} 
+                    style={[
+                      styles.simpleButton, 
+                      isUploadingVideo && styles.disabledButton,
+                      (!videoUrl || !isValidYouTubeUrl(videoUrl)) && styles.disabledButton
+                    ]} 
                     onPress={handleVideoUpload}
-                    disabled={isUploadingVideo}
+                    disabled={isUploadingVideo || !videoUrl || !isValidYouTubeUrl(videoUrl)}
                   >
                     <Text style={styles.simpleButtonText}>
                       {isUploadingVideo ? 'Uploading...' : 'Upload'}
@@ -1209,6 +1243,15 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     opacity: 0.7,
+  },
+  invalidInput: {
+    borderColor: '#ff0000',
+  },
+  errorText: {
+    color: '#ff0000',
+    fontSize: 12,
+    marginTop: -5,
+    marginBottom: 10,
   },
 });
 
