@@ -160,6 +160,14 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
       ]}
       onPress={() => handleSelectPlayer(item)}
     >
+      <View style={[
+        styles.selectionIndicator,
+        selectedPlayers.some(p => p.player_id === item.player_id) && styles.selectedIndicator
+      ]}>
+        {selectedPlayers.some(p => p.player_id === item.player_id) && (
+          <Text style={{ color: '#fff', fontSize: 16 }}>✓</Text>
+        )}
+      </View>
       <Text style={styles.playerName}>{item.name}</Text>
     </TouchableOpacity>
   );
@@ -243,6 +251,7 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
               placeholder="Search players..."
               value={playerSearchQuery}
               onChangeText={setPlayerSearchQuery}
+              placeholderTextColor="#999"
             />
 
             <FlatList
@@ -251,6 +260,10 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
               keyExtractor={(item) => item.player_id.toString()}
               style={styles.playerList}
             />
+
+            <Text style={styles.selectedCount}>
+              {selectedPlayers.length} player{selectedPlayers.length !== 1 ? 's' : ''} selected
+            </Text>
 
             <View style={styles.modalButtons}>
               <TouchableOpacity
@@ -261,7 +274,7 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
                   setPlayerSearchQuery('');
                 }}
               >
-                <Text style={styles.buttonText}>Cancel</Text>
+                <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalButton, styles.addButton]}
@@ -377,14 +390,18 @@ const styles = StyleSheet.create({
   },
   playerItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
+    alignItems: 'center',
+    padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: '#eee',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    marginVertical: 4,
   },
   playerName: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#333',
+    flex: 1,
   },
   playerRole: {
     fontSize: 14,
@@ -398,45 +415,89 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 16,
+    borderRadius: 16,
+    padding: 24,
     width: '90%',
     maxHeight: '80%',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 20,
     textAlign: 'center',
+    color: '#333',
+  },
+  searchInput: {
+    height: 48,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    fontSize: 16,
+    backgroundColor: '#f8f8f8',
   },
   playerList: {
-    maxHeight: 300,
+    maxHeight: 400,
+    marginVertical: 16,
   },
   selectedPlayerItem: {
     backgroundColor: '#e3f2fd',
+    borderColor: '#2196f3',
+    borderWidth: 1,
+  },
+  selectionIndicator: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#2196f3',
+    marginRight: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  selectedIndicator: {
+    backgroundColor: '#2196f3',
   },
   modalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 16,
+    marginTop: 24,
+    gap: 12,
   },
   modalButton: {
     flex: 1,
-    padding: 12,
-    borderRadius: 8,
+    padding: 16,
+    borderRadius: 12,
     alignItems: 'center',
-    marginHorizontal: 8,
+    justifyContent: 'center',
   },
   cancelButton: {
-    backgroundColor: '#ff3b30',
+    backgroundColor: '#f5f5f5',
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   addButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#2196f3',
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  cancelButtonText: {
+    color: '#666',
+  },
+  selectedCount: {
+    textAlign: 'center',
+    marginTop: 8,
+    color: '#666',
+    fontSize: 14,
   },
 });
 
