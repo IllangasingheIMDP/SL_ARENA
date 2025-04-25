@@ -39,7 +39,7 @@ router.get('/:team_id/players',
 
 router.get('/user/:user_id/teams', 
     authenticateToken,
-    checkRole(['player', 'admin', 'general', 'organisation', 'trainer']), 
+    checkRole(['player']), 
     teamController.getTeamsByUserId
 );
 
