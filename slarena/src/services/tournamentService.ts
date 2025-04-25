@@ -127,7 +127,7 @@ export const tournamentService = {
     try {
       const response = await api.get('/teams/upcoming-tournaments');
       const tournaments = response.data;
-  
+      
       const transformedTournaments: Tournament[] = await Promise.all(
         tournaments.map(async (item: any) => {
           // Get detailed venue info using the venue_id
@@ -266,6 +266,7 @@ export const tournamentService = {
   }> => {
     try {
       const response = await api.get(`/players/team/${teamId}/tournaments`)
+      //console.log('response', response);
       //console.log('response', response);
       const { registered, applied, notApplied } = response;
 

@@ -263,6 +263,7 @@ const getTournamentDetailsByIds = async (ids) => {
       t.tournament_id,
       t.tournament_name,
       t.start_date,
+      t.end_date,
       t.rules,
       o.organizer_id,
       o.organization_name AS organizer_name,
