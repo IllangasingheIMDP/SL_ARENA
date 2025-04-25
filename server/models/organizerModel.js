@@ -554,6 +554,16 @@ const updateInningSummary = async (inning_id) => {
     await db.execute(sql, params);
   };
 
+  const getInningStatsById = async (inning_id) => {
+    const [rows] = await db.execute(
+      `SELECT total_runs, total_wickets 
+       FROM Innings 
+       WHERE inning_id = ?`,
+      [inning_id]
+    );
+    return rows[0];
+  };
+
 module.exports = {
     createTournament,
     getTournamentsByOrganizer,
@@ -576,6 +586,7 @@ module.exports = {
     updateMatchWinner,
     viewKnockoutBracket,
     getUpcomingTournaments,
-    insertPlaying11
+    insertPlaying11,
+    getInningStatsById
 
 };
