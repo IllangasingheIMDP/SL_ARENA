@@ -387,6 +387,18 @@ const updateInningSummary = async (inning_id) => {
     );
     return result;
   };
+
+  const markAttendance = async (ids) => {
+    const placeholders = ids.map(() => '?').join(',');
+    const sql = `
+      UPDATE tournament_applicants
+      SET attendance = TRUE
+      WHERE id IN (${placeholders})
+    `;
+    const [result] = await db.execute(sql, ids);
+    return result;
+  };
+  
   
 
 
@@ -406,5 +418,6 @@ module.exports = {
     getNextBall,
     updateInningSummary,
     updatePlayerStats,
-    updateTournamentStatus
+    updateTournamentStatus,
+    markAttendance
 };

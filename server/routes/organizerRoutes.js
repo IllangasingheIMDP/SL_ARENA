@@ -18,6 +18,7 @@ router.post('/current-batsmen-runs',authenticateToken,checkRole(['organisation']
 router.post('/get-next-ball', authenticateToken,checkRole(['organisation']),organizerController.getNextBallController);
 router.post('/updateInningSummary',authenticateToken,checkRole(['organisation']), organizerController.updateInningSummary);
 router.post('/updatePlayerStats',authenticateToken,checkRole(['organisation']), organizerController.updatePlayerStats);
+router.post('/markAttendance', organizerController.markAttendance);
 
 
 module.exports = router;

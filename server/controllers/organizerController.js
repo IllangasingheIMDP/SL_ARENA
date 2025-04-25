@@ -336,6 +336,22 @@ const updateInningSummary = async (req, res) => {
       res.status(500).json({ error: 'Failed to update tournament status' });
     }
   };
+
+  const markAttendance = async (req, res) => {
+    try {
+      const { ids } = req.body;
+  
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: 'Invalid or empty list of IDs.' });
+      }
+  
+      const result = await OrganizerModel.markAttendance(ids);
+      res.status(200).json({ message: 'Attendance marked successfully', result });
+    } catch (err) {
+      console.error('Error marking attendance:', err);
+      res.status(500).json({ message: 'Server error while marking attendance.' });
+    }
+  };
   
 
 
@@ -358,5 +374,6 @@ module.exports = {
     getNextBallController,
     updateInningSummary,
     updatePlayerStats,
-    updateTournamentStatus
+    updateTournamentStatus,
+    markAttendance
 };
