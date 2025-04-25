@@ -24,6 +24,8 @@ import TeamDetailsScreen from '../screens/organisation/TeamDetailsScreen';
 import RoleManagementScreen from '../screens/organisation/RoleManagementScreen';
 import CreateTournamentScreen from '../screens/organisation/CreateTournamentScreen';
 import TournamentDetailsScreen from '../screens/organisation/TournamentDetailsScreen';
+import TeamsScreen from '../screens/player/TeamsScreen';
+import CreateTeamScreen from '../screens/player/CreateTeamScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -43,6 +45,8 @@ export type RootStackParamList = {
   RoleManagement: undefined;
   CreateTournament: undefined;
   TournamentDetails: { tournament: Tournament };
+  Teams: undefined;
+  CreateTeam: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -113,6 +117,20 @@ const AppNavigator = () => {
                         component={PlayerProfileScreen}
                         options={{
                           title: 'Player Profile',
+                        }}
+                      />
+                      <Stack.Screen
+                        name="Teams"
+                        component={TeamsScreen}
+                        options={{
+                          title: 'My Teams',
+                        }}
+                      />
+                      <Stack.Screen
+                        name="CreateTeam"
+                        component={CreateTeamScreen}
+                        options={{
+                          title: 'Create Team',
                         }}
                       />
                       <Stack.Screen
