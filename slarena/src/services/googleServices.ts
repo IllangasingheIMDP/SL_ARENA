@@ -31,7 +31,6 @@ export const googleServices = {
   getPlaceDetails: async (placeId: string): Promise<PlaceDetails> => {
     try {
       const response = await api.get(`/places/details/${placeId}`);
-      console.log('place details', response.data);
       return response.data;
     } catch (error) {
       console.error('Error getting place details:', error);

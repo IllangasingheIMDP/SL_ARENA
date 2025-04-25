@@ -35,10 +35,10 @@ const UpcomingMatchesTab = () => {
   const renderTournamentItem = ({ item }: { item: Tournament }) => (
     <UpcomingTournamentComponent
       tournament_id={item.tournament_id}
-      tournament_name={item.tournament_name}
+      tournament_name={item.name}
       start_date={item.start_date}
       end_date={item.end_date}
-      tournament_type={item.tournament_type}
+      tournament_type={item.type}
       onViewDetails={() => handleViewDetails(item)}
     />
 
