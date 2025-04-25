@@ -455,6 +455,28 @@ const updateMatchWinner = async (req, res) => {
   }
 };
 
+
+const getInningStats = async (req, res) => {
+    try {
+      const { inning_id } = req.params;
+  
+      if (!inning_id) {
+        return res.status(400).json({ error: 'inning_id is required' });
+      }
+  
+      const stats = await OrganizerModel.getInningStatsById(inning_id);
+  
+      if (!stats) {
+        return res.status(404).json({ error: 'Inning not found' });
+      }
+  
+      res.status(200).json(stats);
+    } catch (err) {
+      console.error('Error fetching inning stats:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
 module.exports = {
     createTournament,
     getTournamentsByOrganizerController,
@@ -480,5 +502,6 @@ module.exports = {
     updateMatchWinner,
 
     getUpcomingTournaments,
-    addPlaying11
+    addPlaying11,
+    getInningStats
 };
