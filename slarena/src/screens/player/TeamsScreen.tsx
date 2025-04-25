@@ -5,11 +5,18 @@ import { playerService } from '../../services/playerService';
 import { Team, TeamPlayer } from '../../types/team';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
+import { Picker } from '@react-native-picker/picker';
 
 interface Player {
   player_id: number;
   name: string;
   user_id: number;
+}
+
+type PlayerRole = 'Batsman' | 'Bowler' | 'All-Rounder' | 'Wicket-Keeper';
+
+interface SelectedPlayer extends Player {
+  role: PlayerRole;
 }
 
 type TeamsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Teams'>;
@@ -28,7 +35,7 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [showPlayerModal, setShowPlayerModal] = useState(false);
   const [players, setPlayers] = useState<Player[]>([]);
-  const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
+  const [selectedPlayers, setSelectedPlayers] = useState<SelectedPlayer[]>([]);
   const [playerSearchQuery, setPlayerSearchQuery] = useState('');
 
   useEffect(() => {
@@ -100,8 +107,14 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
     if (selectedPlayers.some(p => p.player_id === player.player_id)) {
       setSelectedPlayers(selectedPlayers.filter(p => p.player_id !== player.player_id));
     } else {
-      setSelectedPlayers([...selectedPlayers, player]);
+      setSelectedPlayers([...selectedPlayers, { ...player, role: 'Batsman' }]);
     }
+  };
+
+  const handleRoleChange = (playerId: number, role: PlayerRole) => {
+    setSelectedPlayers(selectedPlayers.map(p => 
+      p.player_id === playerId ? { ...p, role } : p
+    ));
   };
 
   const handleAddSelectedPlayers = async () => {
@@ -113,7 +126,7 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
         await teamService.addPlayerToTeam({
           team_id: selectedTeam.team_id,
           player_id: player.player_id,
-          role: 'Player'
+          role: player.role
         });
       }
       setShowPlayerModal(false);
@@ -170,6 +183,24 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
       </View>
       <Text style={styles.playerName}>{item.name}</Text>
     </TouchableOpacity>
+  );
+
+  const renderSelectedPlayer = (player: SelectedPlayer) => (
+    <View style={styles.selectedPlayerContainer}>
+      <Text style={styles.selectedPlayerName}>{player.name}</Text>
+      <View style={styles.rolePickerContainer}>
+        <Picker
+          selectedValue={player.role}
+          onValueChange={(value) => handleRoleChange(player.player_id, value as PlayerRole)}
+          style={styles.rolePicker}
+        >
+          <Picker.Item label="Batsman" value="Batsman" />
+          <Picker.Item label="Bowler" value="Bowler" />
+          <Picker.Item label="All-Rounder" value="All-Rounder" />
+          <Picker.Item label="Wicket-Keeper" value="Wicket-Keeper" />
+        </Picker>
+      </View>
+    </View>
   );
 
   const renderTeamSection = (title: string, teams: Team[]) => {
@@ -264,9 +295,12 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
               style={styles.playerList}
             />
 
-            <Text style={styles.selectedCount}>
-              {selectedPlayers.length} player{selectedPlayers.length !== 1 ? 's' : ''} selected
-            </Text>
+            {selectedPlayers.length > 0 && (
+              <View style={styles.selectedPlayersContainer}>
+                <Text style={styles.selectedPlayersTitle}>Selected Players</Text>
+                {selectedPlayers.map(player => renderSelectedPlayer(player))}
+              </View>
+            )}
 
             <View style={styles.modalButtons}>
               <TouchableOpacity
@@ -495,11 +529,41 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     color: '#666',
   },
-  selectedCount: {
-    textAlign: 'center',
-    marginTop: 8,
-    color: '#666',
-    fontSize: 14,
+  selectedPlayersContainer: {
+    marginTop: 16,
+    padding: 16,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 12,
+  },
+  selectedPlayersTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    color: '#333',
+  },
+  selectedPlayerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  selectedPlayerName: {
+    fontSize: 16,
+    color: '#333',
+    flex: 1,
+  },
+  rolePickerContainer: {
+    width: 150,
+    height: 40,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  rolePicker: {
+    height: 40,
   },
 });
 
