@@ -304,7 +304,7 @@ module.exports ={
     deleteVideo,
     uploadVideoForMatch,
     getAllPlayers,
-    getPublicPlayerProfileDetails
+    getPublicPlayerProfileDetails,
     getTeamsByLeader
 
 }

@@ -235,7 +235,7 @@ module.exports = {
   getPlayerVideos,
   getTrainingSessionsByPlayer,
   updateProfileBio,
-  getAllPlayers
+  getAllPlayers,
   getTeamsByLeader
 };
 
