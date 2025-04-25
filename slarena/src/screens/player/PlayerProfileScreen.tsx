@@ -907,7 +907,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 25,
-    backgroundColor: '#1a73e8',
+    backgroundColor: '#00247D', // Sri Lankan navy blue
     alignItems: 'center',
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
@@ -923,7 +923,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#FFB81C', // Sri Lankan golden yellow
     textShadowColor: 'rgba(0, 0, 0, 0.2)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
@@ -946,10 +946,10 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1a73e8',
+    color: '#00247D', // Sri Lankan navy blue
     marginBottom: 20,
     borderBottomWidth: 2,
-    borderBottomColor: '#1a73e8',
+    borderBottomColor: '#FFB81C', // Sri Lankan golden yellow
     paddingBottom: 8,
   },
   statsContainer: {
@@ -984,7 +984,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#1a73e8',
+    color: '#00247D', // Sri Lankan navy blue
     textAlign: 'center',
   },
   statLabel: {
@@ -1024,7 +1024,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   saveButton: {
-    backgroundColor: '#1a73e8',
+    backgroundColor: '#00247D', // Sri Lankan navy blue
   },
   cancelButton: {
     backgroundColor: '#5f6368',
@@ -1077,14 +1077,14 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   activeTabText: {
-    color: '#1a73e8',
+    color: '#00247D', // Sri Lankan navy blue
     fontWeight: 'bold',
   },
   contentArea: {
     padding: 10,
   },
   simpleButton: {
-    backgroundColor: '#1a73e8',
+    backgroundColor: '#00247D', // Sri Lankan navy blue
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -1101,7 +1101,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   simpleButtonText: {
-    color: '#fff',
+    color: '#FFB81C', // Sri Lankan golden yellow
     fontWeight: 'bold',
     fontSize: 16,
   },
@@ -1157,7 +1157,7 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#1a73e8',
+    color: '#00247D', // Sri Lankan navy blue
   },
   simpleDeleteButton: {
     padding: 12,
@@ -1167,7 +1167,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#e8eaed',
   },
   simpleDeleteText: {
-    color: '#1a73e8',
+    color: '#00247D', // Sri Lankan navy blue
     fontWeight: 'bold',
   },
   simplePlayOverlay: {
@@ -1181,7 +1181,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.3)',
   },
   simplePlayText: {
-    color: '#fff',
+    color: '#FFB81C', // Sri Lankan golden yellow
     fontSize: 40,
   },
   trainingItem: {
@@ -1268,7 +1268,7 @@ const styles = StyleSheet.create({
   attributeLabel: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#1a73e8',
+    color: '#00247D', // Sri Lankan navy blue
     marginBottom: 8,
   },
   attributeValueContainer: {
