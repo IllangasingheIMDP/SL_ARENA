@@ -172,9 +172,36 @@ const getPlayerStats = async (req, res) => {
     }
   };
 
+  const getAllPlayers = async (req, res) => {
+    try {
+        const players = await PlayerModel.getAllPlayers();
+        res.json({
+            success: true,
+            data: players
+        });
+    } catch (error) {
+        console.error('Error fetching all players:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+  };
+  
   const getPlayerProfileDetails= async (req,res)=>{
     try {
         const player_id = req.user.user_id;
+        const data = await PlayerModel.getPlayerProfileDetails(player_id);
+        res.json({
+            success: true,
+            data
+        });
+
+    }catch (error) {
+        console.error('Error fetching player profile details:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+  }
+  const getPublicPlayerProfileDetails= async (req,res)=>{
+    try {
+        const player_id = req.params.player_id;
         const data = await PlayerModel.getPlayerProfileDetails(player_id);
         res.json({
             success: true,
@@ -239,7 +266,24 @@ const getPlayerStats = async (req, res) => {
   }
 
 
-
+  const getTeamsByLeader = async (req, res) => {
+    try {
+      const playerId = req.user.user_id;
+      const teams = await PlayerModel.getTeamsByLeader(playerId);
+      
+      res.json({
+        success: true,
+        data: teams
+      });
+    } catch (error) {
+      console.error('Error fetching teams by leader:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Server error',
+        error: error.message 
+      });
+    }
+  };
 
 
 
@@ -258,7 +302,9 @@ module.exports ={
     getPlayerVideos,
     uploadVideo,
     deleteVideo,
-    uploadVideoForMatch
-
+    uploadVideoForMatch,
+    getAllPlayers,
+    getPublicPlayerProfileDetails,
+    getTeamsByLeader
 
 }

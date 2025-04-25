@@ -94,6 +94,8 @@ export const tournamentService = {
   },
 
   createTournament: async (tournamentData: any): Promise<any> => {
+    console.log("in service");
+    console.log('tournamentData', tournamentData);
     try {
       console.log('Creating tournament with data:', tournamentData);
       const response = await api.post('/organizers/createtournament', {
@@ -106,5 +108,15 @@ export const tournamentService = {
       console.error('Error creating tournament:', error);
       throw error;
     }
-  }
+  },
+
+  getUpcomingTournaments: async (): Promise<Tournament[]> => {
+    try {
+      const response = await api.get('/organizers/upcoming-tournaments');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching upcoming tournaments:', error);
+      throw error;
+    }
+  },
 }; 

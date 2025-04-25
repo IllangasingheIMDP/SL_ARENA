@@ -20,6 +20,7 @@ router.post('/updateInningSummary',authenticateToken,checkRole(['organisation'])
 router.post('/updatePlayerStats',authenticateToken,checkRole(['organisation']), organizerController.updatePlayerStats);
 router.put('/tournaments/:tournamentId/teams/:teamId/attendance', organizerController.updateTeamAttendance);
 router.put('/tournaments/updatestatus', organizerController.updateTournamentStatus);
+router.get('/upcoming-tournaments', authenticateToken,checkRole(['organisation']), organizerController.getUpcomingTournaments);
 
 
 module.exports = router;

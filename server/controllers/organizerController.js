@@ -5,8 +5,6 @@ const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/constants');
 const createTournament = async (req, res) => {
     try {
         const userId = req.user.user_id; // organizer_id
-
-        console.log(userId)
     
 
         const {
@@ -375,6 +373,19 @@ const updateInningSummary = async (req, res) => {
     }
   };
 
+  const getUpcomingTournaments = async (req, res) => {
+    try{
+        const tournaments = await OrganizerModel.getUpcomingTournaments();
+        res.status(200).json({
+            message: 'Upcoming tournaments fetched successfully',
+            data: tournaments
+        });
+    }catch(error){
+        console.error('Error fetching upcoming tournaments:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+  };
+
 
 
 
@@ -397,5 +408,6 @@ module.exports = {
     updatePlayerStats,
     updateTournamentStatus,
     markAttendance,
-    updateTeamAttendance
+    updateTeamAttendance,
+    getUpcomingTournaments
 };

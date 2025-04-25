@@ -294,7 +294,7 @@ const PlayerProfileScreen = () => {
           </View>
           <View style={[styles.statItem, styles.roleStatItem]}>
             <View style={styles.statValueContainer}>
-              <Text style={styles.statValue}>{profile?.role || 'Role'}</Text>
+              <Text style={styles.statValue}>{(profile?.role || 'Role').charAt(0).toUpperCase() + (profile?.role || 'Role').slice(1).toLowerCase()}</Text>
             </View>
             <Text style={styles.statLabel}>Role</Text>
           </View>
