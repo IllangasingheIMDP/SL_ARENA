@@ -13,6 +13,7 @@ export type Venue = {
 export type Team = {
   team_id: number;
   team_name: string;
+  team_logo?: string;
   captain_id?: number;
   players?: TeamPlayer[];
 };
@@ -49,4 +50,15 @@ export type PlayerStats = {
   total_wickets: string;
   batting_average: string;
   bowling_economy: string;
+}
+
+export interface Match {
+  match_id: number;
+  round: number;
+  match_number: number;
+  team1_id: number | null;
+  team2_id: number | null;
+  team1_name: string | null;
+  team2_name: string | null;
+  winner_name: string | null;
 }
