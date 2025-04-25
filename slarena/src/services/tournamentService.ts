@@ -91,5 +91,15 @@ export const tournamentService = {
       console.error(`Error fetching player stats for team ID ${teamId}:`, error);
       throw error;
     }
+  },
+
+  createTournament: async (tournamentData: any): Promise<any> => {
+    try {
+      const response = await api.post('/organizers/createtournament', tournamentData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating tournament:', error);
+      throw error;
+    }
   }
 }; 
