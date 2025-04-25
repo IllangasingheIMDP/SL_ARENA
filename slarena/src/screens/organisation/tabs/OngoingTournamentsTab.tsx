@@ -19,6 +19,7 @@ import TeamAttendanceForm from '../../../components/organisation/TeamAttendanceF
 import TournamentDetails from '../../../components/organisation/TournamentDetails';
 import VenueMap from '../../../components/organisation/VenueMap';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
+import Draw from '../../../components/organisation/Draw';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -28,6 +29,7 @@ const OngoingTournamentsTab = () => {
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [showAttendanceForm, setShowAttendanceForm] = useState(false);
+  const [showDraw, setShowDraw] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -69,6 +71,11 @@ const OngoingTournamentsTab = () => {
     }
   };
 
+  const handleDrawPress = (tournament: Tournament) => {
+    setSelectedTournament(tournament);
+    setShowDraw(true);
+  };
+
   const handleViewTeamsPress = (tournament: Tournament) => {
     // Navigate to teams view
     navigation.navigate('TournamentTeams', { tournamentId: tournament.tournament_id });
@@ -92,6 +99,7 @@ const OngoingTournamentsTab = () => {
     <TournamentCard
       tournament={item}
       onStartPress={() => handleStartPress(item)}
+      onDrawPress={() => handleDrawPress(item)}
       onViewTeamsPress={() => handleViewTeamsPress(item)}
       onDetailsPress={() => handleDetailsPress(item)}
     />
@@ -140,6 +148,21 @@ const OngoingTournamentsTab = () => {
           />
         )}
       </Modal>
+
+      {/* Draw Modal */}
+      <Modal
+        visible={showDraw}
+        animationType="slide"
+        onRequestClose={() => setShowDraw(false)}
+      >
+        {selectedTournament && (
+          <Draw
+            tournament={selectedTournament}
+            onClose={() => setShowDraw(false)}
+          />
+        )}
+      </Modal>
+      
 
       {/* Tournament Details Modal */}
       <Modal
