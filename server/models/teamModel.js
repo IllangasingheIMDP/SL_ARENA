@@ -80,7 +80,7 @@ const getTeamByName = async (teamName, options = {}) => {
       const searchValue = caseSensitive ? searchParam : searchParam.toLowerCase();
   
       // Execute query
-      console.log(query,'query in getTeamByName');
+      //console.log(query,'query in getTeamByName');
       const [teams] = await db.query(query, [searchValue]);
   
       // Return null if no team found
@@ -195,6 +195,19 @@ const isUserTeamCaptain = async (teamId, userId) => {
         throw new Error(`Error checking if user is team captain: ${error.message}`);
     }
 };
+const applyForTournament = async (teamId, tournamentId,photoUrl) => {
+    try {
+        const query = `
+            INSERT INTO tournament_applicants (team_id, tournament_id,payment_slip)
+            VALUES (?, ?, ? )
+        `;
+        const [result] = await db.query(query, [teamId, tournamentId,photoUrl]);
+        return result;
+    } catch (error) {
+        throw new Error(`Error applying for tournament: ${error.message}`);
+    }
+}
+
 
 const getFinishedTournaments = async () => {
     try {
@@ -247,6 +260,30 @@ const getMyHistoryTournaments = async (teamId) => {
     }
 };
 
+const getUpcomingTournaments = async () => {
+    try {
+        const query = `
+            SELECT 
+                t.tournament_id,
+                t.tournament_name,
+                t.start_date,
+                t.end_date,
+                t.tournament_type,
+                t.rules,
+                t.venue_id,
+                o.organization_name
+            FROM Tournaments t
+            LEFT JOIN Organizers o ON t.organizer_id = o.organizer_id
+            WHERE t.status = 'upcoming'
+            ORDER BY t.start_date ASC
+        `;
+        const [tournaments] = await db.query(query);
+        return tournaments;
+    } catch (error) {
+        throw new Error(`Error getting upcoming tournaments: ${error.message}`);
+    }
+};
+
 module.exports = {
     getPlayerTeams,
     getAllTeams,
@@ -260,6 +297,8 @@ module.exports = {
     deleteTeam,
     isUserTeamCaptain,
     getFinishedTournaments,
-    getMyHistoryTournaments
+    getMyHistoryTournaments,
+    getUpcomingTournaments,
+    applyForTournament
 };
 

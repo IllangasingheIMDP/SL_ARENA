@@ -10,7 +10,7 @@ import {
   Alert
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Tournament } from '../../../types/tournamentTypes';
 import { tournamentService } from '../../../services/tournamentService';
@@ -33,6 +33,16 @@ const OngoingTournamentsTab = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setShowAttendanceForm(false);
+      setShowDraw(false);
+      setShowDetails(false);
+      setShowMap(false);
+      setSelectedTournament(null);
+    }, [])
+  );
 
   const fetchTournaments = async () => {
     try {
@@ -80,6 +90,7 @@ const OngoingTournamentsTab = () => {
 
   const handleViewTeamsPress = (tournament: Tournament) => {
     if (!tournament.tournament_id) return;
+    setShowDraw(false);
     navigation.navigate('TournamentTeams', { tournamentId: tournament.tournament_id });
   };
 

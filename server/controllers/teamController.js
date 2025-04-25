@@ -1,5 +1,5 @@
 const Team = require('../models/teamModel');
-
+const notificationModel = require('../models/notificationModel');
 // Get teams for the authenticated user
 const getMyTeams = async (req, res) => {
     try {
@@ -178,7 +178,7 @@ const removePlayerFromTeam = async (req, res) => {
 // Add player to team
 const addPlayerToTeam = async (req, res) => {
     try {
-        const { team_id, player_id, role } = req.body;
+        const { team_id, player_id, role, team_name } = req.body;
 
         if (!team_id || !player_id || !role) {
             return res.status(400).json({
@@ -188,6 +188,22 @@ const addPlayerToTeam = async (req, res) => {
         }
 
         await Team.addPlayerToTeam(team_id, player_id, role);
+        // Create notification for player
+        const notification = await notificationModel.create(
+            player_id,
+            `You have been added to team ${team_name}`,
+            'team'
+        );
+        // Get updated unread count for organizer
+        const notifications = await notificationModel.getByUserId(player_id);
+        const unreadCount = notifications.filter(n => n.is_read === 0).length;
+
+        // Emit notification and count to organizer's room
+        const room = `user_${player_id}`;
+        req.io.to(room).emit('new_notification', notification);
+        req.io.to(room).emit('notification_count_update', unreadCount);
+
+        
         res.status(200).json({
             success: true,
             message: 'Player added to team successfully'
@@ -219,6 +235,40 @@ const getTeamsByUserId = async (req, res) => {
     }
 };
 
+const applyForTournament = async (req, res) => {
+    try {
+        const { team_id, tournament_id, organizer_id, tournament_name, team_name } = req.body;
+        const photoUrl = req.file.path;
+        await Team.applyForTournament(team_id, tournament_id,photoUrl);
+        
+        // Create notification for organizer
+        const notification = await notificationModel.create(
+            organizer_id,
+            `${team_name} has applied for ${tournament_name}`,
+            'tournament'
+        );
+
+        // Get updated unread count for organizer
+        const notifications = await notificationModel.getByUserId(organizer_id);
+        const unreadCount = notifications.filter(n => n.is_read === 0).length;
+
+        // Emit notification and count to organizer's room
+        const room = `user_${organizer_id}`;
+        req.io.to(room).emit('new_notification', notification);
+        req.io.to(room).emit('notification_count_update', unreadCount);
+
+        res.status(200).json({
+            success: true,
+            message: 'Tournament applied successfully'
+        });
+    } catch (error) {
+        console.log(error, 'error in applyForTournament');
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+}
 // Check if a user is the captain of a team
 const isUserTeamCaptain = async (req, res) => {
     try {
@@ -272,6 +322,22 @@ const getMyHistoryTournaments = async (req, res) => {
     }
 };
 
+const getUpcomingTournaments = async (req, res) => {
+    try {
+        const tournaments = await Team.getUpcomingTournaments();
+        res.status(200).json({
+            success: true,
+            data: tournaments
+        });
+    } catch (error) {
+        console.log(error, 'error in getUpcomingTournaments');
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 module.exports = {
     getMyTeams,
     getPlayerTeams,
@@ -286,5 +352,7 @@ module.exports = {
     deleteTeam,
     isUserTeamCaptain,
     getFinishedTournaments,
-    getMyHistoryTournaments
+    getMyHistoryTournaments,
+    getUpcomingTournaments,
+    applyForTournament
 };

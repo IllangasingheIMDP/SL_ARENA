@@ -77,6 +77,8 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
   'http://16.171.12.238',
+  'https://sl-arena.vercel.app',
+  "https://sl-arena-dasun-illangasinghes-projects.vercel.app",
   'https://lpedu.lk',
   'http://localhost:19000', // Expo development
   'http://localhost:19001', // Expo development
