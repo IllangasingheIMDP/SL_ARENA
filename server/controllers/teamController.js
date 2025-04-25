@@ -238,7 +238,8 @@ const getTeamsByUserId = async (req, res) => {
 const applyForTournament = async (req, res) => {
     try {
         const { team_id, tournament_id, organizer_id, tournament_name, team_name } = req.body;
-        await Team.applyForTournament(team_id, tournament_id);
+        const photoUrl = req.file.path;
+        await Team.applyForTournament(team_id, tournament_id,photoUrl);
         
         // Create notification for organizer
         const notification = await notificationModel.create(

@@ -9,11 +9,14 @@ import {
   Modal,
   ActivityIndicator,
   Alert,
+  Image,
 } from 'react-native';
 import { tournamentService } from '../../services/tournamentService';
+import { playerService } from '../../services/playerService';
 import GoogleMapView from '../../components/maps/GoogleMapView';
 import { Tournament } from '../../types/tournamentTypes';
 import { useAuth } from '../../context/AuthContext';
+import * as ImagePicker from 'expo-image-picker';
 
 type TournamentTab = 'all' | 'team';
 type TeamTournamentStatus = 'registered' | 'applied' | 'notApplied';
@@ -42,6 +45,9 @@ const TournamentsScreen = () => {
     applied: [],
     notApplied: []
   });
+  const [selectedTournamentForApplication, setSelectedTournamentForApplication] = useState<Tournament | null>(null);
+  const [paymentPhoto, setPaymentPhoto] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (activeTab === 'all') {
@@ -102,14 +108,57 @@ const TournamentsScreen = () => {
     }
   };
 
-  const handleApplyTournament = async (tournamentId: number,organizerId:number,tournamentName:string) => {
-    if (!selectedTeam) return;
+  const handleApplyTournament = async (tournamentId: number, organizerId: number, tournamentName: string) => {
+    if (!selectedTeam || !paymentPhoto) {
+      Alert.alert('Error', 'Please select a team and upload payment slip');
+      return;
+    }
+
+    setIsUploading(true);
     try {
-      await tournamentService.applyForTournament(selectedTeam.team_id, tournamentId,organizerId,tournamentName,selectedTeam.team_name);
+      // Create FormData for the photo
+      const formData = new FormData();
+      formData.append('photo', {
+        uri: paymentPhoto,
+        type: 'image/jpeg',
+        name: 'payment_slip.jpg'
+      } as any);
+
+      // Apply for tournament with payment photo
+      await tournamentService.applyForTournament(
+        selectedTeam.team_id,
+        tournamentId,
+        organizerId,
+        tournamentName,
+        selectedTeam.team_name,
+        formData
+      );
+
       Alert.alert('Success', 'Application submitted successfully');
+      setPaymentPhoto(null);
+      setSelectedTournamentForApplication(null);
       fetchTeamTournaments(); // Refresh the list
     } catch (error) {
       Alert.alert('Error', 'Failed to apply for tournament');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const pickPaymentPhoto = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        setPaymentPhoto(result.assets[0].uri);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to pick image');
     }
   };
 
@@ -153,7 +202,10 @@ const TournamentsScreen = () => {
       {showApplyButton && (
         <TouchableOpacity
           style={styles.applyButton}
-          onPress={() => handleApplyTournament(tournament.tournament_id,tournament.organiser.organiser_id,tournament.name)}
+          onPress={() => {
+            setSelectedTournamentForApplication(tournament);
+            pickPaymentPhoto();
+          }}
         >
           <Text style={styles.applyButtonText}>Apply Now</Text>
         </TouchableOpacity>
@@ -326,6 +378,74 @@ const TournamentsScreen = () => {
                   </View>
                 )}
               </>
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={!!selectedTournamentForApplication}
+        onRequestClose={() => setSelectedTournamentForApplication(null)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Upload Payment Slip</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => {
+                  setSelectedTournamentForApplication(null);
+                  setPaymentPhoto(null);
+                }}
+              >
+                <Text style={styles.closeButtonText}>×</Text>
+              </TouchableOpacity>
+            </View>
+            
+            {paymentPhoto ? (
+              <>
+                <Image
+                  source={{ uri: paymentPhoto }}
+                  style={styles.paymentPhoto}
+                  resizeMode="contain"
+                />
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity
+                    style={[styles.modalButton, styles.retakeButton]}
+                    onPress={pickPaymentPhoto}
+                  >
+                    <Text style={styles.modalButtonText}>Retake</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.modalButton, styles.submitButton]}
+                    onPress={() => {
+                      if (selectedTournamentForApplication) {
+                        handleApplyTournament(
+                          selectedTournamentForApplication.tournament_id,
+                          selectedTournamentForApplication.organiser.organiser_id,
+                          selectedTournamentForApplication.name
+                        );
+                      }
+                    }}
+                    disabled={isUploading}
+                  >
+                    {isUploading ? (
+                      <ActivityIndicator color="#fff" />
+                    ) : (
+                      <Text style={styles.modalButtonText}>Submit</Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </>
+            ) : (
+              <TouchableOpacity
+                style={styles.uploadButton}
+                onPress={pickPaymentPhoto}
+              >
+                <Text style={styles.uploadButtonText}>Select Payment Slip</Text>
+              </TouchableOpacity>
             )}
           </View>
         </View>
@@ -579,6 +699,46 @@ const styles = StyleSheet.create({
   applyButtonText: {
     color: '#FFD700',
     fontSize: 14,
+    fontWeight: '600',
+  },
+  paymentPhoto: {
+    width: '100%',
+    height: 300,
+    marginVertical: 20,
+    borderRadius: 8,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 20,
+  },
+  modalButton: {
+    padding: 12,
+    borderRadius: 8,
+    minWidth: 120,
+    alignItems: 'center',
+  },
+  retakeButton: {
+    backgroundColor: '#666',
+  },
+  submitButton: {
+    backgroundColor: '#000080',
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  uploadButton: {
+    backgroundColor: '#000080',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  uploadButtonText: {
+    color: '#FFD700',
+    fontSize: 16,
     fontWeight: '600',
   },
 });
