@@ -90,7 +90,7 @@ const getPlayerStats = async (req, res) => {
   }
   
   const uploadPhoto = async (req, res) => {
-    console.log(req.file,'req.file');
+    //console.log(req.file,'req.file');
     try {
         const userId = req.user.user_id;
         const { title, description } = req.body;
@@ -175,7 +175,7 @@ const getPlayerStats = async (req, res) => {
   const getAllPlayers = async (req, res) => {
     try {
         const players = await PlayerModel.getAllPlayers();
-        console.log(players,'players');
+        //console.log(players,'players');
         res.json({
             success: true,
             data: players
@@ -352,7 +352,7 @@ const getTeamTournaments = async (req, res) => {
     ]);
      
 
-    console.log(appliedIds)
+    //console.log(appliedIds)
     
 
     const [registered, applied, notApplied] = await Promise.all([

@@ -28,7 +28,7 @@ module.exports = (io) => {
   router.use(`${BASE_PATH}/organizers`, organizerRoutes);
   router.use(`${BASE_PATH}/notifications`, notificationRoutes(io));
   router.use(`${BASE_PATH}/places`, placeRoutes);
-  router.use(`${BASE_PATH}/teams`, teamRoutes);
+  router.use(`${BASE_PATH}/teams`, teamRoutes(io));
   router.use(`${BASE_PATH}/admin`, adminRoutes);
   router.use(`${BASE_PATH}/feed`, feedRoutes);
   

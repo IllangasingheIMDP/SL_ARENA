@@ -262,14 +262,16 @@ const getTournamentDetailsByIds = async (ids) => {
     SELECT 
       t.tournament_id,
       t.tournament_name,
+      t.tournament_type,
       t.start_date,
+      t.end_date,
       t.rules,
       o.organizer_id,
       o.organization_name AS organizer_name,
       t.venue_id
     FROM Tournaments t
     JOIN Organizers o ON t.organizer_id = o.organizer_id
-    WHERE t.tournament_id IN (${placeholders})
+    WHERE t.tournament_id IN (${placeholders}) and t.status = 'upcoming'
     `,
     ids
   );
