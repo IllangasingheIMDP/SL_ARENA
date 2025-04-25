@@ -25,7 +25,10 @@ const SettingsTab = () => {
       title: "Role Management",
       icon: "admin-panel-settings",
       description: "Manage user roles and permissions",
-      onPress: () => navigation.navigate("RoleManagement"),
+      onPress: () => {
+        setSelectedRole(null);
+        navigation.navigate("RoleManagement");
+      },
     },
     {
       id: "2",
@@ -58,10 +61,6 @@ const SettingsTab = () => {
     }
   };
 
-  const handleSwitchRole = () => {
-    setSelectedRole(null);
-  };
-
   const renderSettingsItem = ({ item }: { item: any }) => (
     <SettingsItem
       title={item.title}
@@ -81,15 +80,8 @@ const SettingsTab = () => {
         showsVerticalScrollIndicator={false}
       />
 
-      <TouchableOpacity
-        style={styles.switchRoleButton}
-        onPress={handleSwitchRole}
-      >
-        <Text style={styles.switchRoleButtonText}>Manage Roles</Text>
-      </TouchableOpacity>
-
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Icon name="logout" size={20} color="#fff" />
+        <Icon name="logout" size={20} color="#FFD700" />
         <Text style={styles.logoutButtonText}>Logout</Text>
       </TouchableOpacity>
     </View>
@@ -100,39 +92,40 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: '#f0f4f8',
   },
   tabTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 16,
-    color: "#333",
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#000080',
+    marginBottom: 20,
+    borderBottomWidth: 2,
+    borderBottomColor: '#FFD700',
+    paddingBottom: 8,
   },
   logoutButton: {
-    flexDirection: "row",
-    backgroundColor: "#f44336",
+    flexDirection: 'row',
+    backgroundColor: '#000080',
     padding: 16,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 20,
     marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
   logoutButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: '#FFD700',
+    fontWeight: 'bold',
     marginLeft: 8,
-  },
-  switchRoleButton: {
-    backgroundColor: "#4CAF50",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  switchRoleButtonText: {
-    color: "#fff",
     fontSize: 16,
-    fontWeight: "bold",
   },
 });
 
