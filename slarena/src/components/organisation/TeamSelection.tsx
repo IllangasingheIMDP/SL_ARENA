@@ -40,17 +40,17 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
   const [playerCount, setPlayerCount] = useState<number>(11);
   const [tempPlayerCount, setTempPlayerCount] = useState<string>("11");
 
-  useEffect(() => {
-    // Save the current phase when component mounts
-    const savePhase = async () => {
-      try {
-        await tournamentService.saveMatchPhase(matchId, "team_selection");
-      } catch (error) {
-        console.error("Error saving match phase:", error);
-      }
-    };
-    savePhase();
-  }, [matchId]);
+  // useEffect(() => {
+  //   // Save the current phase when component mounts
+  //   const savePhase = async () => {
+  //     try {
+  //       await tournamentService.saveMatchPhase(matchId, "team_selection");
+  //     } catch (error) {
+  //       console.error("Error saving match phase:", error);
+  //     }
+  //   };
+  //   savePhase();
+  // }, [matchId]);
 
   const handlePlayerSelection = (playerId: number, isSelected: boolean) => {
     if (currentTeam === "team1") {

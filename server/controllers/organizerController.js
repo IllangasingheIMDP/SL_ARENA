@@ -402,7 +402,8 @@ const getUpcomingTournaments = async (req, res) => {
 
  const addPlaying11 = async (req, res) => {
     try {
-      const players = req.body.players; // Expecting an array of { match_id, player_id }
+      const players = req.body; // Expecting an array of { match_id, player_id }
+      console.log("Received players:", players);
   
       if (!Array.isArray(players) || players.length === 0) {
         return res.status(400).json({ error: 'players array is required' });
