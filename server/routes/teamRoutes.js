@@ -37,6 +37,12 @@ router.get('/:team_id/players',
     teamController.getTeamPlayers
 );
 
+router.get('/user/:user_id/teams', 
+    authenticateToken,
+    checkRole(['player', 'admin', 'general', 'organisation', 'trainer']), 
+    teamController.getTeamsByUserId
+);
+
 // POST routes - accessible only by players
 router.post('/', 
     authenticateToken,

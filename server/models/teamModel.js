@@ -142,6 +142,26 @@ const addPlayerToTeam = async (teamId, playerId, role) => {
     }
 };
 
+// Get all teams associated with a user (both as captain and player)
+const getTeamsByUserId = async (userId) => {
+    try {
+        const query = `
+            (SELECT DISTINCT t.team_id, t.team_name
+            FROM Teams t
+            WHERE t.captain_id = ?)
+            UNION
+            (SELECT DISTINCT t.team_id, t.team_name
+            FROM Teams t
+            INNER JOIN Team_Players tp ON t.team_id = tp.team_id
+            WHERE tp.player_id = ?)
+        `;
+        const [teams] = await db.query(query, [userId, userId]);
+        return teams;
+    } catch (error) {
+        throw new Error(`Error getting teams by user ID: ${error.message}`);
+    }
+};
+
 module.exports = {
     getPlayerTeams,
     getAllTeams,
@@ -149,6 +169,7 @@ module.exports = {
     createTeam,
     addPlayerToTeam,
     getTeamByName,
-    getTeamsLeadByPlayer
+    getTeamsLeadByPlayer,
+    getTeamsByUserId
 };
 
