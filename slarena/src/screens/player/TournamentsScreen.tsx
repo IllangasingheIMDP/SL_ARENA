@@ -337,11 +337,11 @@ const TournamentsScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f0f4f8',
   },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f0f4f8',
   },
   loadingContainer: {
     flex: 1,
@@ -356,13 +356,26 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#000080',
+    alignItems: 'center',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 15,
+    color: '#FFD700',
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   tabsContainer: {
     flexDirection: 'row',
@@ -377,14 +390,14 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   activeTab: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#000080',
   },
   tabText: {
-    color: '#2196F3',
+    color: '#000080',
     fontWeight: '500',
   },
   activeTabText: {
-    color: '#fff',
+    color: '#FFD700',
   },
   teamSelector: {
     padding: 15,
@@ -394,6 +407,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginBottom: 10,
+    color: '#000080',
   },
   teamButton: {
     paddingHorizontal: 15,
@@ -402,16 +416,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginRight: 10,
     borderWidth: 1,
-    borderColor: '#2196F3',
+    borderColor: '#000080',
   },
   selectedTeamButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#000080',
   },
   teamButtonText: {
-    color: '#2196F3',
+    color: '#000080',
   },
   selectedTeamButtonText: {
-    color: '#fff',
+    color: '#FFD700',
   },
   content: {
     padding: 20,
@@ -423,7 +437,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#2196F3',
+    color: '#000080',
+    borderBottomWidth: 2,
+    borderBottomColor: '#FFD700',
+    paddingBottom: 8,
   },
   tournamentCard: {
     backgroundColor: '#fff',
@@ -436,7 +453,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     borderLeftWidth: 4,
-    borderLeftColor: '#2196F3',
+    borderLeftColor: '#000080',
   },
   cardHeader: {
     flexDirection: 'row',
@@ -447,7 +464,7 @@ const styles = StyleSheet.create({
   tournamentName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1a237e',
+    color: '#000080',
     flex: 1,
   },
   tournamentTypeContainer: {
@@ -458,7 +475,7 @@ const styles = StyleSheet.create({
   },
   tournamentType: {
     fontSize: 12,
-    color: '#1976d2',
+    color: '#000080',
     fontWeight: '500',
   },
   dateContainer: {
@@ -515,7 +532,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#1a237e',
+    color: '#000080',
     flex: 1,
   },
   closeButton: {
@@ -532,7 +549,7 @@ const styles = StyleSheet.create({
   modalSectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1976d2',
+    color: '#000080',
     marginBottom: 8,
   },
   modalText: {
@@ -548,7 +565,7 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
   },
   applyButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#000080',
     padding: 10,
     borderRadius: 8,
     marginTop: 12,
@@ -560,7 +577,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
   },
   applyButtonText: {
-    color: 'white',
+    color: '#FFD700',
     fontSize: 14,
     fontWeight: '600',
   },
