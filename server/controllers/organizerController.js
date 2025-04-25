@@ -66,14 +66,6 @@ const getTournamentsByOrganizerController = async (req, res) => {
             },
             venue: {
                 venue_id: row.venue_id,
-                venue_name: row.venue_name,
-                address: row.address,
-                city: row.city,
-                state: row.state,
-                country: row.country,
-                latitude: row.latitude,
-                longitude: row.longitude,
-                capacity: row.capacity
             }
         }));
       

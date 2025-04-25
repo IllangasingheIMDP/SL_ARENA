@@ -38,18 +38,9 @@ const getTournamentsByOrganizer = async (organizer_id) => {
             t.venue_id,
             u.user_id AS organizer_id,
             u.name AS organizer_name,
-            u.email AS organizer_email,
-            v.venue_name,
-            v.address,
-            v.city,
-            v.state,
-            v.country,
-            v.latitude,
-            v.longitude,
-            v.capacity
+            u.email AS organizer_email
         FROM Tournaments t
         JOIN Users u ON t.organizer_id = u.user_id
-        LEFT JOIN Venues v ON t.venue_id = v.venue_id
         WHERE t.organizer_id = ?
           AND t.status IN ('start', 'matches');
         `,
@@ -536,7 +527,7 @@ const updateInningSummary = async (inning_id) => {
   const getUpcomingTournaments = async () => {
     try{
         const [rows] = await db.execute(
-            `select T.organizer_id , T.tournament_name , T.start_date , T.end_date , T.tournament_type , T.rules
+            `select T.organizer_id , T.tournament_name , T.start_date , T.end_date , T.tournament_type , T.rules, T.venue_id
             from Tournaments T
             where T.status='upcoming';`
         );

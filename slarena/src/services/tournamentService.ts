@@ -105,7 +105,6 @@ export const tournamentService = {
         ...tournamentData,
         organizer_id: tournamentData.organizer_id
       });
-      console.log('Tournament created successfully:', response);
       return response;
     } catch (error) {
       console.error('Error creating tournament:', error);

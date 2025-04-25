@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -20,6 +20,8 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { Place } from "../../types/placeTypes";
 import debounce from "lodash/debounce";
 import authService from "../../services/authService";
+import GoogleMapView from "../../components/maps/GoogleMapView";
+import * as Location from 'expo-location';
 
 const CreateTournamentScreen = () => {
   const navigation =
@@ -40,6 +42,7 @@ const CreateTournamentScreen = () => {
   const [searching, setSearching] = useState(false);
   const [selectedVenue, setSelectedVenue] = useState<Place | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState<Location.LocationObject | null>(null);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -183,6 +186,19 @@ const CreateTournamentScreen = () => {
     </TouchableOpacity>
   );
 
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Location permission is required to show nearby venues');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setCurrentLocation(location);
+    })();
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -239,6 +255,14 @@ const CreateTournamentScreen = () => {
             {selectedVenue ? selectedVenue.name : "Search Venue *"}
           </Text>
         </TouchableOpacity>
+
+        {/* Show Map if venue is selected */}
+        {selectedVenue && (
+          <GoogleMapView
+            placeId={selectedVenue.place_id}
+            height={200}
+          />
+        )}
 
         <TouchableOpacity 
           style={[
