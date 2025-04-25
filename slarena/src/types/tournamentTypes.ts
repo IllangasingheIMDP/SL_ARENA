@@ -1,13 +1,7 @@
 export type Venue = {
   venue_id: string;
   venue_name: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  country?: string;
-  latitude?: number;
-  longitude?: number;
-  capacity?: number;
+  address: string;
 };
 
 export type Team = {

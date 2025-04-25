@@ -6,7 +6,7 @@ import { RootStackParamList } from '../../../navigation/AppNavigator';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import UpcomingTournamentComponent from '../../../components/organisation/UpcomingTournamentComponent';
 import { tournamentService } from '../../../services/tournamentService';
-import { Tournament } from '../../../types/tournamentTypes';
+import { Tournament, Venue } from '../../../types/tournamentTypes';
 
 const UpcomingMatchesTab = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -32,15 +32,16 @@ const UpcomingMatchesTab = () => {
     navigation.navigate('TournamentDetails', { tournament });
   };
 
-  const renderTournamentItem = ({ item }: { item: any }) => (
+  const renderTournamentItem = ({ item }: { item: Tournament }) => (
     <UpcomingTournamentComponent
-      tournament_id={item.organizer_id}
+      tournament_id={item.tournament_id}
       tournament_name={item.tournament_name}
       start_date={item.start_date}
       end_date={item.end_date}
       tournament_type={item.tournament_type}
       onViewDetails={() => handleViewDetails(item)}
     />
+
   );
 
   return (

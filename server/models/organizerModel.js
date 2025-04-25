@@ -384,7 +384,7 @@ const updateInningSummary = async (inning_id) => {
   const getUpcomingTournaments = async () => {
     try{
         const [rows] = await db.execute(
-            `select T.organizer_id , T.tournament_name , T.start_date , T.end_date , T.tournament_type , T.rules
+            `select T.organizer_id , T.tournament_name , T.start_date , T.end_date , T.tournament_type , T.rules, T.venue_id
             from Tournaments T
             where T.status='upcoming';`
         );
