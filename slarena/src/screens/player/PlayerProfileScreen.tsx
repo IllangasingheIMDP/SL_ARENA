@@ -64,6 +64,8 @@ const PlayerProfileScreen = () => {
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [isUploadingVideo, setIsUploadingVideo] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -209,6 +211,7 @@ const PlayerProfileScreen = () => {
 
   const handlePhotoUpload = async () => {
     try {
+      setIsUploadingPhoto(true);
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -218,9 +221,7 @@ const PlayerProfileScreen = () => {
       if (!result.canceled) {
         const formData = new FormData();
         const imageUri = result.assets[0].uri;
-        // Get the file extension from the URI
         const fileExtension = imageUri.split('.').pop()?.toLowerCase();
-        // Get the mime type from the URI
         const mimeType = result.assets[0].mimeType || `image/${fileExtension}`;
         
         formData.append('photo', {
@@ -242,11 +243,14 @@ const PlayerProfileScreen = () => {
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to upload photo');
+    } finally {
+      setIsUploadingPhoto(false);
     }
   };
 
   const handleVideoUpload = async () => {
     try {
+      setIsUploadingVideo(true);
       if (!videoUrl) {
         Alert.alert('Error', 'Please enter a video URL');
         return;
@@ -270,6 +274,8 @@ const PlayerProfileScreen = () => {
       fetchData();
     } catch (error) {
       Alert.alert('Error', 'Failed to upload video');
+    } finally {
+      setIsUploadingVideo(false);
     }
   };
 
@@ -588,7 +594,6 @@ const PlayerProfileScreen = () => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Media Gallery</Text>
         
-        {/* Simple Tab Buttons */}
         <View style={styles.simpleTabContainer}>
           <TouchableOpacity 
             style={[styles.simpleTab, activeTab === 0 && styles.activeTab]} 
@@ -604,7 +609,6 @@ const PlayerProfileScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Content Area */}
         <View style={styles.contentArea}>
           {activeTab === 0 ? (
             // Photos Tab
@@ -612,8 +616,14 @@ const PlayerProfileScreen = () => {
               <TouchableOpacity 
                 style={styles.simpleButton} 
                 onPress={() => setShowPhotoForm(!showPhotoForm)}
+                disabled={isUploadingPhoto}
               >
-                <Text style={styles.simpleButtonText}>Add Photo</Text>
+                <Text style={styles.simpleButtonText}>
+                  {isUploadingPhoto ? 'Uploading...' : 'Add Photo'}
+                </Text>
+                {isUploadingPhoto && (
+                  <ActivityIndicator size="small" color="#fff" style={styles.buttonLoader} />
+                )}
               </TouchableOpacity>
 
               {showPhotoForm && (
@@ -623,6 +633,7 @@ const PlayerProfileScreen = () => {
                     placeholder="Title"
                     value={photoTitle}
                     onChangeText={setPhotoTitle}
+                    editable={!isUploadingPhoto}
                   />
                   <TextInput
                     style={styles.simpleInput}
@@ -630,12 +641,19 @@ const PlayerProfileScreen = () => {
                     value={photoDescription}
                     onChangeText={setPhotoDescription}
                     multiline
+                    editable={!isUploadingPhoto}
                   />
                   <TouchableOpacity 
-                    style={styles.simpleButton} 
+                    style={[styles.simpleButton, isUploadingPhoto && styles.disabledButton]} 
                     onPress={handlePhotoUpload}
+                    disabled={isUploadingPhoto}
                   >
-                    <Text style={styles.simpleButtonText}>Upload</Text>
+                    <Text style={styles.simpleButtonText}>
+                      {isUploadingPhoto ? 'Uploading...' : 'Upload'}
+                    </Text>
+                    {isUploadingPhoto && (
+                      <ActivityIndicator size="small" color="#fff" style={styles.buttonLoader} />
+                    )}
                   </TouchableOpacity>
                 </View>
               )}
@@ -677,8 +695,14 @@ const PlayerProfileScreen = () => {
               <TouchableOpacity 
                 style={styles.simpleButton} 
                 onPress={() => setShowVideoForm(!showVideoForm)}
+                disabled={isUploadingVideo}
               >
-                <Text style={styles.simpleButtonText}>Add Video</Text>
+                <Text style={styles.simpleButtonText}>
+                  {isUploadingVideo ? 'Uploading...' : 'Add Video'}
+                </Text>
+                {isUploadingVideo && (
+                  <ActivityIndicator size="small" color="#fff" style={styles.buttonLoader} />
+                )}
               </TouchableOpacity>
 
               {showVideoForm && (
@@ -688,18 +712,26 @@ const PlayerProfileScreen = () => {
                     placeholder="Title"
                     value={videoTitle}
                     onChangeText={setVideoTitle}
+                    editable={!isUploadingVideo}
                   />
                   <TextInput
                     style={styles.simpleInput}
                     placeholder="Video URL"
                     value={videoUrl}
                     onChangeText={setVideoUrl}
+                    editable={!isUploadingVideo}
                   />
                   <TouchableOpacity 
-                    style={styles.simpleButton} 
+                    style={[styles.simpleButton, isUploadingVideo && styles.disabledButton]} 
                     onPress={handleVideoUpload}
+                    disabled={isUploadingVideo}
                   >
-                    <Text style={styles.simpleButtonText}>Upload</Text>
+                    <Text style={styles.simpleButtonText}>
+                      {isUploadingVideo ? 'Uploading...' : 'Upload'}
+                    </Text>
+                    {isUploadingVideo && (
+                      <ActivityIndicator size="small" color="#fff" style={styles.buttonLoader} />
+                    )}
                   </TouchableOpacity>
                 </View>
               )}
@@ -1171,6 +1203,12 @@ const styles = StyleSheet.create({
   picker: {
     height: 50,
     width: '100%',
+  },
+  buttonLoader: {
+    marginLeft: 8,
+  },
+  disabledButton: {
+    opacity: 0.7,
   },
 });
 
