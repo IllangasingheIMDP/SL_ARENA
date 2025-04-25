@@ -56,6 +56,12 @@ router.get('/finished-tournaments',
     teamController.getFinishedTournaments
 );
 
+router.get('/:team_id/myhistory-tournaments', 
+    authenticateToken,
+    checkRole(['player', 'admin', 'general', 'organisation', 'trainer']), 
+    teamController.getMyHistoryTournaments
+);
+
 router.post('/delete-team', 
     authenticateToken,
     checkRole(['player', 'admin', 'organisation', 'trainer']), 
