@@ -31,10 +31,10 @@ export type Tournament = {
   end_date: string;
   tournament_type: string;
   rules: string;
-  capacity: number;
-  latitude: number | null;
-  longitude: number | null;
   organizer_id: number;
+  venue_id: string;
+  teams: Team[];
+  status: TournamentStatus;
 }; 
 
 export type PlayerStats = {
