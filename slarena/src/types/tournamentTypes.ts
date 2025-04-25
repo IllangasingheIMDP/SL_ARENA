@@ -25,19 +25,16 @@ export type TeamPlayer = {
 export type TournamentStatus = 'upcoming' | 'start' | 'matches' | 'finished';
 
 export type Tournament = {
-  tournament_id: number;
-  name: string;
+  tournament_id?: number;
+  tournament_name: string;
   start_date: string;
   end_date: string;
-  type: string;
+  tournament_type: string;
   rules: string;
-  venue: Venue;
-  organiser: {
-    organiser_id: number;
-    name: string;
-  };
-  teams: Team[];
-  status: TournamentStatus;
+  capacity: number;
+  latitude: number | null;
+  longitude: number | null;
+  organizer_id: number;
 }; 
 
 export type PlayerStats = {

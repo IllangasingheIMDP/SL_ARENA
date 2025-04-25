@@ -412,6 +412,21 @@ const updateInningSummary = async (inning_id) => {
     return result;
   };
 
+
+  const getUpcomingTournaments = async () => {
+    try{
+        const [rows] = await db.execute(
+            `select T.organizer_id , T.tournament_name , T.start_date , T.end_date , T.tournament_type , T.rules , V.longitude , V.latitude , V.capacity
+            from Tournaments T join Venues V 
+            on T.venue_id = V.venue_id
+            where T.status='upcoming';`
+        );
+        return rows;
+    }catch(error){
+        throw error;
+    }
+  }
+
 module.exports = {
     createTournament,
     getTournamentsByOrganizer,
@@ -429,5 +444,6 @@ module.exports = {
     updatePlayerStats,
     updateTournamentStatus,
     markAttendance,
-    updateTeamAttendance
+    updateTeamAttendance,
+    getUpcomingTournaments
 };
