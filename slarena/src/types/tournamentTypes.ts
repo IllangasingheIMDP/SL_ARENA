@@ -1,13 +1,7 @@
 export type Venue = {
-  venue_id: number;
+  venue_id: string;
   venue_name: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  country?: string;
-  latitude?: number;
-  longitude?: number;
-  capacity?: number;
+  address: string;
 };
 
 export type Team = {
@@ -32,7 +26,7 @@ export type Tournament = {
   tournament_type: string;
   rules: string;
   organizer_id: number;
-  venue_id: string;
+  venue: Venue;
   teams: Team[];
   status: TournamentStatus;
 }; 
