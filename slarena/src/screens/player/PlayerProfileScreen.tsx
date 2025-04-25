@@ -28,6 +28,7 @@ import { Ionicons } from '@expo/vector-icons';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { useAuth } from '../../context/AuthContext';
 import { Tab, TabView } from '@rneui/themed';
+import { Picker } from '@react-native-picker/picker';
 
 const PlayerProfileScreen = () => {
   const { user } = useAuth();
@@ -40,6 +41,14 @@ const PlayerProfileScreen = () => {
   const [loading, setLoading] = useState(true);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [bioText, setBioText] = useState('');
+  const [isEditingBattingStyle, setIsEditingBattingStyle] = useState(false);
+  const [battingStyleText, setBattingStyleText] = useState('');
+  const [isEditingBowlingStyle, setIsEditingBowlingStyle] = useState(false);
+  const [bowlingStyleText, setBowlingStyleText] = useState('');
+  const [isEditingFieldingPosition, setIsEditingFieldingPosition] = useState(false);
+  const [fieldingPositionText, setFieldingPositionText] = useState('');
+  const [isEditingRole, setIsEditingRole] = useState(false);
+  const [roleText, setRoleText] = useState('');
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
@@ -73,6 +82,10 @@ const PlayerProfileScreen = () => {
       const profileData = await playerService.getPlayerProfile();
       setProfile(profileData);
       setBioText(profileData.bio);
+      setBattingStyleText(profileData.batting_style || '');
+      setBowlingStyleText(profileData.bowling_style || '');
+      setFieldingPositionText(profileData.fielding_position || '');
+      setRoleText(profileData.role || '');
 
       // Fetch achievements
       const achievementsData = await playerService.getPlayerAchievements();
@@ -123,6 +136,50 @@ const PlayerProfileScreen = () => {
       Alert.alert('Success', 'Bio updated successfully');
     } catch (error) {
       Alert.alert('Error', 'Failed to update bio');
+    }
+  };
+
+  const handleUpdateBattingStyle = async () => {
+    try {
+      await playerService.updatePlayerBattingStyle(battingStyleText);
+      setProfile(prev => prev ? { ...prev, batting_style: battingStyleText } : null);
+      setIsEditingBattingStyle(false);
+      Alert.alert('Success', 'Batting style updated successfully');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to update batting style');
+    }
+  };
+
+  const handleUpdateBowlingStyle = async () => {
+    try {
+      await playerService.updatePlayerBowlingStyle(bowlingStyleText);
+      setProfile(prev => prev ? { ...prev, bowling_style: bowlingStyleText } : null);
+      setIsEditingBowlingStyle(false);
+      Alert.alert('Success', 'Bowling style updated successfully');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to update bowling style');
+    }
+  };
+
+  const handleUpdateFieldingPosition = async () => {
+    try {
+      await playerService.updatePlayerFieldingPosition(fieldingPositionText);
+      setProfile(prev => prev ? { ...prev, fielding_position: fieldingPositionText } : null);
+      setIsEditingFieldingPosition(false);
+      Alert.alert('Success', 'Fielding position updated successfully');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to update fielding position');
+    }
+  };
+
+  const handleUpdateRole = async () => {
+    try {
+      await playerService.updatePlayerRole(roleText as 'batting' | 'bowling' | 'allrounder');
+      setProfile(prev => prev ? { ...prev, role: roleText } : null);
+      setIsEditingRole(false);
+      Alert.alert('Success', 'Role updated successfully');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to update role');
     }
   };
 
@@ -249,7 +306,184 @@ const PlayerProfileScreen = () => {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.name}>{profile?.name || 'Player Name'}</Text>
-        <Text style={styles.role}>{profile?.batting_style || 'Batting Style'}</Text>
+      </View>
+
+      {/* Player Attributes Section */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Player Attributes</Text>
+        
+        {/* Batting Style */}
+        <View style={styles.attributeItem}>
+          <Text style={styles.attributeLabel}>Batting Style</Text>
+          {isEditingBattingStyle ? (
+            <View>
+              <TextInput
+                style={styles.attributeInput}
+                value={battingStyleText}
+                onChangeText={setBattingStyleText}
+              />
+              <View style={styles.editButtons}>
+                <TouchableOpacity
+                  style={[styles.button, styles.saveButton]}
+                  onPress={handleUpdateBattingStyle}
+                >
+                  <Text style={styles.buttonText}>Save</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, styles.cancelButton]}
+                  onPress={() => {
+                    setIsEditingBattingStyle(false);
+                    setBattingStyleText(profile?.batting_style || '');
+                  }}
+                >
+                  <Text style={styles.buttonText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.attributeValueContainer}>
+              <Text style={styles.attributeValue}>{profile?.batting_style || 'Not specified'}</Text>
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => setIsEditingBattingStyle(true)}
+              >
+                <Ionicons name="pencil" size={20} color="#f4511e" />
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+
+        {/* Bowling Style */}
+        <View style={styles.attributeItem}>
+          <Text style={styles.attributeLabel}>Bowling Style</Text>
+          {isEditingBowlingStyle ? (
+            <View>
+              <TextInput
+                style={styles.attributeInput}
+                value={bowlingStyleText}
+                onChangeText={setBowlingStyleText}
+              />
+              <View style={styles.editButtons}>
+                <TouchableOpacity
+                  style={[styles.button, styles.saveButton]}
+                  onPress={handleUpdateBowlingStyle}
+                >
+                  <Text style={styles.buttonText}>Save</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, styles.cancelButton]}
+                  onPress={() => {
+                    setIsEditingBowlingStyle(false);
+                    setBowlingStyleText(profile?.bowling_style || '');
+                  }}
+                >
+                  <Text style={styles.buttonText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.attributeValueContainer}>
+              <Text style={styles.attributeValue}>{profile?.bowling_style || 'Not specified'}</Text>
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => setIsEditingBowlingStyle(true)}
+              >
+                <Ionicons name="pencil" size={20} color="#f4511e" />
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+
+        {/* Fielding Position */}
+        <View style={styles.attributeItem}>
+          <Text style={styles.attributeLabel}>Fielding Position</Text>
+          {isEditingFieldingPosition ? (
+            <View>
+              <TextInput
+                style={styles.attributeInput}
+                value={fieldingPositionText}
+                onChangeText={setFieldingPositionText}
+              />
+              <View style={styles.editButtons}>
+                <TouchableOpacity
+                  style={[styles.button, styles.saveButton]}
+                  onPress={handleUpdateFieldingPosition}
+                >
+                  <Text style={styles.buttonText}>Save</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, styles.cancelButton]}
+                  onPress={() => {
+                    setIsEditingFieldingPosition(false);
+                    setFieldingPositionText(profile?.fielding_position || '');
+                  }}
+                >
+                  <Text style={styles.buttonText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.attributeValueContainer}>
+              <Text style={styles.attributeValue}>{profile?.fielding_position || 'Not specified'}</Text>
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => setIsEditingFieldingPosition(true)}
+              >
+                <Ionicons name="pencil" size={20} color="#f4511e" />
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+
+        {/* Role */}
+        <View style={styles.attributeItem}>
+          <Text style={styles.attributeLabel}>Role</Text>
+          {isEditingRole ? (
+            <View>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={roleText}
+                  onValueChange={(itemValue) => setRoleText(itemValue)}
+                  style={styles.picker}
+                >
+                  <Picker.Item label="Select Role" value="" />
+                  <Picker.Item label="Batting" value="batting" />
+                  <Picker.Item label="Bowling" value="bowling" />
+                  <Picker.Item label="Allrounder" value="allrounder" />
+                </Picker>
+              </View>
+              <View style={styles.editButtons}>
+                <TouchableOpacity
+                  style={[styles.button, styles.saveButton]}
+                  onPress={handleUpdateRole}
+                >
+                  <Text style={styles.buttonText}>Save</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, styles.cancelButton]}
+                  onPress={() => {
+                    setIsEditingRole(false);
+                    setRoleText(profile?.role || '');
+                  }}
+                >
+                  <Text style={styles.buttonText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.attributeValueContainer}>
+              <Text style={styles.attributeValue}>
+                {(profile?.role || 'Not specified').charAt(0).toUpperCase() + (profile?.role || 'Not specified').slice(1).toLowerCase()}
+              </Text>
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => setIsEditingRole(true)}
+              >
+                <Ionicons name="pencil" size={20} color="#f4511e" />
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
       </View>
 
       {/* Stats Section */}
@@ -291,12 +525,6 @@ const PlayerProfileScreen = () => {
               <Text style={styles.statValue}>{profile?.allrounder_points || 0}</Text>
             </View>
             <Text style={styles.statLabel}>Allrounder Points</Text>
-          </View>
-          <View style={[styles.statItem, styles.roleStatItem]}>
-            <View style={styles.statValueContainer}>
-              <Text style={styles.statValue}>{(profile?.role || 'Role').charAt(0).toUpperCase() + (profile?.role || 'Role').slice(1).toLowerCase()}</Text>
-            </View>
-            <Text style={styles.statLabel}>Role</Text>
           </View>
         </View>
       </View>
@@ -620,11 +848,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
-  role: {
-    fontSize: 16,
-    color: '#fff',
-    marginTop: 5,
-  },
   section: {
     padding: 20,
     borderBottomWidth: 1,
@@ -899,6 +1122,55 @@ const styles = StyleSheet.create({
   modalPhoto: {
     width: '100%',
     height: '100%',
+  },
+  attributeItem: {
+    marginBottom: 20,
+    padding: 15,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 2.22,
+    elevation: 3,
+  },
+  attributeLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
+  },
+  attributeValueContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  attributeValue: {
+    fontSize: 16,
+    color: '#666',
+    flex: 1,
+  },
+  attributeInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 16,
+    backgroundColor: '#fff',
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    backgroundColor: '#fff',
+    marginBottom: 10,
+  },
+  picker: {
+    height: 50,
+    width: '100%',
   },
 });
 
