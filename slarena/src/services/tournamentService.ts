@@ -1,6 +1,10 @@
 import { api } from '../utils/api';
 import { Team, Tournament, Match } from '../types/tournamentTypes';
 import { googleServices } from './googleServices'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
+
+const BASE_URL = Constants.expoConfig?.extra?.apiUrl;
 
 export const tournamentService = {
   getOngoingTournaments: async (): Promise<Tournament[]> => {
@@ -345,15 +349,28 @@ export const tournamentService = {
     }
   },
 
-  applyForTournament: async (teamId: number, tournamentId: number,organizerId:number,tournamentName:string,teamName:string): Promise<void> => {
+  applyForTournament: async (teamId: number, tournamentId: number, organizerId: number, tournamentName: string, teamName: string, paymentPhoto: FormData): Promise<void> => {
     try {
-      await api.post('/teams/apply-tournament', {
-        team_id: teamId,
-        tournament_id: tournamentId,
-        organizer_id: organizerId,
-        tournament_name: tournamentName,
-        team_name: teamName
+      const token = await AsyncStorage.getItem('token');
+      
+      // Add the tournament details to the FormData
+      paymentPhoto.append('team_id', teamId.toString());
+      paymentPhoto.append('tournament_id', tournamentId.toString());
+      paymentPhoto.append('organizer_id', organizerId.toString());
+      paymentPhoto.append('tournament_name', tournamentName);
+      paymentPhoto.append('team_name', teamName);
+
+      const response = await fetch(`${BASE_URL}/teams/apply-tournament`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: paymentPhoto,
       });
+      
+      if (!response.ok) {
+        throw new Error('Failed to apply for tournament');
+      }
     } catch (error) {
       console.error('Error applying for tournament:', error);
       throw error;

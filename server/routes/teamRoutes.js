@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const teamController = require('../controllers/teamController');
 const { authenticateToken, checkRole } = require('../middleware/auth');
-
+const upload = require('../middleware/uploadMiddleware');
 module.exports = (io) => {
     // GET routes - accessible by all specified roles
     router.get('/my-teams', 
@@ -47,7 +47,8 @@ module.exports = (io) => {
     );
     router.post('/apply-tournament', 
         authenticateToken,
-        checkRole(['player']), 
+        checkRole(['player']),
+        upload.single('photo'), 
         (req, res) => {
             req.io = io; // Attach io instance to request
             teamController.applyForTournament(req, res);

@@ -195,13 +195,13 @@ const isUserTeamCaptain = async (teamId, userId) => {
         throw new Error(`Error checking if user is team captain: ${error.message}`);
     }
 };
-const applyForTournament = async (teamId, tournamentId) => {
+const applyForTournament = async (teamId, tournamentId,photoUrl) => {
     try {
         const query = `
-            INSERT INTO tournament_applicants (team_id, tournament_id)
-            VALUES (?, ?)
+            INSERT INTO tournament_applicants (team_id, tournament_id,payment_slip)
+            VALUES (?, ?, ? )
         `;
-        const [result] = await db.query(query, [teamId, tournamentId]);
+        const [result] = await db.query(query, [teamId, tournamentId,photoUrl]);
         return result;
     } catch (error) {
         throw new Error(`Error applying for tournament: ${error.message}`);
