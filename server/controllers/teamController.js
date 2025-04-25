@@ -178,7 +178,7 @@ const removePlayerFromTeam = async (req, res) => {
 // Add player to team
 const addPlayerToTeam = async (req, res) => {
     try {
-        const { team_id, player_id, role } = req.body;
+        const { team_id, player_id, role, team_name } = req.body;
 
         if (!team_id || !player_id || !role) {
             return res.status(400).json({
@@ -188,6 +188,22 @@ const addPlayerToTeam = async (req, res) => {
         }
 
         await Team.addPlayerToTeam(team_id, player_id, role);
+        // Create notification for player
+        const notification = await notificationModel.create(
+            player_id,
+            `You have been added to team ${team_name}`,
+            'team'
+        );
+        // Get updated unread count for organizer
+        const notifications = await notificationModel.getByUserId(player_id);
+        const unreadCount = notifications.filter(n => n.is_read === 0).length;
+
+        // Emit notification and count to organizer's room
+        const room = `user_${player_id}`;
+        req.io.to(room).emit('new_notification', notification);
+        req.io.to(room).emit('notification_count_update', unreadCount);
+
+        
         res.status(200).json({
             success: true,
             message: 'Player added to team successfully'

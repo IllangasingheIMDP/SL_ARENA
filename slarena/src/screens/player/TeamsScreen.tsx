@@ -129,7 +129,8 @@ const TeamsScreen: React.FC = () => {
         await teamService.addPlayerToTeam({
           team_id: selectedTeam.team_id,
           player_id: player.player_id,
-          role: player.role
+          role: player.role,
+          team_name: selectedTeam.team_name
         });
       }
       setShowPlayerModal(false);

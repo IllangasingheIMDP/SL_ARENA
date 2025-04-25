@@ -80,7 +80,7 @@ const getTeamByName = async (teamName, options = {}) => {
       const searchValue = caseSensitive ? searchParam : searchParam.toLowerCase();
   
       // Execute query
-      console.log(query,'query in getTeamByName');
+      //console.log(query,'query in getTeamByName');
       const [teams] = await db.query(query, [searchValue]);
   
       // Return null if no team found

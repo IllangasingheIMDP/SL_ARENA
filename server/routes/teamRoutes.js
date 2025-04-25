@@ -94,7 +94,11 @@ module.exports = (io) => {
     router.post('/add-player', 
         authenticateToken,
         checkRole(['player']), 
-        teamController.addPlayerToTeam
+        (req, res) => {
+            req.io = io; // Attach io instance to request
+            teamController.addPlayerToTeam(req, res);
+        }
+        
     );
 
     router.post('/remove-player', 
