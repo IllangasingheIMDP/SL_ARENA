@@ -121,6 +121,7 @@ const getPlayerProfileDetails = async (player_id) => {
   }
 };
 
+
 const getPlayerVideos = async (playerId) => {
   // Validate input
   if (!playerId || isNaN(playerId) || playerId <= 0) {
@@ -192,6 +193,24 @@ const getTrainingSessionsByPlayer = async (playerId) => {
   return rows;
 };
 
+const getAllPlayers = async () => {
+  try {
+    const [rows] = await db.execute(
+      `SELECT 
+        p.player_id,
+        u.name
+      FROM Players p
+      JOIN Users u ON p.player_id = u.user_id
+      ORDER BY u.name ASC`
+    );
+    
+    return rows;
+  } catch (error) {
+    console.error('Error fetching all players:', error);
+    throw new Error(`Failed to fetch players: ${error.message || 'Unknown error'}`);
+  }
+};
+
 const getTeamsByLeader = async (playerId) => {
   try {
     const [rows] = await db.execute(
@@ -208,7 +227,6 @@ const getTeamsByLeader = async (playerId) => {
   }
 };
 
-
 module.exports = {
   getPlayerStats,
   getPlayerAchievements,
@@ -217,6 +235,7 @@ module.exports = {
   getPlayerVideos,
   getTrainingSessionsByPlayer,
   updateProfileBio,
+  getAllPlayers
   getTeamsByLeader
 };
 
