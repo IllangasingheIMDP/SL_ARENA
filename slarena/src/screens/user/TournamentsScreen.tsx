@@ -12,6 +12,7 @@ import {
 import { tournamentService } from '../../services/tournamentService';
 import { Tournament } from '../../types/tournamentTypes';
 import GoogleMapView from '../../components/maps/GoogleMapView';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const TournamentsScreen = () => {
   const [upcomingTournaments, setUpcomingTournaments] = useState<Tournament[]>([]);
@@ -56,7 +57,10 @@ const TournamentsScreen = () => {
       onPress={() => handleTournamentPress(tournament)}
     >
       <View style={styles.cardHeader}>
-        <Text style={styles.tournamentName}>{tournament.name}</Text>
+        <View style={styles.titleContainer}>
+          <Icon name="emoji-events" size={24} color="#4CAF50" style={styles.sectionIcon} />
+          <Text style={styles.tournamentName}>{tournament.name}</Text>
+        </View>
         <View style={styles.tournamentTypeContainer}>
           <Text style={styles.tournamentType}>{tournament.type}</Text>
         </View>
@@ -78,7 +82,7 @@ const TournamentsScreen = () => {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#2196F3" />
+          <ActivityIndicator size="large" color="#4CAF50" />
         </View>
       </SafeAreaView>
     );
@@ -158,11 +162,11 @@ const TournamentsScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f0f4f8',
+    backgroundColor: '#f8f9fa',
   },
   container: {
     flex: 1,
-    backgroundColor: '#f0f4f8',
+    backgroundColor: '#f8f9fa',
   },
   loadingContainer: {
     flex: 1,
@@ -172,24 +176,24 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
-    backgroundColor: '#000080',
+    backgroundColor: '#1a2151',
     alignItems: 'center',
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFD700',
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    color: '#4CAF50',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
@@ -198,44 +202,51 @@ const styles = StyleSheet.create({
   },
   tournamentCard: {
     backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    elevation: 4,
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 15,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    borderLeftWidth: 4,
-    borderLeftColor: '#000080',
+    shadowRadius: 2.22,
+    elevation: 3,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 15,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  sectionIcon: {
+    marginRight: 8,
   },
   tournamentName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#000080',
-    flex: 1,
+    color: '#1a2151',
   },
   tournamentTypeContainer: {
-    backgroundColor: '#e3f2fd',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 12,
   },
   tournamentType: {
-    fontSize: 12,
-    color: '#000080',
+    fontSize: 14,
+    color: '#4CAF50',
     fontWeight: '500',
   },
   dateContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 8,
+    marginTop: 10,
   },
   dateItem: {
     flex: 1,
@@ -247,7 +258,7 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 14,
-    color: '#333',
+    color: '#1a2151',
     fontWeight: '500',
   },
   noTournamentsText: {
@@ -263,30 +274,33 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 16,
+    backgroundColor: '#fff',
+    borderRadius: 20,
     padding: 20,
     width: '90%',
     maxHeight: '80%',
-    elevation: 5,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+    elevation: 5,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
-    paddingBottom: 12,
+    paddingBottom: 15,
   },
   modalTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#000080',
+    color: '#1a2151',
     flex: 1,
   },
   closeButton: {
@@ -298,12 +312,12 @@ const styles = StyleSheet.create({
     fontWeight: '300',
   },
   modalSection: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   modalSectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000080',
+    color: '#4CAF50',
     marginBottom: 8,
   },
   modalText: {
