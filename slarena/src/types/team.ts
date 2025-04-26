@@ -19,6 +19,7 @@ export interface AddPlayerToTeamRequest {
     team_id: number;
     player_id: number;
     role: string;
+    team_name: string;
 }
 
 export interface TeamResponse {

@@ -176,7 +176,7 @@ const UserProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f8f9fa',
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -186,10 +186,20 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   header: {
-    backgroundColor: '#f4511e',
+    backgroundColor: '#1a2151',
     padding: 20,
     paddingBottom: 40,
     alignItems: 'center',
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   headerInfo: {
     alignItems: 'center',
@@ -197,17 +207,20 @@ const styles = StyleSheet.create({
   },
   avatar: {
     borderWidth: 3,
-    borderColor: '#fff',
+    borderColor: '#4CAF50',
   },
   name: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
     marginTop: 10,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   role: {
     fontSize: 16,
-    color: '#fff',
+    color: '#4CAF50',
     opacity: 0.8,
   },
   content: {
@@ -226,8 +239,8 @@ const styles = StyleSheet.create({
       height: 2,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -238,36 +251,48 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#1a2151',
+    borderBottomWidth: 2,
+    borderBottomColor: '#4CAF50',
+    paddingBottom: 8,
   },
   formGroup: {
     marginBottom: 15,
   },
   label: {
     fontSize: 14,
-    color: '#666',
+    color: '#5f6368',
     marginBottom: 5,
   },
   value: {
     fontSize: 16,
-    color: '#333',
+    color: '#1a2151',
   },
   infoRow: {
     marginBottom: 15,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#e8eaed',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
     marginBottom: 15,
+    backgroundColor: '#f8f9fa',
   },
   editButton: {
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 5,
-    backgroundColor: '#f4511e',
+    backgroundColor: '#4CAF50',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
   editButtonText: {
     color: '#fff',
@@ -279,6 +304,14 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
   saveButtonText: {
     color: '#fff',
@@ -286,11 +319,19 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   securityButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#4CAF50',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
   securityButtonText: {
     color: '#fff',
@@ -303,6 +344,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
   roleManagementButtonText: {
     color: '#fff',
@@ -314,6 +363,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
   accountButtonText: {
     color: '#fff',
@@ -321,7 +378,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   logoutButton: {
-    backgroundColor: '#f44336',
+    backgroundColor: '#4CAF50',
   },
 });
 

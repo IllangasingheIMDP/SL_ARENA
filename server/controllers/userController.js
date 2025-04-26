@@ -7,9 +7,10 @@ const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/constants');
 const register = async (req, res) => {
   try {
     const { email, password, name, phone, date_of_birth, role } = req.body;
-    
+    //console.log(email, password, name, phone, date_of_birth, role,'email, password, name, phone, date_of_birth, role');
     // Check if user already exists
     const existingUser = await UserModel.findByEmail(email);
+    console.log(existingUser,'existingUser');
     if (existingUser) {
       return res.status(409).json({
         status: 'error',

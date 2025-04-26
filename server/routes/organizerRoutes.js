@@ -5,6 +5,7 @@ const { authenticateToken, checkRole } = require('../middleware/auth');
 
 router.post('/createtournament', authenticateToken,checkRole(['organisation']), organizerController.createTournament);
 router.get('/ongoingtournaments', authenticateToken,checkRole(['organisation']),organizerController.getTournamentsByOrganizerController);
+router.get('/ongoingtournaments/all', authenticateToken,checkRole(['general','organisation','admin','player']),organizerController.getAllOngoingTournaments);
 router.get('/applied-teams',authenticateToken,checkRole(['organisation']), organizerController.getAppliedTeamsToOngoingTournaments);
 router.post('/applicants/accept',authenticateToken,checkRole(['organisation']), organizerController.acceptTournamentApplicant);
 router.post('/applicants/reject',authenticateToken,checkRole(['organisation']), organizerController.rejectTournamentApplicant);
@@ -34,7 +35,9 @@ router.post('/save-match-result', authenticateToken, checkRole(['organisation'])
 router.get('/match-score/:matchId', authenticateToken, checkRole(['organisation']), organizerController.getMatchScoreController);
 router.post('/save-inning-result', authenticateToken, checkRole(['organisation']), organizerController.saveInningResultController);
 router.get('/match-state/:matchId', authenticateToken, checkRole(['organisation']), organizerController.getMatchStateController);
-
+router.get('/applied-requests/:tournament_id',authenticateToken,checkRole(['organisation']),organizerController.getApplieddRequestsByTournamentID);
+router.delete('/reject-req/:tournament_id/:team_id',authenticateToken,checkRole(['organisation']),organizerController.deleteAppliedRequest);
+router.put('/accept-req/:tournament_id/:team_id',authenticateToken,checkRole(['organisation']),organizerController.acceptAppliedRequest);
 
 
 module.exports = router;

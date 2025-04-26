@@ -1,6 +1,10 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Dimensions } from 'react-native';
 import LogItem from '../../../components/organisation/LogItem';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
+
+const { width } = Dimensions.get('window');
 
 const LogsTab = () => {
   const logs = [
@@ -12,22 +16,36 @@ const LogsTab = () => {
   ];
 
   const renderLogItem = ({ item }: { item: any }) => (
-    <LogItem
-      title={item.title}
-      description={item.description}
-      date={item.date}
-      type={item.type}
-    />
+    <View style={styles.logItemContainer}>
+      <LogItem
+        title={item.title}
+        description={item.description}
+        date={item.date}
+        type={item.type}
+      />
+    </View>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.tabTitle}>Activity Logs</Text>
+      <View style={styles.header}>
+        <LinearGradient
+          colors={['#4c669f', '#3b5998', '#192f6a']}
+          style={styles.gradient}
+        >
+          <BlurView intensity={20} style={styles.blurContainer}>
+            <Text style={styles.tabTitle}>Activity Logs</Text>
+            <Text style={styles.subtitle}>Track all your organization's activities</Text>
+          </BlurView>
+        </LinearGradient>
+      </View>
+
       <FlatList
         data={logs}
         renderItem={renderLogItem}
         keyExtractor={item => item.id}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listContainer}
       />
     </View>
   );
@@ -36,13 +54,59 @@ const LogsTab = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    backgroundColor: '#f8f9fa',
+  },
+  header: {
+    width: '100%',
+    height: 200,
+    overflow: 'hidden',
+    position: 'absolute',
+    top: 0,
+    zIndex: 1,
+  },
+  gradient: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  blurContainer: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   tabTitle: {
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 16,
-    color: '#333',
+    color: '#ffffff',
+    marginBottom: 8,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#ffffff',
+    opacity: 0.9,
+  },
+  listContainer: {
+    paddingTop: 220,
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+  },
+  logItemContainer: {
+    marginBottom: 12,
+    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });
 

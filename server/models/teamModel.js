@@ -80,7 +80,7 @@ const getTeamByName = async (teamName, options = {}) => {
       const searchValue = caseSensitive ? searchParam : searchParam.toLowerCase();
   
       // Execute query
-      console.log(query,'query in getTeamByName');
+      //console.log(query,'query in getTeamByName');
       const [teams] = await db.query(query, [searchValue]);
   
       // Return null if no team found
@@ -195,6 +195,19 @@ const isUserTeamCaptain = async (teamId, userId) => {
         throw new Error(`Error checking if user is team captain: ${error.message}`);
     }
 };
+const applyForTournament = async (teamId, tournamentId,photoUrl) => {
+    try {
+        const query = `
+            INSERT INTO tournament_applicants (team_id, tournament_id,payment_slip)
+            VALUES (?, ?, ? )
+        `;
+        const [result] = await db.query(query, [teamId, tournamentId,photoUrl]);
+        return result;
+    } catch (error) {
+        throw new Error(`Error applying for tournament: ${error.message}`);
+    }
+}
+
 
 const getFinishedTournaments = async () => {
     try {
@@ -285,6 +298,7 @@ module.exports = {
     isUserTeamCaptain,
     getFinishedTournaments,
     getMyHistoryTournaments,
-    getUpcomingTournaments
+    getUpcomingTournaments,
+    applyForTournament
 };
 

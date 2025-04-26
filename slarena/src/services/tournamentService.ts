@@ -1,6 +1,10 @@
 import { api } from '../utils/api';
 import { Team, Tournament, Match } from '../types/tournamentTypes';
 import { googleServices } from './googleServices'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
+
+const BASE_URL = Constants.expoConfig?.extra?.apiUrl;
 
 export const tournamentService = {
   getOngoingTournaments: async (): Promise<Tournament[]> => {
@@ -43,6 +47,48 @@ export const tournamentService = {
             },
             teams: [], // This can be populated later
             status: item.tournament.status
+          };
+        })
+      );
+  
+      return transformedTournaments;
+    } catch (error) {
+      console.error('Error fetching enriched ongoing tournaments:', error);
+      throw error;
+    }
+  },
+
+  getOngoingAllTournaments: async (): Promise<Tournament[]> => {
+    try {
+      const response = await api.get('/organizers/ongoingtournaments/all');
+      const tournaments = response.data;
+  
+      const transformedTournaments: Tournament[] = await Promise.all(
+        tournaments.map(async (item: any) => {
+          // Get detailed venue info using the venue_id
+          let venueDetails;
+          try {
+            venueDetails = await googleServices.getPlaceDetails(item.venue_id);
+            if (!venueDetails || !venueDetails.place_id || !venueDetails.name) {
+              throw new Error('Invalid venue details received');
+            }
+          } catch (error) {
+            console.error('Error fetching venue details:', error);
+            // Provide fallback venue details if the API call fails
+            venueDetails = {
+              place_id: item.venue.venue_id,
+              name: 'Venue details unavailable'
+            };
+          }
+            
+          return {
+            tournament_id: item.tournament_id,
+            name: item.tournament_name,
+            type: item.tournament_type,
+            venue: {
+              venue_id: venueDetails.place_id,
+              venue_name: venueDetails.name,
+            }
           };
         })
       );
@@ -123,6 +169,57 @@ export const tournamentService = {
       throw error;
     }
   },
+  getUpcomingTournamentsForPlayer: async (): Promise<Tournament[]> => {
+    try {
+      const response = await api.get('/teams/upcoming-tournaments');
+      const tournaments = response.data;
+      
+      const transformedTournaments: Tournament[] = await Promise.all(
+        tournaments.map(async (item: any) => {
+          // Get detailed venue info using the venue_id
+          let venueDetails;
+          try {
+            venueDetails = await googleServices.getPlaceDetails(item.venue_id);
+            if (!venueDetails || !venueDetails.place_id || !venueDetails.name) {
+              throw new Error('Invalid venue details received');
+            }
+          } catch (error) {
+            console.error('Error fetching venue details:', error);
+            // Provide fallback venue details if the API call fails
+            venueDetails = {
+              place_id: item.venue_id,
+              name: 'Venue details unavailable'
+            };
+          }
+            
+          return {
+            tournament_id: item.tournament_id,
+            name: item.tournament_name,
+            start_date: item.start_date,
+            end_date: item.end_date,
+            type: item.tournament_type,
+            rules: item.rules,
+            venue: {
+              venue_id: venueDetails.place_id,
+              venue_name: venueDetails.name,
+            },
+            organiser: {
+              organiser_id: item.organizer_id,
+              name: item.organization_name
+            },
+            teams: [],
+            status: item.status
+          };
+        })
+      );
+  
+      return transformedTournaments;
+    } catch (error) {
+      console.error('Error fetching enriched upcoming tournaments:', error);
+      throw error;
+    }
+  },
+  
 
   getUpcomingTournaments: async (): Promise<Tournament[]> => {
     try {
@@ -204,6 +301,150 @@ export const tournamentService = {
       return response.data;
     } catch (error) {
       console.error('Error saving match phase:', error);
+      throw error;
+    }
+  },
+
+
+  getAppliedRequests: async (tournamentId: number): Promise<any[]> => {
+    try {
+      const response = await api.get(`/organizers/applied-requests/${tournamentId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching applied requests:', error);
+       throw error;
+    }
+  },
+  getTeamTournaments: async (teamId: number): Promise<{
+    registered: Tournament[];
+    applied: Tournament[];
+    notApplied: Tournament[];
+  }> => {
+    try {
+      const response = await api.get(`/players/team/${teamId}/tournaments`)
+      //console.log('response', response);
+      //console.log('response', response);
+      const { registered, applied, notApplied } = response;
+
+      const transformTournaments = async (tournaments: any[]): Promise<Tournament[]> => {
+        return await Promise.all(
+          tournaments.map(async (item: any) => {
+            let venueDetails;
+            try {
+              venueDetails = await googleServices.getPlaceDetails(item.venue_id);
+              if (!venueDetails || !venueDetails.place_id || !venueDetails.name) {
+                throw new Error('Invalid venue details received');
+              }
+            } catch (error) {
+              console.error('Error fetching venue details:', error);
+              venueDetails = {
+                place_id: item.venue_id,
+                name: 'Venue details unavailable'
+              };
+            }
+
+            return {
+              tournament_id: item.tournament_id,
+              name: item.tournament_name,
+              start_date: item.start_date,
+              end_date: item.end_date,
+              type: item.tournament_type,
+              rules: item.rules,
+              venue: {
+                venue_id: venueDetails.place_id,
+                venue_name: venueDetails.name,
+              },
+              organiser: {
+                organiser_id: item.organizer_id,
+                name: item.organizer_name
+              },
+              teams: [],
+              status: item.status
+            };
+          })
+        );
+      };
+
+      return {
+        registered: await transformTournaments(registered),
+        applied: await transformTournaments(applied),
+        notApplied: await transformTournaments(notApplied)
+      };
+    } catch (error) {
+      console.error('Error fetching team tournaments:', error);
+      throw error;
+    }
+  },
+
+  acceptRequest: async (tournamentId: number, teamId: number): Promise<any> => {
+    try {
+      const response = await api.put(`/organizers/accept-req/${tournamentId}/${teamId}`, {});
+      return response.data;
+    } catch (error) {
+      console.error('Error accepting request:', error);
+            throw error;
+    }
+  },
+  getPlayerTeams: async (): Promise<Team[]> => {
+    try {
+      const response = await api.get('/teams/player/teams');
+      //console.log('response', response.success);
+      if (response.success) {
+        return response.data;
+      }
+      throw new Error('Failed to fetch player teams');
+    } catch (error) {
+      console.error('Error fetching player teams:', error);
+      throw error;
+    }
+  },
+
+  rejectRequest: async (tournamentId: number, teamId: number): Promise<any> => {
+    console.log("tournamentId", tournamentId);
+    console.log("teamId", teamId);
+    try {
+      const response = await api.delete(`/organizers/reject-req/${tournamentId}/${teamId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error rejecting request:', error);
+      throw error;
+    }
+  },
+  isTeamCaptain: async (teamId: number): Promise<boolean> => {
+    try {
+      const response = await api.get(`/teams/${teamId}/is-captain`);
+      //console.log('response', response);
+      return response.isCaptain;
+    } catch (error) {
+      console.error('Error checking team captain status:', error);
+      throw error;
+    }
+  },
+
+  applyForTournament: async (teamId: number, tournamentId: number, organizerId: number, tournamentName: string, teamName: string, paymentPhoto: FormData): Promise<void> => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      
+      // Add the tournament details to the FormData
+      paymentPhoto.append('team_id', teamId.toString());
+      paymentPhoto.append('tournament_id', tournamentId.toString());
+      paymentPhoto.append('organizer_id', organizerId.toString());
+      paymentPhoto.append('tournament_name', tournamentName);
+      paymentPhoto.append('team_name', teamName);
+
+      const response = await fetch(`${BASE_URL}/teams/apply-tournament`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: paymentPhoto,
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to apply for tournament');
+      }
+    } catch (error) {
+      console.error('Error applying for tournament:', error);
       throw error;
     }
   }

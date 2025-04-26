@@ -117,7 +117,7 @@ const LeaderBoardScreen = () => {
               onPress={() => handlePlayerPress(item.player_id)}
             >
               <LinearGradient
-                colors={['#4A90E2', '#007AFF']}
+                colors={['#4CAF50', '#388E3C']}
                 style={styles.buttonGradient}
               >
                 <Text style={styles.viewDetailsText}>View Full Details</Text>
@@ -138,7 +138,7 @@ const LeaderBoardScreen = () => {
           onPress={() => setActiveTab(tab)}
         >
           <LinearGradient
-            colors={activeTab === tab ? ['#4A90E2', '#007AFF'] : ['#f5f5f5', '#f5f5f5']}
+            colors={activeTab === tab ? ['#4CAF50', '#388E3C'] : ['#f5f5f5', '#f5f5f5']}
             style={styles.tabGradient}
           >
             <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
@@ -278,7 +278,7 @@ const LeaderBoardScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f9fa',
   },
   backgroundGradient: {
     flex: 1,
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: 'rgba(74, 144, 226, 0.1)',
+    backgroundColor: 'rgba(26, 33, 81, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 8,
@@ -364,17 +364,17 @@ const styles = StyleSheet.create({
   rankText: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#1a2151',
   },
   playerName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#2c3e50',
+    color: '#1a2151',
     flex: 1,
     marginRight: 8,
   },
   pointsContainer: {
-    backgroundColor: 'rgba(74, 144, 226, 0.1)',
+    backgroundColor: 'rgba(26, 33, 81, 0.1)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -384,11 +384,11 @@ const styles = StyleSheet.create({
   playerPoints: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#4CAF50',
   },
   pointItem: {
     alignItems: 'center',
-    backgroundColor: 'rgba(74, 144, 226, 0.1)',
+    backgroundColor: 'rgba(26, 33, 81, 0.1)',
     padding: 10,
     borderRadius: 10,
     minWidth: 80,
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
   pointValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#4CAF50',
   },
   expandedContent: {
     padding: 15,
@@ -415,6 +415,7 @@ const styles = StyleSheet.create({
   buttonGradient: {
     padding: 12,
     alignItems: 'center',
+    backgroundColor: '#1a2151',
   },
   viewDetailsText: {
     color: '#fff',
@@ -452,7 +453,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#1a2151',
     textAlign: 'center',
   },
   modalSection: {
@@ -461,7 +462,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#007AFF',
+    color: '#4CAF50',
     marginBottom: 15,
   },
   modalCloseButton: {
@@ -471,14 +472,14 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    backgroundColor: 'rgba(26, 33, 81, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1,
   },
   modalCloseButtonText: {
     fontSize: 24,
-    color: '#666',
+    color: '#1a2151',
     fontWeight: 'bold',
   },
   profileCard: {
@@ -497,7 +498,7 @@ const styles = StyleSheet.create({
   },
   profileValue: {
     fontSize: 16,
-    color: '#2c3e50',
+    color: '#1a2151',
     fontWeight: '500',
   },
   achievementItem: {
@@ -506,7 +507,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     borderLeftWidth: 4,
-    borderLeftColor: '#007AFF',
+    borderLeftColor: '#4CAF50',
   },
   achievementHeader: {
     flexDirection: 'row',
@@ -517,12 +518,12 @@ const styles = StyleSheet.create({
   achievementType: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#2c3e50',
+    color: '#1a2151',
   },
   achievementMatch: {
     fontSize: 14,
     color: '#666',
-    backgroundColor: 'rgba(74, 144, 226, 0.1)',
+    backgroundColor: 'rgba(26, 33, 81, 0.1)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,

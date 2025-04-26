@@ -22,6 +22,7 @@ import debounce from "lodash/debounce";
 import authService from "../../services/authService";
 import GoogleMapView from "../../components/maps/GoogleMapView";
 import * as Location from 'expo-location';
+import { Calendar, DateData } from 'react-native-calendars';
 
 const CreateTournamentScreen = () => {
   const navigation =
@@ -43,6 +44,8 @@ const CreateTournamentScreen = () => {
   const [selectedVenue, setSelectedVenue] = useState<Place | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<Location.LocationObject | null>(null);
+  const [showStartCalendar, setShowStartCalendar] = useState(false);
+  const [showEndCalendar, setShowEndCalendar] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -176,6 +179,18 @@ const CreateTournamentScreen = () => {
     }
   };
 
+  const handleDateSelect = (day: DateData, type: 'start' | 'end') => {
+    setFormData(prev => ({
+      ...prev,
+      [type === 'start' ? 'start_date' : 'end_date']: day.dateString
+    }));
+    if (type === 'start') {
+      setShowStartCalendar(false);
+    } else {
+      setShowEndCalendar(false);
+    }
+  };
+
   const renderVenueItem = ({ item }: { item: Place }) => (
     <TouchableOpacity
       style={styles.venueItem}
@@ -215,30 +230,40 @@ const CreateTournamentScreen = () => {
         <TextInput
           style={styles.input}
           placeholder="Tournament Name *"
+          placeholderTextColor="#000000"
           value={formData.tournament_name}
           onChangeText={(value) => handleInputChange("tournament_name", value)}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Start Date (YYYY-MM-DD) *"
-          value={formData.start_date}
-          onChangeText={(value) => handleInputChange("start_date", value)}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="End Date (YYYY-MM-DD) *"
-          value={formData.end_date}
-          onChangeText={(value) => handleInputChange("end_date", value)}
-        />
+        
+        <TouchableOpacity 
+          style={styles.dateButton}
+          onPress={() => setShowStartCalendar(true)}
+        >
+          <Text style={styles.dateButtonText}>
+            {formData.start_date || "Select Start Date *"}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.dateButton}
+          onPress={() => setShowEndCalendar(true)}
+        >
+          <Text style={styles.dateButtonText}>
+            {formData.end_date || "Select End Date *"}
+          </Text>
+        </TouchableOpacity>
+
         <TextInput
           style={styles.input}
           placeholder="Tournament Type *"
+          placeholderTextColor="#000000"
           value={formData.tournament_type}
           onChangeText={(value) => handleInputChange("tournament_type", value)}
         />
         <TextInput
           style={[styles.input, styles.textArea]}
           placeholder="Rules"
+          placeholderTextColor="#000000"
           value={formData.rules}
           onChangeText={(value) => handleInputChange("rules", value)}
           multiline
@@ -301,6 +326,7 @@ const CreateTournamentScreen = () => {
             <TextInput
               style={styles.searchInput}
               placeholder="Enter venue name"
+              placeholderTextColor="#000000"
               value={searchQuery}
               onChangeText={handleSearchChange}
               autoFocus
@@ -327,6 +353,67 @@ const CreateTournamentScreen = () => {
           />
         </View>
       </Modal>
+
+      {/* Calendar Modals */}
+      <Modal
+        visible={showStartCalendar}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowStartCalendar(false)}
+      >
+        <View style={styles.calendarModalContainer}>
+          <View style={styles.calendarModalContent}>
+            <View style={styles.calendarHeader}>
+              <Text style={styles.calendarTitle}>Select Start Date</Text>
+              <TouchableOpacity onPress={() => setShowStartCalendar(false)}>
+                <Icon name="close" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
+            <Calendar
+              onDayPress={(day: DateData) => handleDateSelect(day, 'start')}
+              minDate={new Date().toISOString().split('T')[0]}
+              markedDates={{
+                [formData.start_date]: { selected: true, selectedColor: '#D4AF37' }
+              }}
+              theme={{
+                todayTextColor: '#D4AF37',
+                selectedDayBackgroundColor: '#D4AF37',
+                arrowColor: '#D4AF37',
+              }}
+            />
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={showEndCalendar}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowEndCalendar(false)}
+      >
+        <View style={styles.calendarModalContainer}>
+          <View style={styles.calendarModalContent}>
+            <View style={styles.calendarHeader}>
+              <Text style={styles.calendarTitle}>Select End Date</Text>
+              <TouchableOpacity onPress={() => setShowEndCalendar(false)}>
+                <Icon name="close" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
+            <Calendar
+              onDayPress={(day: DateData) => handleDateSelect(day, 'end')}
+              minDate={formData.start_date || new Date().toISOString().split('T')[0]}
+              markedDates={{
+                [formData.end_date]: { selected: true, selectedColor: '#D4AF37' }
+              }}
+              theme={{
+                todayTextColor: '#D4AF37',
+                selectedDayBackgroundColor: '#D4AF37',
+                arrowColor: '#D4AF37',
+              }}
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -334,14 +421,15 @@ const CreateTournamentScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF", // White background
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: "#1E3A8A", // Darker navy blue
+    backgroundColor: "#FFFFFF", // White background
   },
   backButton: {
     marginRight: 16,
@@ -349,25 +437,27 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#333",
+    color: "#D4AF37", // Gold color
   },
   formContainer: {
     padding: 16,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#1E3A8A", // Darker navy blue
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
     fontSize: 16,
+    backgroundColor: "#FFFFFF", // White background
+    color: "#0A192F", // Navy blue text
   },
   textArea: {
     height: 100,
     textAlignVertical: "top",
   },
   submitButton: {
-    backgroundColor: "#f4511e",
+    backgroundColor: "#D4AF37", // Gold color
     padding: 16,
     borderRadius: 8,
     alignItems: "center",
@@ -375,16 +465,16 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   submitButtonDisabled: {
-    backgroundColor: "#f4511e80",
+    backgroundColor: "#D4AF3780",
     opacity: 0.7,
   },
   submitButtonText: {
-    color: "#fff",
+    color: "#0A192F", // Navy blue text
     fontSize: 16,
     fontWeight: "bold",
   },
   venueSearchButton: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#1E3A8A", // Darker navy blue
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -393,21 +483,22 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   venueSearchButtonText: {
-    color: "#fff",
+    color: "#D4AF37", // Gold color
     fontSize: 16,
     fontWeight: "bold",
     marginLeft: 8,
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF", // White background
   },
   modalHeader: {
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: "#1E3A8A", // Darker navy blue
+    backgroundColor: "#FFFFFF", // White background
   },
   modalCloseButton: {
     marginRight: 16,
@@ -415,48 +506,89 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#333",
+    color: "#D4AF37", // Gold color
   },
   searchContainer: {
     flexDirection: "row",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: "#1E3A8A", // Darker navy blue
     alignItems: "center",
+    backgroundColor: "#FFFFFF", // White background
   },
   searchInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#1E3A8A", // Darker navy blue
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
+    backgroundColor: "#FFFFFF", // White background
+    color: "#0A192F", // Navy blue text
   },
   searchLoading: {
     marginLeft: 8,
   },
   searchResults: {
     flex: 1,
+    backgroundColor: "#FFFFFF", // White background
   },
   venueItem: {
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: "#1E3A8A", // Darker navy blue
+    backgroundColor: "#FFFFFF", // White background
   },
   venueName: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
+    color: "#D4AF37", // Gold color
     marginBottom: 4,
   },
   venueAddress: {
     fontSize: 14,
-    color: "#666",
+    color: "#0A192F", // Navy blue text
   },
   noResults: {
     textAlign: "center",
     padding: 16,
-    color: "#666",
+    color: "#D4AF37", // Gold color
+  },
+  dateButton: {
+    borderWidth: 1,
+    borderColor: "#1E3A8A",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    backgroundColor: "#FFFFFF",
+  },
+  dateButtonText: {
+    fontSize: 16,
+    color: "#0A192F",
+  },
+  calendarModalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  calendarModalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    padding: 16,
+    width: '90%',
+    maxWidth: 400,
+  },
+  calendarHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  calendarTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#D4AF37',
   },
 });
 

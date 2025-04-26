@@ -1,144 +1,311 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { RouteProp, useRoute } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  FlatList, 
+  ActivityIndicator, 
+  TouchableOpacity,
+  Alert
+} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { PlayerStats, Team, TeamPlayer } from '../../types/tournamentTypes';
+import { tournamentService } from '../../services/tournamentService';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-import GoogleMapView from '../../components/maps/GoogleMapView';
 
-type TournamentDetailsRouteProp = RouteProp<RootStackParamList, 'TournamentDetails'>;
+type RouteParams = {
+  team_: Team;
+};
 
-const TournamentDetailsScreen = () => {
-  const route = useRoute<TournamentDetailsRouteProp>();
-  const { tournament } = route.params;
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-  if (!tournament) {
+
+const TeamDetailsScreen = () => {
+  const route = useRoute();
+  const navigation = useNavigation<NavigationProp>();
+  const { team_ } = route.params as RouteParams;
+  
+  const [loading, setLoading] = useState(true);
+  const [team, setTeam] = useState<Team | null>(null);
+  const [players, setPlayers] = useState<TeamPlayer[]>([]);
+  const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchTeamDetails = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch player stats from the backend
+      const stats = await tournamentService.getTeamPlayerStats(team_.team_id);
+      
+      // Create a team object from the first player's data
+      if (stats && stats.length > 0) {
+        const firstPlayer = stats[0];
+        
+        const teamData: Team = {
+          team_id: team_.team_id,
+          team_name: team_.team_name,
+          captain_id: team_.captain_id,
+        };
+        
+        setTeam(teamData);
+        
+        // Create player objects from the stats data
+        const playerData: TeamPlayer[] = stats.map((stat: PlayerStats) => ({
+          player_id: stat.player_id,
+          role: stat.role,
+        }));
+        
+        setPlayers(playerData);
+      } else {
+        // If no stats available, create a basic team object
+        const teamData: Team = {
+          team_id: team_.team_id,
+          team_name: `Team ${team_.team_id}`,
+          captain_id: undefined,
+        };
+        
+        setTeam(teamData);
+        setPlayers([]);
+      }
+      
+      setPlayerStats(stats);
+    } catch (error) {
+      console.error('Error fetching team details:', error);
+      Alert.alert('Error', 'Failed to load team details. Please try again.');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTeamDetails();
+  }, [team_]);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchTeamDetails();
+  };
+
+  const renderPlayerItem = ({ item }: { item: TeamPlayer }) => {
+    // Find player stats if available
+    const stats = playerStats.find(stat => stat.player_id === item.player_id);
+    
+    // Check if this player is the captain
+    const isCaptain = team?.captain_id === item.player_id;
+    
     return (
-      <View style={styles.container}>
-        <Text>Tournament data not available</Text>
+      <TouchableOpacity 
+        style={[
+          styles.playerItem,
+          isCaptain && styles.captainItem
+        ]}
+      >
+        <View style={styles.playerInfo}>
+          <View style={styles.nameContainer}>
+            <Text style={[
+              styles.playerName,
+              isCaptain && styles.captainName
+            ]}>
+              {stats?.name || `Player ${item.player_id}`}
+            </Text>
+            {isCaptain && (
+              <View style={styles.captainBadge}>
+                <Text style={styles.captainBadgeText}>Captain</Text>
+              </View>
+            )}
+          </View>
+          <Text style={styles.playerRole}>{stats?.role || item.role}</Text>
+          {stats && (
+            <View style={styles.statsContainer}>
+              <Text style={styles.statsText}>Matches: {stats.total_matches}</Text>
+              <Text style={styles.statsText}>Runs: {stats.total_runs}</Text>
+              <Text style={styles.statsText}>Wickets: {stats.total_wickets}</Text>
+            </View>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  if (loading && !refreshing) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#f4511e" />
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{tournament.name}</Text>
-        <Text style={styles.subtitle}>{tournament.type}</Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Tournament Details</Text>
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Start Date:</Text>
-          <Text style={styles.detailValue}>
-            {new Date(tournament.start_date).toLocaleDateString()}
-          </Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>End Date:</Text>
-          <Text style={styles.detailValue}>
-            {new Date(tournament.end_date).toLocaleDateString()}
-          </Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Status:</Text>
-          <Text style={styles.detailValue}>{tournament.status}</Text>
-        </View>
-      </View>
-
-      {tournament.venue && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Venue</Text>
-          <Text style={styles.venueName}>{tournament.venue.venue_name}</Text>
-          <Text style={styles.venueAddress}>{tournament.venue.address}</Text>
-          <View style={styles.mapContainer}>
-            <GoogleMapView
-              placeId={tournament.venue.venue_id.toString()}
-              height={300}
-              showUserLocation
-              showDirections
-            />
+    <View style={styles.container}>
+      
+      
+      <View style={styles.teamInfoContainer}>
+        <Text style={styles.teamName}>{team?.team_name}</Text>
+        {team?.captain_id && (
+          <View style={styles.captainInfoContainer}>
+            <Icon name="stars" size={16} color="#f4511e" />
+            <Text style={styles.captainText}>
+              Captain: {playerStats.find(p => p.player_id === team.captain_id)?.name || `Player ${team.captain_id}`}
+            </Text>
           </View>
+        )}
+      </View>
+      
+      <Text style={styles.sectionTitle}>Players</Text>
+      
+      {players.length > 0 ? (
+        <FlatList
+          data={players}
+          renderItem={renderPlayerItem}
+          keyExtractor={item => item.player_id.toString()}
+          contentContainerStyle={styles.listContent}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          showsVerticalScrollIndicator={false}
+        />
+      ) : (
+        <View style={styles.emptyStateContainer}>
+          <Icon name="person" size={64} color="#ccc" />
+          <Text style={styles.emptyStateText}>No players found for this team</Text>
         </View>
       )}
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Rules</Text>
-        <Text style={styles.content}>{tournament.rules || 'No rules specified'}</Text>
-      </View>
-    </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f5f5f5',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 16,
+    backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
+  backButton: {
+    marginRight: 16,
+  },
   title: {
-    fontSize: 24,
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  teamInfoContainer: {
+    backgroundColor: '#fff',
+    padding: 16,
+    marginBottom: 16,
+  },
+  teamName: {
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 8,
   },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 16,
+  captainInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  section: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+  captainText: {
+    fontSize: 14,
+    color: '#666',
+    marginLeft: 4,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: 'bold',
     color: '#333',
-    marginBottom: 12,
-  },
-  detailRow: {
-    flexDirection: 'row',
+    marginLeft: 16,
     marginBottom: 8,
   },
-  detailLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginRight: 8,
+  listContent: {
+    padding: 16,
   },
-  detailValue: {
-    fontSize: 16,
-    color: '#444',
+  playerItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
-  venueName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
+  captainItem: {
+    borderLeftWidth: 4,
+    borderLeftColor: '#f4511e',
+    backgroundColor: '#fff8f5',
   },
-  venueAddress: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 4,
-  },
-  mapContainer: {
-    height: 300,
-    marginTop: 16,
-    marginBottom: 16,
-  },
-  map: {
+  playerInfo: {
     flex: 1,
   },
-  content: {
+  nameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  playerName: {
     fontSize: 16,
-    color: '#444',
-    lineHeight: 24,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  captainName: {
+    color: '#f4511e',
+  },
+  captainBadge: {
+    backgroundColor: '#f4511e',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginLeft: 8,
+  },
+  captainBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  playerRole: {
+    fontSize: 14,
+    color: '#666',
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: '#999',
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  statsText: {
+    fontSize: 14,
+    color: '#666',
   },
 });
 
-export default TournamentDetailsScreen; 
+export default TeamDetailsScreen;
