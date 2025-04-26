@@ -276,11 +276,12 @@ const styles = StyleSheet.create({
   dateHeader: {
     padding: 12,
     marginBottom: 8,
+    backgroundColor: '#1a2151',
   },
   dateHeaderText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#495057',
+    color: '#4CAF50',
     textAlign: 'center',
   },
   feedItem: {
@@ -309,24 +310,24 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#1a2151',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
   avatarText: {
-    color: '#fff',
+    color: '#4CAF50',
     fontSize: 18,
     fontWeight: 'bold',
   },
   username: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#212529',
+    color: '#1a2151',
   },
   date: {
     fontSize: 12,
-    color: '#6c757d',
+    color: '#4CAF50',
     marginTop: 2,
   },
   moreButton: {
@@ -350,7 +351,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   placeholderText: {
-    color: '#6c757d',
+    color: '#1a2151',
     marginTop: 8,
     fontSize: 14,
   },
@@ -367,7 +368,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(26, 33, 81, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -377,7 +378,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#212529',
+    color: '#1a2151',
     marginBottom: 8,
   },
   description: {
@@ -404,11 +405,11 @@ const styles = StyleSheet.create({
   actionText: {
     marginLeft: 8,
     fontSize: 14,
-    color: '#495057',
+    color: '#1a2151',
     fontWeight: '500',
   },
   likedText: {
-    color: '#ff3b30',
+    color: '#4CAF50',
   },
 });
 
