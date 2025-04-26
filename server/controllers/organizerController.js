@@ -211,9 +211,9 @@ const sendTournamentInvite = async (req, res) => {
 };
 
 const addInning = async (req, res) => {
-    console.log("addInning called");
+    //console.log("addInning called");
   const { match_id, batting_team_id, bowling_team_id } = req.body;
-
+  //console.log(match_id, batting_team_id, bowling_team_id,"addInning called");
   if (!match_id || !batting_team_id || !bowling_team_id) {
     return res.status(400).json({ message: "Missing required fields" });
   }

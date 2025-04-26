@@ -68,10 +68,12 @@ export const matchService = {
       const response = await api.post('/organizers/players-stats_ofTeam', {
         team_id: teamId
       });
-      return response.data.data || []; // Added .data to handle your API response structure
+      console.log("Team players response:", response.data); // Add logging
+      // The response is already an array of players, no need to access .data.data
+      return response.data || [];
     } catch (error) {
       console.error(`Error fetching team players for ID ${teamId}:`, error);
-      return []; // Return empty array to avoid UI errors
+      return [];
     }
   },
 
@@ -149,6 +151,7 @@ export const matchService = {
   saveMatchPlayers: async (
     matchId: number,
     playerIds: number[]
+    
   ): Promise<void> => {
     try {
       const response = await api.post('/organizers/playing-11', {

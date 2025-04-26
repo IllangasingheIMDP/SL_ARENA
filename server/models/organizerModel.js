@@ -149,14 +149,14 @@ const createInning = async (match_id, batting_team_id, bowling_team_id) => {
     [match_id]
   );
   const inningNumber = rows[0].inningCount + 1;
-
+  //console.log(inningNumber,"inningNumber");
   // Step 2: Insert the new inning
   const [result] = await db.execute(
     `INSERT INTO Innings (match_id, batting_team_id, bowling_team_id, inning_number)
          VALUES (?, ?, ?, ?)`,
     [match_id, batting_team_id, bowling_team_id, inningNumber]
   );
-
+  //console.log(result,"result");
   return result;
 };
 
@@ -819,7 +819,7 @@ const getMatchState = async (matchId) => {
        WHERE p11.match_id = ?`,
       [matchId]
     );
-    
+    console.log(players,"players");
     // Group players by team
     const selectedPlayers = {
       team1: [],
