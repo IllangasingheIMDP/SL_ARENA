@@ -22,6 +22,7 @@ import debounce from "lodash/debounce";
 import authService from "../../services/authService";
 import GoogleMapView from "../../components/maps/GoogleMapView";
 import * as Location from 'expo-location';
+import { Calendar, DateData } from 'react-native-calendars';
 
 const CreateTournamentScreen = () => {
   const navigation =
@@ -43,6 +44,8 @@ const CreateTournamentScreen = () => {
   const [selectedVenue, setSelectedVenue] = useState<Place | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<Location.LocationObject | null>(null);
+  const [showStartCalendar, setShowStartCalendar] = useState(false);
+  const [showEndCalendar, setShowEndCalendar] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -176,6 +179,18 @@ const CreateTournamentScreen = () => {
     }
   };
 
+  const handleDateSelect = (day: DateData, type: 'start' | 'end') => {
+    setFormData(prev => ({
+      ...prev,
+      [type === 'start' ? 'start_date' : 'end_date']: day.dateString
+    }));
+    if (type === 'start') {
+      setShowStartCalendar(false);
+    } else {
+      setShowEndCalendar(false);
+    }
+  };
+
   const renderVenueItem = ({ item }: { item: Place }) => (
     <TouchableOpacity
       style={styles.venueItem}
@@ -219,20 +234,25 @@ const CreateTournamentScreen = () => {
           value={formData.tournament_name}
           onChangeText={(value) => handleInputChange("tournament_name", value)}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Start Date (YYYY-MM-DD) *"
-          placeholderTextColor="#000000"
-          value={formData.start_date}
-          onChangeText={(value) => handleInputChange("start_date", value)}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="End Date (YYYY-MM-DD) *"
-          placeholderTextColor="#000000"
-          value={formData.end_date}
-          onChangeText={(value) => handleInputChange("end_date", value)}
-        />
+        
+        <TouchableOpacity 
+          style={styles.dateButton}
+          onPress={() => setShowStartCalendar(true)}
+        >
+          <Text style={styles.dateButtonText}>
+            {formData.start_date || "Select Start Date *"}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.dateButton}
+          onPress={() => setShowEndCalendar(true)}
+        >
+          <Text style={styles.dateButtonText}>
+            {formData.end_date || "Select End Date *"}
+          </Text>
+        </TouchableOpacity>
+
         <TextInput
           style={styles.input}
           placeholder="Tournament Type *"
@@ -331,6 +351,67 @@ const CreateTournamentScreen = () => {
               </Text>
             }
           />
+        </View>
+      </Modal>
+
+      {/* Calendar Modals */}
+      <Modal
+        visible={showStartCalendar}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowStartCalendar(false)}
+      >
+        <View style={styles.calendarModalContainer}>
+          <View style={styles.calendarModalContent}>
+            <View style={styles.calendarHeader}>
+              <Text style={styles.calendarTitle}>Select Start Date</Text>
+              <TouchableOpacity onPress={() => setShowStartCalendar(false)}>
+                <Icon name="close" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
+            <Calendar
+              onDayPress={(day: DateData) => handleDateSelect(day, 'start')}
+              minDate={new Date().toISOString().split('T')[0]}
+              markedDates={{
+                [formData.start_date]: { selected: true, selectedColor: '#D4AF37' }
+              }}
+              theme={{
+                todayTextColor: '#D4AF37',
+                selectedDayBackgroundColor: '#D4AF37',
+                arrowColor: '#D4AF37',
+              }}
+            />
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={showEndCalendar}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowEndCalendar(false)}
+      >
+        <View style={styles.calendarModalContainer}>
+          <View style={styles.calendarModalContent}>
+            <View style={styles.calendarHeader}>
+              <Text style={styles.calendarTitle}>Select End Date</Text>
+              <TouchableOpacity onPress={() => setShowEndCalendar(false)}>
+                <Icon name="close" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
+            <Calendar
+              onDayPress={(day: DateData) => handleDateSelect(day, 'end')}
+              minDate={formData.start_date || new Date().toISOString().split('T')[0]}
+              markedDates={{
+                [formData.end_date]: { selected: true, selectedColor: '#D4AF37' }
+              }}
+              theme={{
+                todayTextColor: '#D4AF37',
+                selectedDayBackgroundColor: '#D4AF37',
+                arrowColor: '#D4AF37',
+              }}
+            />
+          </View>
         </View>
       </Modal>
     </View>
@@ -472,6 +553,42 @@ const styles = StyleSheet.create({
     textAlign: "center",
     padding: 16,
     color: "#D4AF37", // Gold color
+  },
+  dateButton: {
+    borderWidth: 1,
+    borderColor: "#1E3A8A",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    backgroundColor: "#FFFFFF",
+  },
+  dateButtonText: {
+    fontSize: 16,
+    color: "#0A192F",
+  },
+  calendarModalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  calendarModalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    padding: 16,
+    width: '90%',
+    maxWidth: 400,
+  },
+  calendarHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  calendarTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#D4AF37',
   },
 });
 
