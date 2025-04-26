@@ -211,8 +211,9 @@ const sendTournamentInvite = async (req, res) => {
 };
 
 const addInning = async (req, res) => {
+    //console.log("addInning called");
   const { match_id, batting_team_id, bowling_team_id } = req.body;
-
+  //console.log(match_id, batting_team_id, bowling_team_id,"addInning called");
   if (!match_id || !batting_team_id || !bowling_team_id) {
     return res.status(400).json({ message: "Missing required fields" });
   }
@@ -477,50 +478,187 @@ const getInningStats = async (req, res) => {
     }
   };
 
-  const getApplieddRequestsByTournamentID = async (req, res) => {
-    const { tournament_id } = req.params;
-   try{
-    const requests = await OrganizerModel.getApplieddRequestsByTournamentID(tournament_id);
-    res.status(200).json({ message: "Applied requests fetched successfully", data: requests });
-   }catch(error){
-    console.error('Error fetching applied requests:', error);
-    res.status(500).json({ error: 'Internal server error' });
-   }
-  };
+  // Add these new controller functions to organizerController.js
 
-  const deleteAppliedRequest = async (req, res) => {
-    const { tournament_id, team_id } = req.params;
-    try{
-      await OrganizerModel.deleteAppliedRequest(tournament_id, team_id);
-      res.status(200).json({ message: "Applied request deleted successfully" });
-    }catch(error){
-      console.error('Error deleting applied request:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  };
-  const acceptAppliedRequest = async (req, res) => {
-    const { tournament_id, team_id } = req.params;
-    try{
-      await OrganizerModel.acceptAppliedRequest(tournament_id, team_id);
-      res.status(200).json({ message: "Applied request accepted successfully" });
-    }catch(error){
-      console.error('Error accepting applied request:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  };
-
-  const getAllOngoingTournaments = async (req, res) => {
+// Get match phase
+const getMatchPhaseController = async (req, res) => {
     try {
-      const tournaments = await OrganizerModel.getAllOngoingTournaments();
-      res.status(200).json({ message: "All ongoing tournaments fetched successfully", data: tournaments });
+      const { matchId } = req.params;
+      
+      if (!matchId) {
+        return res.status(400).json({ message: 'Match ID is required' });
+      }
+      
+      const phase = await OrganizerModel.getMatchPhase(matchId);
+      res.status(200).json(phase);
     } catch (error) {
-      console.error("Error fetching all ongoing tournaments:", error);
-      res.status(500).json({ error: "Failed to fetch all ongoing tournaments" });
+      console.error('Error getting match phase:', error);
+      res.status(500).json({ message: 'Server error' });
     }
   };
   
-
-module.exports = {
+  // Update match phase
+  const updateMatchPhaseController = async (req, res) => {
+    try {
+      const { match_id, phase } = req.body;
+      
+      if (!match_id || !phase) {
+        return res.status(400).json({ message: 'Match ID and phase are required' });
+      }
+      
+      // Validate phase
+      const validPhases = ['toss', 'team_selection', 'inning_one', 'inning_two', 'finished'];
+      if (!validPhases.includes(phase)) {
+        return res.status(400).json({ message: 'Invalid phase value' });
+      }
+      
+      const result = await OrganizerModel.saveMatchPhase(match_id, phase);
+      res.status(200).json({ message: 'Match phase updated successfully' });
+    } catch (error) {
+      console.error('Error updating match phase:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
+  
+  // Get match details
+  const getMatchDetailsController = async (req, res) => {
+    try {
+      const { matchId } = req.params;
+      
+      if (!matchId) {
+        return res.status(400).json({ message: 'Match ID is required' });
+      }
+      
+      const match = await OrganizerModel.getMatchDetails(matchId);
+      
+      if (!match) {
+        return res.status(404).json({ message: 'Match not found' });
+      }
+      
+      res.status(200).json(match);
+    } catch (error) {
+      console.error('Error getting match details:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
+  
+  // Get team details
+  const getTeamDetailsController = async (req, res) => {
+    try {
+      const { teamId } = req.params;
+      
+      if (!teamId) {
+        return res.status(400).json({ message: 'Team ID is required' });
+      }
+      
+      const team = await OrganizerModel.getTeamDetails(teamId);
+      
+      if (!team) {
+        return res.status(404).json({ message: 'Team not found' });
+      }
+      
+      res.status(200).json(team);
+    } catch (error) {
+      console.error('Error getting team details:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
+  
+  // Save match result
+  const saveMatchResultController = async (req, res) => {
+    try {
+      const { match_id, winner_team_id } = req.body;
+      
+      if (!match_id || !winner_team_id) {
+        return res.status(400).json({ message: 'Match ID and winner team ID are required' });
+      }
+      
+      const result = await OrganizerModel.saveMatchResult(match_id, winner_team_id);
+      
+      // Also update the match in the tournament bracket
+      await OrganizerModel.updateMatchWinner(match_id, winner_team_id);
+      
+      res.status(200).json({ message: 'Match result saved successfully' });
+    } catch (error) {
+      console.error('Error saving match result:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
+  
+  // Get match score
+  const getMatchScoreController = async (req, res) => {
+    try {
+      const { matchId } = req.params;
+      
+      if (!matchId) {
+        return res.status(400).json({ message: 'Match ID is required' });
+      }
+      
+      const score = await OrganizerModel.getMatchScore(matchId);
+      res.status(200).json(score);
+    } catch (error) {
+      console.error('Error getting match score:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
+  
+  // Save inning result
+  const saveInningResultController = async (req, res) => {
+    try {
+      const { inning_id, runs, wickets, overs } = req.body;
+      
+      if (!inning_id) {
+        return res.status(400).json({ message: 'Inning ID is required' });
+      }
+      
+      // First update Innings table directly
+      await db.execute(
+        'UPDATE Innings SET total_runs = ?, total_wickets = ?, overs_played = ? WHERE inning_id = ?', 
+        [runs || 0, wickets || 0, overs || 0, inning_id]
+      );
+      
+      res.status(200).json({ message: 'Inning result saved successfully' });
+    } catch (error) {
+      console.error('Error saving inning result:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
+  
+  // Get match state
+  const getMatchStateController = async (req, res) => {
+    try {
+      const { matchId } = req.params;
+      
+      if (!matchId) {
+        return res.status(400).json({ message: 'Match ID is required' });
+      }
+      
+      const state = await OrganizerModel.getMatchState(matchId);
+      
+      if (!state) {
+        return res.status(404).json({ message: 'Match not found' });
+      }
+      
+      res.status(200).json({data : state});
+    } catch (error) {
+      console.error('Error getting match state:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
+  
+  // Add your new controller functions to the exports
+  module.exports = {
+    // Your new exports
+    getMatchPhaseController,
+    updateMatchPhaseController,
+    getMatchDetailsController,
+    getTeamDetailsController,
+    saveMatchResultController,
+    getMatchScoreController,
+    saveInningResultController,
+    getMatchStateController,
+    
+    // Your existing exports
     createTournament,
     getTournamentsByOrganizerController,
     getAppliedTeamsToOngoingTournaments,
@@ -539,16 +677,10 @@ module.exports = {
     updateTournamentStatus,
     markAttendance,
     updateTeamAttendance,
-    deleteAppliedRequest,
-    acceptAppliedRequest,
     createKnockoutDraw,
     viewKnockoutBracket,
     updateMatchWinner,
-
     getUpcomingTournaments,
     addPlaying11,
-    getInningStats,
-    getApplieddRequestsByTournamentID,
-    deleteAppliedRequest,
-    getAllOngoingTournaments
-};
+    getInningStats
+  };

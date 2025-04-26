@@ -45,13 +45,12 @@ const Draw: React.FC<DrawProps> = ({ tournament, onClose }) => {
 
   const handleMatchPress = (match: Match) => {
     if (!match.team1_id || !match.team2_id || !tournament.tournament_id) return;
-    
-    navigation.navigate('MatchDetails', { 
+  
+    navigation.navigate('MatchManagement', { 
       matchId: match.match_id,
-      tournamentId: tournament.tournament_id,
       team1Id: match.team1_id,
-      team1Name: match.team1_name || 'TBD',
       team2Id: match.team2_id,
+      team1Name: match.team1_name || 'TBD',
       team2Name: match.team2_name || 'TBD'
     });
   };

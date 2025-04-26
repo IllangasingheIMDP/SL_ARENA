@@ -23,6 +23,17 @@ interface TeamSelectionProps {
   onComplete: (team1Players: number[], team2Players: number[]) => void;
 }
 
+interface Player {
+  player_id: number;
+  name: string;
+  role: string | null;
+  batting_average: string | null;
+  bowling_economy: string | null;
+  total_matches: number;
+  total_runs: string | null;
+  total_wickets: string | null;
+}
+
 const TeamSelection: React.FC<TeamSelectionProps> = ({
   team1,
   team2,
@@ -32,47 +43,63 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
   inningId,
   onComplete,
 }) => {
-  const [selectedTeam1Players, setSelectedTeam1Players] = useState<number[]>([]);
-  const [selectedTeam2Players, setSelectedTeam2Players] = useState<number[]>([]);
+  const [selectedTeam1Players, setSelectedTeam1Players] = useState<Player[]>([]);
+  const [selectedTeam2Players, setSelectedTeam2Players] = useState<Player[]>([]);
   const [currentTeam, setCurrentTeam] = useState<"team1" | "team2">("team1");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [team1Players, setTeam1Players] = useState<Player[]>([]);
+  const [team2Players, setTeam2Players] = useState<Player[]>([]);
+  const [loadingPlayers, setLoadingPlayers] = useState(true);
   
   // New state for phases and player count
   const [currentPhase, setCurrentPhase] = useState<"confirm_teams" | "set_player_count" | "select_players">("confirm_teams");
   const [playerCount, setPlayerCount] = useState<number>(11);
   const [tempPlayerCount, setTempPlayerCount] = useState<string>("11");
 
-  // useEffect(() => {
-  //   // Save the current phase when component mounts
-  //   const savePhase = async () => {
-  //     try {
-  //       await tournamentService.saveMatchPhase(matchId, "team_selection");
-  //     } catch (error) {
-  //       console.error("Error saving match phase:", error);
-  //     }
-  //   };
-  //   savePhase();
-  // }, [matchId]);
-
   useEffect(() => {
     const savePhase = async () => {
       try {
-        await matchService.saveMatchPhase(matchId, "team_selection", { inningId }); // Update if your API accepts extra data
+        await matchService.saveMatchPhase(matchId, "team_selection");
       } catch (error) {
         console.error("Error saving match phase:", error);
       }
     };
     savePhase();
-  }, [matchId, inningId]);
+  }, [matchId]);
+
+  // Fetch players for both teams
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      try {
+        setLoadingPlayers(true);
+        if (team1?.team_id) {
+          const team1PlayersData = await matchService.getTeamPlayers(team1.team_id);
+         // console.log("Team 1 players:", team1PlayersData);
+          setTeam1Players(team1PlayersData);
+        }
+        if (team2?.team_id) {
+          const team2PlayersData = await matchService.getTeamPlayers(team2.team_id);
+          //console.log("Team 2 players:", team2PlayersData);
+          setTeam2Players(team2PlayersData);
+        }
+      } catch (error) {
+        console.error("Error fetching team players:", error);
+      } finally {
+        setLoadingPlayers(false);
+      }
+    };
+
+    fetchPlayers();
+  }, [team1?.team_id, team2?.team_id]);
 
   const handlePlayerSelection = (playerId: number, isSelected: boolean) => {
     if (currentTeam === "team1") {
       setSelectedTeam1Players((prev) =>
-        isSelected ? [...prev, playerId] : prev.filter((id) => id !== playerId)
+        isSelected ? [...prev, team1Players.find(p => p.player_id === playerId)!] : prev.filter((p) => p.player_id !== playerId)
       );
     } else {
       setSelectedTeam2Players((prev) =>
-        isSelected ? [...prev, playerId] : prev.filter((id) => id !== playerId)
+        isSelected ? [...prev, team2Players.find(p => p.player_id === playerId)!] : prev.filter((p) => p.player_id !== playerId)
       );
     }
   };
@@ -86,18 +113,15 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
 
       try {
         setIsSubmitting(true);
-        await matchService.saveMatchPlayers(
-          matchId,
-          team1?.team_id!,
-          selectedTeam1Players
-        );
+        const playerIds = selectedTeam1Players.map(player => player.player_id);
+        await matchService.saveMatchPlayers(matchId, playerIds);
         setCurrentTeam("team2");
       } catch (error) {
+        console.error("Save error:", error);
         Alert.alert(
           "Error",
           "Failed to save team 1 players. Please try again."
         );
-        console.error("Save error:", error);
       } finally {
         setIsSubmitting(false);
       }
@@ -109,26 +133,27 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
 
       try {
         setIsSubmitting(true);
-        await matchService.saveMatchPlayers(
-          matchId,
-          team2?.team_id!,
-          selectedTeam2Players
+        const playerIds = selectedTeam2Players.map(player => player.player_id);
+        await matchService.saveMatchPlayers(matchId, playerIds);
+        // Pass just the player IDs to onComplete
+        onComplete(
+          selectedTeam1Players.map(p => p.player_id),
+          selectedTeam2Players.map(p => p.player_id)
         );
-        onComplete(selectedTeam1Players, selectedTeam2Players);
       } catch (error) {
+        console.error("Save error:", error);
         Alert.alert(
           "Error",
           "Failed to save team 2 players. Please try again."
         );
-        console.error("Save error:", error);
       } finally {
         setIsSubmitting(false);
       }
     }
   };
 
-  const renderPlayerRow = (player: any, selectedPlayers: number[]) => {
-    const isSelected = selectedPlayers.includes(player.player_id);
+  const renderPlayerRow = (player: Player, selectedPlayers: Player[]) => {
+    const isSelected = selectedPlayers.includes(player);
     
     return (
       <View key={player.player_id} style={styles.playerRow}>
@@ -145,64 +170,35 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
     );
   };
 
-  const getPlayersArray = (team: any) => {
+  const getPlayersArray = (team: any): Player[] => {
     if (!team) return [];
 
-    // Case 1: If team is already an array of players
-    if (Array.isArray(team)) {
-      return team.map((player) => ({
-        player_id: player.player_id,
-        name: player.name,
-        role: player.role,
-      }));
+    // If we have the team ID, return the corresponding players array
+    if (team.team_id === team1?.team_id) {
+      return team1Players;
+    }
+    if (team.team_id === team2?.team_id) {
+      return team2Players;
     }
 
-    // Case 2: If team has a Players property
-    if (team.Players && Array.isArray(team.Players)) {
-      return team.Players.map((player) => ({
-        player_id: player.player_id,
-        name: player.name,
-        role: player.role,
-      }));
+    // If we're passed a team object directly, return its players
+    if (team.players) {
+      return team.players;
     }
 
-    // Case 3: If team has a team property
-    if (team.team && Array.isArray(team.team)) {
-      return team.team.map((player) => ({
-        player_id: player.player_id,
-        name: player.name,
-        role: player.role,
-      }));
-    }
-
-    // Case 4: If team has a players property
-    if (team.players && Array.isArray(team.players)) {
-      return team.players.map((player) => ({
-        player_id: player.player_id,
-        name: player.name,
-        role: player.role,
-      }));
-    }
-
+    console.log("Team structure:", team);
     console.log("No valid player structure found");
     return [];
   };
 
   const renderTeamSelection = (
     team: any,
-    selectedPlayers: number[],
+    selectedPlayers: Player[],
     teamName: string
   ) => {
-    // Based on your console logs, team is already the array of players
-    const players = Array.isArray(team)
-      ? team.map((player) => ({
-          player_id: player.player_id,
-          name: player.name,
-          role: player.role,
-        }))
-      : getPlayersArray(team);
+    const players = getPlayersArray(team);
 
-    if (!team) {
+    if (loadingPlayers) {
       return (
         <View style={styles.centeredContainer}>
           <ActivityIndicator size="large" color="#4CAF50" />

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
-import CaptainTossComponent from './CaptainTossComponent';
+import CaptainTossComponent from './CaptainToss';
 import TeamSelection from './TeamSelection';
 import ScoreCard from './ScoreCard';
 import { Team } from '../../types/tournamentTypes';

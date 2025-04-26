@@ -1,314 +1,311 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Modal, TouchableOpacity, Image } from 'react-native';
-import { RouteProp, useRoute } from '@react-navigation/native';
-import { RootStackParamList } from '../../navigation/AppNavigator';
-import GoogleMapView from '../../components/maps/GoogleMapView';
-import Navbar from '../../components/common/Navbar';
+import React, { useState, useEffect } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  FlatList, 
+  ActivityIndicator, 
+  TouchableOpacity,
+  Alert
+} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { PlayerStats, Team, TeamPlayer } from '../../types/tournamentTypes';
 import { tournamentService } from '../../services/tournamentService';
+import { RootStackParamList } from '../../navigation/AppNavigator';
 
-type TournamentDetailsRouteProp = RouteProp<RootStackParamList, 'TournamentDetails'>;
+type RouteParams = {
+  team_: Team;
+};
 
-interface AppliedRequest {
-  team_id: number;
-  team_name: string;
-  payment_slip: string;
-  created_at: string;
-}
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-const TournamentDetailsScreen = () => {
-  const route = useRoute<TournamentDetailsRouteProp>();
-  const { tournament } = route.params;
-  const [appliedRequests, setAppliedRequests] = useState<AppliedRequest[]>([]);
+
+const TeamDetailsScreen = () => {
+  const route = useRoute();
+  const navigation = useNavigation<NavigationProp>();
+  const { team_ } = route.params as RouteParams;
+  
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedRequest, setSelectedRequest] = useState<AppliedRequest | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [actionLoading, setActionLoading] = useState(false);
+  const [team, setTeam] = useState<Team | null>(null);
+  const [players, setPlayers] = useState<TeamPlayer[]>([]);
+  const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    fetchAppliedRequests();
-  }, []);
-
-  const fetchAppliedRequests = async () => {
+  const fetchTeamDetails = async () => {
     try {
       setLoading(true);
-      setError(null);
-      const response = await tournamentService.getAppliedRequests(tournament.tournament_id);
-      if (response && Array.isArray(response)) {
-        setAppliedRequests(response);
+      
+      // Fetch player stats from the backend
+      const stats = await tournamentService.getTeamPlayerStats(team_.team_id);
+      
+      // Create a team object from the first player's data
+      if (stats && stats.length > 0) {
+        const firstPlayer = stats[0];
+        
+        const teamData: Team = {
+          team_id: team_.team_id,
+          team_name: team_.team_name,
+          captain_id: team_.captain_id,
+        };
+        
+        setTeam(teamData);
+        
+        // Create player objects from the stats data
+        const playerData: TeamPlayer[] = stats.map((stat: PlayerStats) => ({
+          player_id: stat.player_id,
+          role: stat.role,
+        }));
+        
+        setPlayers(playerData);
       } else {
-        setAppliedRequests([]);
+        // If no stats available, create a basic team object
+        const teamData: Team = {
+          team_id: team_.team_id,
+          team_name: `Team ${team_.team_id}`,
+          captain_id: undefined,
+        };
+        
+        setTeam(teamData);
+        setPlayers([]);
       }
+      
+      setPlayerStats(stats);
     } catch (error) {
-      console.error('Error fetching applied requests:', error);
-      setError('Failed to fetch applied requests');
-      setAppliedRequests([]);
+      console.error('Error fetching team details:', error);
+      Alert.alert('Error', 'Failed to load team details. Please try again.');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
-  const handleRequestAction = async (action: 'accept' | 'reject') => {
-    if (!selectedRequest) return;
-    console.log("selectedRequest", selectedRequest);
-    console.log("tournament.tournament_id", tournament.tournament_id);
+  useEffect(() => {
+    fetchTeamDetails();
+  }, [team_]);
 
-    try {
-      setActionLoading(true);
-      if (action === 'accept') {
-        await tournamentService.acceptRequest(tournament.tournament_id, selectedRequest.team_id);
-      } else {
-        await tournamentService.rejectRequest(tournament.tournament_id, selectedRequest.team_id);
-      }
-      // Refresh the requests list
-      await fetchAppliedRequests();
-      setModalVisible(false);
-      setSelectedRequest(null);
-    } catch (error) {
-      console.error(`Error ${action}ing request:`, error);
-      setError(`Failed to ${action} request`);
-    } finally {
-      setActionLoading(false);
-    }
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchTeamDetails();
   };
 
-  return (
-    <View style={styles.mainContainer}>
-      <Navbar showBackButton={true} showNotification={true} />
-      <ScrollView style={styles.container}>
-        <View style={styles.section}>
-          <Text style={styles.title}>{tournament.name}</Text>
-          <Text style={styles.subtitle}>Tournament Details</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Location</Text>
-          <View style={styles.mapPlaceholder}>
-            <GoogleMapView
-              placeId={tournament.venue.venue_id.toString()}
-              height={200}
-            />
+  const renderPlayerItem = ({ item }: { item: TeamPlayer }) => {
+    // Find player stats if available
+    const stats = playerStats.find(stat => stat.player_id === item.player_id);
+    
+    // Check if this player is the captain
+    const isCaptain = team?.captain_id === item.player_id;
+    
+    return (
+      <TouchableOpacity 
+        style={[
+          styles.playerItem,
+          isCaptain && styles.captainItem
+        ]}
+      >
+        <View style={styles.playerInfo}>
+          <View style={styles.nameContainer}>
+            <Text style={[
+              styles.playerName,
+              isCaptain && styles.captainName
+            ]}>
+              {stats?.name || `Player ${item.player_id}`}
+            </Text>
+            {isCaptain && (
+              <View style={styles.captainBadge}>
+                <Text style={styles.captainBadgeText}>Captain</Text>
+              </View>
+            )}
           </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Rules</Text>
-          <Text style={styles.content}>{tournament.rules || 'No rules specified'}</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Applied Requests</Text>
-          {loading ? (
-            <ActivityIndicator size="large" color="#f4511e" />
-          ) : error ? (
-            <Text style={styles.errorText}>{error}</Text>
-          ) : appliedRequests && appliedRequests.length > 0 ? (
-            appliedRequests.map((request, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.requestRow}
-                onPress={() => {
-                  setSelectedRequest(request);
-                  setModalVisible(true);
-                }}
-              >
-                <Text style={styles.requestText}>Team: {request.team_name}</Text>
-                <Text style={styles.requestText}>Applied on: {new Date(request.created_at).toLocaleDateString()}</Text>
-                {request.payment_slip && (
-                  <Text style={styles.requestText}>Payment Slip: Available</Text>
-                )}
-              </TouchableOpacity>
-            ))
-          ) : (
-            <Text style={styles.noRequestsText}>No applied requests yet</Text>
+          <Text style={styles.playerRole}>{stats?.role || item.role}</Text>
+          {stats && (
+            <View style={styles.statsContainer}>
+              <Text style={styles.statsText}>Matches: {stats.total_matches}</Text>
+              <Text style={styles.statsText}>Runs: {stats.total_runs}</Text>
+              <Text style={styles.statsText}>Wickets: {stats.total_wickets}</Text>
+            </View>
           )}
         </View>
-      </ScrollView>
+      </TouchableOpacity>
+    );
+  };
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(false);
-          setSelectedRequest(null);
-        }}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Payment Slip</Text>
-            {selectedRequest?.payment_slip ? (
-              <Image
-                source={{ uri: selectedRequest.payment_slip }}
-                style={styles.paymentSlipImage}
-                resizeMode="contain"
-              />
-            ) : (
-              <Text style={styles.noSlipText}>No payment slip available</Text>
-            )}
-            
-            <View style={styles.actionButtons}>
-              <TouchableOpacity
-                style={[styles.actionButton, styles.acceptButton]}
-                onPress={() => handleRequestAction('accept')}
-                disabled={actionLoading}
-              >
-                <Text style={styles.buttonText}>Accept</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.actionButton, styles.rejectButton]}
-                onPress={() => handleRequestAction('reject')}
-                disabled={actionLoading}
-              >
-                <Text style={styles.buttonText}>Reject</Text>
-              </TouchableOpacity>
-            </View>
+  if (loading && !refreshing) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#f4511e" />
+      </View>
+    );
+  }
 
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => {
-                setModalVisible(false);
-                setSelectedRequest(null);
-              }}
-            >
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
+  return (
+    <View style={styles.container}>
+      
+      
+      <View style={styles.teamInfoContainer}>
+        <Text style={styles.teamName}>{team?.team_name}</Text>
+        {team?.captain_id && (
+          <View style={styles.captainInfoContainer}>
+            <Icon name="stars" size={16} color="#f4511e" />
+            <Text style={styles.captainText}>
+              Captain: {playerStats.find(p => p.player_id === team.captain_id)?.name || `Player ${team.captain_id}`}
+            </Text>
           </View>
+        )}
+      </View>
+      
+      <Text style={styles.sectionTitle}>Players</Text>
+      
+      {players.length > 0 ? (
+        <FlatList
+          data={players}
+          renderItem={renderPlayerItem}
+          keyExtractor={item => item.player_id.toString()}
+          contentContainerStyle={styles.listContent}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          showsVerticalScrollIndicator={false}
+        />
+      ) : (
+        <View style={styles.emptyStateContainer}>
+          <Icon name="person" size={64} color="#ccc" />
+          <Text style={styles.emptyStateText}>No players found for this team</Text>
         </View>
-      </Modal>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  mainContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f5f5f5',
   },
-  section: {
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 16,
+    backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
+  backButton: {
+    marginRight: 16,
+  },
   title: {
-    fontSize: 24,
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  teamInfoContainer: {
+    backgroundColor: '#fff',
+    padding: 16,
+    marginBottom: 16,
+  },
+  teamName: {
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 8,
   },
-  subtitle: {
-    fontSize: 16,
+  captainInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  captainText: {
+    fontSize: 14,
     color: '#666',
-    marginBottom: 16,
+    marginLeft: 4,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 12,
-  },
-  content: {
     fontSize: 16,
-    color: '#444',
-    lineHeight: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginLeft: 16,
+    marginBottom: 8,
   },
-  mapPlaceholder: {
-    height: 200,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    justifyContent: 'center',
+  listContent: {
+    padding: 16,
+  },
+  playerItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
-  },
-  requestRow: {
-    backgroundColor: '#f8f8f8',
-    padding: 12,
+    backgroundColor: '#fff',
+    padding: 16,
     borderRadius: 8,
-    marginBottom: 8,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
-  requestText: {
-    fontSize: 14,
-    color: '#444',
+  captainItem: {
+    borderLeftWidth: 4,
+    borderLeftColor: '#f4511e',
+    backgroundColor: '#fff8f5',
+  },
+  playerInfo: {
+    flex: 1,
+  },
+  nameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 4,
   },
-  noRequestsText: {
+  playerName: {
     fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  captainName: {
+    color: '#f4511e',
+  },
+  captainBadge: {
+    backgroundColor: '#f4511e',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginLeft: 8,
+  },
+  captainBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  playerRole: {
+    fontSize: 14,
     color: '#666',
-    fontStyle: 'italic',
   },
-  errorText: {
-    fontSize: 16,
-    color: '#ff0000',
-    textAlign: 'center',
-  },
-  modalContainer: {
+  emptyStateContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 20,
     padding: 20,
-    width: '90%',
-    maxHeight: '80%',
-    alignItems: 'center',
   },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-  },
-  paymentSlipImage: {
-    width: '100%',
-    height: 300,
-    marginBottom: 20,
-    borderRadius: 10,
-  },
-  noSlipText: {
+  emptyStateText: {
     fontSize: 16,
-    color: '#666',
-    marginBottom: 20,
+    color: '#999',
+    marginTop: 16,
+    textAlign: 'center',
   },
-  actionButtons: {
+  statsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginBottom: 20,
-  },
-  actionButton: {
-    padding: 10,
-    borderRadius: 8,
-    width: '45%',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: 4,
   },
-  acceptButton: {
-    backgroundColor: '#4CAF50',
-  },
-  rejectButton: {
-    backgroundColor: '#f44336',
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  closeButton: {
-    padding: 10,
-    borderRadius: 8,
-    backgroundColor: '#666',
-    width: '100%',
-    alignItems: 'center',
-  },
-  closeButtonText: {
-    color: 'white',
-    fontSize: 16,
+  statsText: {
+    fontSize: 14,
+    color: '#666',
   },
 });
 
-export default TournamentDetailsScreen; 
+export default TeamDetailsScreen;
