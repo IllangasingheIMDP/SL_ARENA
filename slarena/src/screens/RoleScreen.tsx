@@ -128,7 +128,7 @@ const RoleScreen: React.FC = () => {
     // Define all possible roles
     const allRoles = [
       { id: 'player', title: 'Player', description: 'Join tournaments and track your progress' },
-      { id: 'organisation', title: 'Organisation', description: 'Create and manage tournaments' },
+      { id: 'organization', title: 'Organization', description: 'Create and manage tournaments' },
       { id: 'trainer', title: 'Trainer', description: 'Coach players and improve their skills' }
     ];
     
