@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
@@ -41,16 +41,19 @@ const UpcomingMatchesTab = () => {
       tournament_type={item.type}
       onViewDetails={() => handleViewDetails(item)}
     />
-
   );
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.tabTitle}>Upcoming Tournaments</Text>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Upcoming Tournaments</Text>
+        </View>
+        
         {loading ? (
           <View style={styles.loadingContainer}>
-            <Text>Loading tournaments...</Text>
+            <ActivityIndicator size="large" color="#FFD700" />
+            <Text style={styles.loadingText}>Loading tournaments...</Text>
           </View>
         ) : (
           <FlatList
@@ -59,13 +62,19 @@ const UpcomingMatchesTab = () => {
             keyExtractor={item => item?.tournament_id?.toString() || Math.random().toString()}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.listContainer}
+            ListEmptyComponent={
+              <View style={styles.emptyStateContainer}>
+                <Text style={styles.emptyStateText}>No upcoming tournaments found</Text>
+              </View>
+            }
           />
         )}
+        
         <TouchableOpacity 
           style={styles.fab}
           onPress={() => navigation.navigate('CreateTournament')}
         >
-          <Icon name="add" size={24} color="#fff" />
+          <Icon name="add" size={24} color="#FFD700" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -75,32 +84,77 @@ const UpcomingMatchesTab = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f0f4f8',
   },
   container: {
     flex: 1,
-    padding: 16,
     position: 'relative',
   },
-  listContainer: {
-    paddingBottom: 80,
+  header: {
+    padding: 25,
+    backgroundColor: '#000080',
+    alignItems: 'center',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  tabTitle: {
-    fontSize: 20,
+  headerTitle: {
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 16,
-    color: '#333',
+    color: '#FFD700',
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  listContainer: {
+    padding: 16,
+    paddingBottom: 80,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#f0f4f8',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#000080',
+    fontWeight: '500',
+  },
+  emptyStateContainer: {
+    padding: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2.22,
+    elevation: 3,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: '#5f6368',
+    textAlign: 'center',
   },
   fab: {
     position: 'absolute',
     right: 16,
     bottom: 16,
-    backgroundColor: '#f4511e',
+    backgroundColor: '#000080',
     width: 56,
     height: 56,
     borderRadius: 28,
