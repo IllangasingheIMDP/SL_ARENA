@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import { Alert, View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import userService from '../services/userService';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 type RoleScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -179,39 +180,61 @@ const RoleScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f0f4f8',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    backgroundColor: '#f0f4f8',
   },
   section: {
     padding: 20,
-    marginBottom: 10,
+    marginHorizontal: 15,
+    marginVertical: 10,
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 15,
-    color: '#333',
+    color: '#000080', // Navy blue
+    marginBottom: 20,
+    borderBottomWidth: 2,
+    borderBottomColor: '#FFD700', // Gold
+    paddingBottom: 8,
   },
   roleButton: {
-    backgroundColor: '#f4511e',
+    backgroundColor: '#000080', // Navy blue
     padding: 15,
     borderRadius: 8,
     marginBottom: 10,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
   roleText: {
-    color: 'white',
+    color: '#FFD700', // Gold
     fontSize: 16,
     fontWeight: 'bold',
   },
   emptyText: {
     fontSize: 16,
-    color: '#666',
+    color: '#5f6368',
     fontStyle: 'italic',
     textAlign: 'center',
     marginVertical: 10,
@@ -222,42 +245,48 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   roleCard: {
-    backgroundColor: 'white',
-    borderRadius: 8,
+    backgroundColor: '#fff',
+    borderRadius: 12,
     padding: 15,
     marginBottom: 15,
     width: '48%',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
   roleCardTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
-    color: '#333',
+    color: '#000080', // Navy blue
   },
   roleCardDescription: {
     fontSize: 12,
-    color: '#666',
+    color: '#5f6368',
   },
   requestItem: {
-    backgroundColor: 'white',
-    borderRadius: 8,
+    backgroundColor: '#fff',
+    borderRadius: 12,
     padding: 15,
     marginBottom: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
   requestRole: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#000080', // Navy blue
   },
   requestStatus: {
     fontSize: 14,
@@ -274,7 +303,7 @@ const styles = StyleSheet.create({
   },
   requestDate: {
     fontSize: 12,
-    color: '#666',
+    color: '#5f6368',
     marginTop: 5,
   },
 });
