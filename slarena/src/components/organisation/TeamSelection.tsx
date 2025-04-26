@@ -43,8 +43,8 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
   inningId,
   onComplete,
 }) => {
-  const [selectedTeam1Players, setSelectedTeam1Players] = useState<number[]>([]);
-  const [selectedTeam2Players, setSelectedTeam2Players] = useState<number[]>([]);
+  const [selectedTeam1Players, setSelectedTeam1Players] = useState<Player[]>([]);
+  const [selectedTeam2Players, setSelectedTeam2Players] = useState<Player[]>([]);
   const [currentTeam, setCurrentTeam] = useState<"team1" | "team2">("team1");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [team1Players, setTeam1Players] = useState<Player[]>([]);
@@ -74,12 +74,12 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
         setLoadingPlayers(true);
         if (team1?.team_id) {
           const team1PlayersData = await matchService.getTeamPlayers(team1.team_id);
-          console.log("Team 1 players:", team1PlayersData);
+         // console.log("Team 1 players:", team1PlayersData);
           setTeam1Players(team1PlayersData);
         }
         if (team2?.team_id) {
           const team2PlayersData = await matchService.getTeamPlayers(team2.team_id);
-          console.log("Team 2 players:", team2PlayersData);
+          //console.log("Team 2 players:", team2PlayersData);
           setTeam2Players(team2PlayersData);
         }
       } catch (error) {
@@ -95,11 +95,11 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
   const handlePlayerSelection = (playerId: number, isSelected: boolean) => {
     if (currentTeam === "team1") {
       setSelectedTeam1Players((prev) =>
-        isSelected ? [...prev, playerId] : prev.filter((id) => id !== playerId)
+        isSelected ? [...prev, team1Players.find(p => p.player_id === playerId)!] : prev.filter((p) => p.player_id !== playerId)
       );
     } else {
       setSelectedTeam2Players((prev) =>
-        isSelected ? [...prev, playerId] : prev.filter((id) => id !== playerId)
+        isSelected ? [...prev, team2Players.find(p => p.player_id === playerId)!] : prev.filter((p) => p.player_id !== playerId)
       );
     }
   };
@@ -113,14 +113,15 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
 
       try {
         setIsSubmitting(true);
-        await matchService.saveMatchPlayers(matchId, selectedTeam1Players);
+        const playerIds = selectedTeam1Players.map(player => player.player_id);
+        await matchService.saveMatchPlayers(matchId, playerIds);
         setCurrentTeam("team2");
       } catch (error) {
+        console.error("Save error:", error);
         Alert.alert(
           "Error",
           "Failed to save team 1 players. Please try again."
         );
-        console.error("Save error:", error);
       } finally {
         setIsSubmitting(false);
       }
@@ -132,22 +133,27 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
 
       try {
         setIsSubmitting(true);
-        await matchService.saveMatchPlayers(matchId, selectedTeam2Players);
-        onComplete(selectedTeam1Players, selectedTeam2Players);
+        const playerIds = selectedTeam2Players.map(player => player.player_id);
+        await matchService.saveMatchPlayers(matchId, playerIds);
+        // Pass just the player IDs to onComplete
+        onComplete(
+          selectedTeam1Players.map(p => p.player_id),
+          selectedTeam2Players.map(p => p.player_id)
+        );
       } catch (error) {
+        console.error("Save error:", error);
         Alert.alert(
           "Error",
           "Failed to save team 2 players. Please try again."
         );
-        console.error("Save error:", error);
       } finally {
         setIsSubmitting(false);
       }
     }
   };
 
-  const renderPlayerRow = (player: Player, selectedPlayers: number[]) => {
-    const isSelected = selectedPlayers.includes(player.player_id);
+  const renderPlayerRow = (player: Player, selectedPlayers: Player[]) => {
+    const isSelected = selectedPlayers.includes(player);
     
     return (
       <View key={player.player_id} style={styles.playerRow}>
@@ -187,7 +193,7 @@ const TeamSelection: React.FC<TeamSelectionProps> = ({
 
   const renderTeamSelection = (
     team: any,
-    selectedPlayers: number[],
+    selectedPlayers: Player[],
     teamName: string
   ) => {
     const players = getPlayersArray(team);

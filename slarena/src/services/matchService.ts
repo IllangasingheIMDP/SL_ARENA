@@ -68,7 +68,7 @@ export const matchService = {
       const response = await api.post('/organizers/players-stats_ofTeam', {
         team_id: teamId
       });
-      console.log("Team players response:", response.data); // Add logging
+     // console.log("Team players response:", response.data); // Add logging
       // The response is already an array of players, no need to access .data.data
       return response.data || [];
     } catch (error) {
@@ -84,7 +84,7 @@ export const matchService = {
       
       // Check if we got a valid response
       if (response && response.data) {
-        console.log("Match state API response:", response.data);
+        //console.log("Match state API response:", response.data);
         return response.data;
       } else {
         console.warn("Match state API returned empty response");
@@ -151,16 +151,19 @@ export const matchService = {
   saveMatchPlayers: async (
     matchId: number,
     playerIds: number[]
-    
   ): Promise<void> => {
     try {
+      console.log("Saving players for match:", matchId, "Player IDs:", playerIds);
       const response = await api.post('/organizers/playing-11', {
         match_id: matchId,
         player_ids: playerIds
       });
-      return response.data;
+      
+      // Just return void since we don't need the response data
+      return;
     } catch (error) {
       console.error('Error saving match players:', error);
+      throw error;
     }
   },
 
