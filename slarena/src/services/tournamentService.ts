@@ -22,7 +22,7 @@ export const tournamentService = {
               throw new Error('Invalid venue details received');
             }
           } catch (error) {
-            console.error('Error fetching venue details:', error);
+            //console.error('Error fetching venue details:', error);
             // Provide fallback venue details if the API call fails
             venueDetails = {
               place_id: item.venue.venue_id,
