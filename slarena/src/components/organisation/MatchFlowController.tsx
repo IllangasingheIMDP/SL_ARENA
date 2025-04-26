@@ -4,7 +4,7 @@ import { useMatch } from '../../context/MatchContext';
 import MatchPhaseNavigator from './MatchPhaseNavigator';
 import CaptainTossWrapper from './CaptainTossWrapper';
 import TeamSelectionWrapper from './TeamSelectionWrapper';
-// import InningWrapper from './InningWrapper';
+import InningWrapper from './InningWrapper';
 import MatchSummary from './MatchSummary'; // Your existing or to be created component
 
 interface MatchFlowControllerProps {
@@ -26,11 +26,11 @@ const MatchFlowController: React.FC<MatchFlowControllerProps> = ({
       case 'team_selection':
         return <TeamSelectionWrapper matchId={matchId} />;
         
-      // case 'inning_one':
-      //   return <InningWrapper matchId={matchId} inningNumber={1} />;
+      case 'inning_one':
+        return <InningWrapper matchId={matchId} inningNumber={1} />;
         
-      // case 'inning_two':
-      //   return <InningWrapper matchId={matchId} inningNumber={2} />;
+      case 'inning_two':
+        return <InningWrapper matchId={matchId} inningNumber={2} />;
         
       case 'finished':
         return <MatchSummary
