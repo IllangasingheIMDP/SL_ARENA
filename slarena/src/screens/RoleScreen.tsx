@@ -25,7 +25,7 @@ const RoleScreen: React.FC = () => {
   const [currentRoles, setCurrentRoles] = useState<string[]>([]);
   const [roleRequests, setRoleRequests] = useState<RoleRequest[]>([]);
   const [isInitialSelection, setIsInitialSelection] = useState(false);
-  const { user, setSelectedRole } = useAuth();
+  const { user, setSelectedRole, logout } = useAuth();
   const navigation = useNavigation<RoleScreenNavigationProp>();
 
   useEffect(() => {
@@ -70,6 +70,14 @@ const RoleScreen: React.FC = () => {
 
   const handleRequestRole = (role: string) => {
     navigation.navigate('RoleRequestForm', { role });
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      Alert.alert('Error', 'Failed to logout');
+    }
   };
 
   const renderCurrentRoles = () => (
@@ -162,9 +170,19 @@ const RoleScreen: React.FC = () => {
 
   return (
     <ScrollView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Role Management</Text>
+        <TouchableOpacity 
+          style={styles.logoutButton}
+          onPress={handleLogout}
+        >
+          <Icon name="logout" size={20} color="#FFD700" />
+          <Text style={styles.logoutButtonText}>Logout</Text>
+        </TouchableOpacity>
+      </View>
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#f4511e" />
+          <ActivityIndicator size="large" color="#000080" />
         </View>
       ) : (
         <>
@@ -305,6 +323,46 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#5f6368',
     marginTop: 5,
+  },
+  header: {
+    backgroundColor: '#000080',
+    padding: 20,
+    paddingBottom: 30,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFD700',
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  logoutButtonText: {
+    color: '#FFD700',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 4,
   },
 });
 
