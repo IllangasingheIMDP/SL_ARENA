@@ -35,7 +35,7 @@ const createTournament = async (tournamentData) => {
 
 const getAllOngoingTournaments = async () => {
   const [rows] = await db.execute(
-    `SELECT tournament_id, tournament_name, venue_id, tournament_type FROM Tournaments WHERE status IN ('start', 'matches');`
+      "SELECT tournament_id, tournament_name, venue_id, tournament_type FROM Tournaments WHERE status IN ('start', 'matches');"
   );
   return rows;
 };

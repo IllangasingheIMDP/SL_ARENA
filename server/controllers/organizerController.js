@@ -3,6 +3,46 @@ const jwt = require("jsonwebtoken");
 const { JWT_SECRET, JWT_EXPIRES_IN } = require("../config/constants");
 const db = require("../config/dbconfig");
 
+const getAllOngoingTournaments = async (req, res) => {
+  try {
+    const tournaments = await OrganizerModel.getAllOngoingTournaments();
+    res.status(200).json({ message: "All ongoing tournaments fetched successfully", data: tournaments });
+  } catch (error) {
+    console.error("Error fetching all ongoing tournaments:", error);
+    res.status(500).json({ error: "Failed to fetch all ongoing tournaments" });
+  }
+};
+const getApplieddRequestsByTournamentID = async (req, res) => {
+  const { tournament_id } = req.params;
+ try{
+  const requests = await OrganizerModel.getApplieddRequestsByTournamentID(tournament_id);
+  res.status(200).json({ message: "Applied requests fetched successfully", data: requests });
+ }catch(error){
+  console.error('Error fetching applied requests:', error);
+  res.status(500).json({ error: 'Internal server error' });
+ }
+};
+
+const deleteAppliedRequest = async (req, res) => {
+  const { tournament_id, team_id } = req.params;
+  try{
+    await OrganizerModel.deleteAppliedRequest(tournament_id, team_id);
+    res.status(200).json({ message: "Applied request deleted successfully" });
+  }catch(error){
+    console.error('Error deleting applied request:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+const acceptAppliedRequest = async (req, res) => {
+  const { tournament_id, team_id } = req.params;
+  try{
+    await OrganizerModel.acceptAppliedRequest(tournament_id, team_id);
+    res.status(200).json({ message: "Applied request accepted successfully" });
+  }catch(error){
+    console.error('Error accepting applied request:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 const createTournament = async (req, res) => {
   try {
     const userId = req.user.user_id; // organizer_id
@@ -682,5 +722,9 @@ const getMatchPhaseController = async (req, res) => {
     updateMatchWinner,
     getUpcomingTournaments,
     addPlaying11,
-    getInningStats
+    getInningStats,
+    getAllOngoingTournaments,
+    getApplieddRequestsByTournamentID,
+    deleteAppliedRequest,
+    acceptAppliedRequest
   };

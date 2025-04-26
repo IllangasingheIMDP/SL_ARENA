@@ -36,7 +36,7 @@ router.get('/match-score/:matchId', authenticateToken, checkRole(['organisation'
 router.post('/save-inning-result', authenticateToken, checkRole(['organisation']), organizerController.saveInningResultController);
 router.get('/match-state/:matchId', authenticateToken, checkRole(['organisation']), organizerController.getMatchStateController);
 router.get('/applied-requests/:tournament_id',authenticateToken,checkRole(['organisation']),organizerController.getApplieddRequestsByTournamentID);
-router.delete('/reject-req/:tournament_id/:team_id',authenticateToken,checkRole(['organisation']),organizerController.deleteAppliedRequest);
+router.delete('/reject-req/:tournament_id/:team_id',authenticateToken,checkRole(['organisation']),organizerController.rejectTournamentApplicant);
 router.put('/accept-req/:tournament_id/:team_id',authenticateToken,checkRole(['organisation']),organizerController.acceptAppliedRequest);
 
 
