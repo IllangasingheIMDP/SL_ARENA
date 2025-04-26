@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 // Import new screens
 import TeamsScreen from './TeamsScreen';
@@ -41,34 +42,78 @@ const PlayerDashboard = () => {
       case 'home':
         return (
           <ScrollView style={styles.container}>
-            <View style={styles.header}>
-              <Text style={styles.welcomeText}>Player Dashboard</Text>
-              <Text style={styles.userName}>{user?.name}</Text>
+            {/* Header Section */}
+            <LinearGradient
+              colors={['#000080', '#000066']}
+              style={styles.header}
+            >
+              <View style={styles.headerContent}>
+                <View style={styles.profileSection}>
+                  <TouchableOpacity 
+                    style={styles.avatarContainer}
+                    onPress={() => navigation.navigate('PlayerProfile')}
+                  >
+                    <Icon name="person" size={40} color="#FFD700" />
+                  </TouchableOpacity>
+                  <View style={styles.userInfo}>
+                    <Text style={styles.welcomeText}>Welcome back,</Text>
+                    <Text style={styles.userName}>{user?.name}</Text>
+                    <TouchableOpacity 
+                      style={styles.viewProfileButton}
+                      onPress={() => navigation.navigate('PlayerProfile')}
+                    >
+                      <Text style={styles.viewProfileText}>View Profile</Text>
+                      <Icon name="chevron-right" size={20} color="#FFD700" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </LinearGradient>
+
+            {/* Quick Stats Section */}
+            <View style={styles.quickStats}>
+              <View style={styles.statCard}>
+                <Icon name="sports-soccer" size={24} color="#000080" />
+                <Text style={styles.statValue}>12</Text>
+                <Text style={styles.statLabel}>Matches</Text>
+              </View>
+              <View style={styles.statCard}>
+                <Icon name="emoji-events" size={24} color="#000080" />
+                <Text style={styles.statValue}>3</Text>
+                <Text style={styles.statLabel}>Trophies</Text>
+              </View>
+              <View style={styles.statCard}>
+                <Icon name="group" size={24} color="#000080" />
+                <Text style={styles.statValue}>2</Text>
+                <Text style={styles.statLabel}>Teams</Text>
+              </View>
             </View>
 
-            <View style={styles.content}>
-              <TouchableOpacity 
-                style={styles.card}
-                onPress={() => navigation.navigate('PlayerProfile')}
-              >
-                <Text style={styles.cardTitle}>Player Profile</Text>
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Email:</Text>
-                  <Text style={styles.infoValue}>{user?.email}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Status:</Text>
-                  <Text style={styles.infoValue}>Active Player</Text>
-                </View>
-              </TouchableOpacity>
-
+            {/* Upcoming Events */}
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Upcoming Events</Text>
+                <TouchableOpacity>
+                  <Text style={styles.viewAllText}>View All</Text>
+                </TouchableOpacity>
+              </View>
               <SportsCalendar />
+            </View>
 
-              <TouchableOpacity style={styles.switchRoleButton} onPress={handleSwitchRole}>
-                <Text style={styles.switchRoleButtonText}>Manage Roles</Text>
+            {/* Action Buttons */}
+            <View style={styles.actionButtonsContainer}>
+              <TouchableOpacity 
+                style={[styles.actionButton, styles.switchRoleButton]} 
+                onPress={handleSwitchRole}
+              >
+                <Icon name="swap-horiz" size={20} color="#000080" />
+                <Text style={styles.switchRoleButtonText}>Switch Role</Text>
               </TouchableOpacity>
-
-              <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+              <TouchableOpacity 
+                style={[styles.actionButton, styles.logoutButton]} 
+                onPress={handleLogout}
+              >
+                <Icon name="logout" size={20} color="#fff" />
                 <Text style={styles.logoutButtonText}>Logout</Text>
               </TouchableOpacity>
             </View>
@@ -87,7 +132,6 @@ const PlayerDashboard = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Main Content */}
       <View style={styles.content}>
         {renderContent()}
       </View>
@@ -140,161 +184,129 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f4f8',
   },
   header: {
-    padding: 25,
-    backgroundColor: '#000080', // Navy blue
+    padding: 20,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+  },
+  headerContent: {
+    marginTop: 20,
+  },
+  profileSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  avatarContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(255, 215, 0, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  userInfo: {
+    flex: 1,
   },
   welcomeText: {
     fontSize: 16,
-    color: '#FFD700', // Gold
+    color: '#FFD700',
     opacity: 0.9,
     letterSpacing: 0.5,
   },
   userName: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#FFD700', // Gold
+    color: '#FFD700',
     marginTop: 8,
     letterSpacing: 0.5,
     textShadowColor: 'rgba(0, 0, 0, 0.2)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
-  content: {
-    flex: 1,
+  quickStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 20,
+    backgroundColor: '#fff',
+    marginTop: -20,
+    marginHorizontal: 15,
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  statCard: {
+    alignItems: 'center',
+    width: '30%',
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000080',
+    marginTop: 8,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#5f6368',
+    marginTop: 4,
+  },
+  section: {
+    marginTop: 20,
     padding: 20,
   },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 25,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
   },
-  cardTitle: {
-    fontSize: 20,
+  sectionTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#000080', // Navy blue
-    marginBottom: 20,
+    color: '#000080',
     letterSpacing: 0.5,
   },
-  infoRow: {
-    flexDirection: 'row',
-    marginBottom: 15,
-    alignItems: 'center',
-  },
-  infoLabel: {
-    width: 100,
-    fontSize: 16,
-    color: '#5f6368',
+  viewAllText: {
+    color: '#000080',
+    fontSize: 14,
     fontWeight: '500',
   },
-  infoValue: {
-    flex: 1,
-    fontSize: 16,
-    color: '#000080', // Navy blue
-    fontWeight: '600',
-  },
-  actionButtons: {
+  actionButtonsContainer: {
+    padding: 20,
     flexDirection: 'row',
-    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 15,
   },
   actionButton: {
-    backgroundColor: '#000080', // Navy blue
-    padding: 18,
-    borderRadius: 15,
-    width: '48%',
-    marginBottom: 15,
+    flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  actionButtonText: {
-    color: '#FFD700', // Gold
-    fontSize: 15,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
-  },
-  eventItem: {
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e8eaed',
-  },
-  eventTitle: {
-    fontSize: 17,
-    fontWeight: 'bold',
-    color: '#000080', // Navy blue
-    marginBottom: 5,
-  },
-  eventDate: {
-    fontSize: 14,
-    color: '#5f6368',
-    fontWeight: '500',
+    justifyContent: 'center',
+    padding: 12,
+    borderRadius: 10,
+    width: '48%',
   },
   switchRoleButton: {
-    backgroundColor: '#000080', // Navy blue
-    padding: 18,
-    borderRadius: 15,
-    alignItems: 'center',
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  switchRoleButtonText: {
-    color: '#FFD700', // Gold
-    fontSize: 16,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#000080',
   },
   logoutButton: {
-    backgroundColor: '#d32f2f',
-    padding: 18,
-    borderRadius: 15,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: '#000080',
+  },
+  switchRoleButtonText: {
+    color: '#000080',
+    marginLeft: 8,
+    fontWeight: 'bold',
   },
   logoutButtonText: {
     color: '#fff',
-    fontSize: 16,
+    marginLeft: 8,
     fontWeight: 'bold',
-    letterSpacing: 0.5,
+  },
+  content: {
+    flex: 1,
   },
   bottomNav: {
     flexDirection: 'row',
@@ -328,6 +340,22 @@ const styles = StyleSheet.create({
   activeNavText: {
     color: '#000080',
     fontWeight: 'bold',
+  },
+  viewProfileButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+  },
+  viewProfileText: {
+    color: '#FFD700',
+    fontSize: 14,
+    fontWeight: '500',
+    marginRight: 4,
   },
 });
 

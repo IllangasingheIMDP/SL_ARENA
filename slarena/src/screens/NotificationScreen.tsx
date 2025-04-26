@@ -72,7 +72,7 @@ const NotificationScreen = () => {
               style={styles.iconGradient}
             >
               <Ionicons 
-                name={getNotificationIcon(item.type)} 
+                name={getNotificationIcon(item.notification_type)} 
                 size={24} 
                 color="#FFD700" 
               />
@@ -123,7 +123,7 @@ const NotificationScreen = () => {
                 style={styles.dialogIconGradient}
               >
                 <Ionicons 
-                  name={selectedNotification ? getNotificationIcon(selectedNotification.type) : 'notifications'} 
+                  name={selectedNotification ? getNotificationIcon(selectedNotification.notification_type) : 'notifications'} 
                   size={32} 
                   color="#FFD700" 
                 />
