@@ -5,6 +5,7 @@ const { authenticateToken, checkRole } = require('../middleware/auth');
 
 router.post('/createtournament', authenticateToken,checkRole(['organisation']), organizerController.createTournament);
 router.get('/ongoingtournaments', authenticateToken,checkRole(['organisation']),organizerController.getTournamentsByOrganizerController);
+router.get('/ongoingtournaments/all', authenticateToken,checkRole(['general','organisation','admin','player']),organizerController.getAllOngoingTournaments);
 router.get('/applied-teams',authenticateToken,checkRole(['organisation']), organizerController.getAppliedTeamsToOngoingTournaments);
 router.post('/applicants/accept',authenticateToken,checkRole(['organisation']), organizerController.acceptTournamentApplicant);
 router.post('/applicants/reject',authenticateToken,checkRole(['organisation']), organizerController.rejectTournamentApplicant);

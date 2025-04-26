@@ -509,6 +509,17 @@ const getInningStats = async (req, res) => {
     }
   };
 
+  const getAllOngoingTournaments = async (req, res) => {
+    try {
+      const tournaments = await OrganizerModel.getAllOngoingTournaments();
+      res.status(200).json({ message: "All ongoing tournaments fetched successfully", data: tournaments });
+    } catch (error) {
+      console.error("Error fetching all ongoing tournaments:", error);
+      res.status(500).json({ error: "Failed to fetch all ongoing tournaments" });
+    }
+  };
+  
+
 module.exports = {
     createTournament,
     getTournamentsByOrganizerController,
@@ -538,5 +549,6 @@ module.exports = {
     addPlaying11,
     getInningStats,
     getApplieddRequestsByTournamentID,
-    deleteAppliedRequest
+    deleteAppliedRequest,
+    getAllOngoingTournaments
 };

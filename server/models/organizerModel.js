@@ -25,6 +25,14 @@ const createTournament = async (tournamentData) => {
 };
 
 
+const getAllOngoingTournaments = async () => {
+    const [rows] = await db.execute(
+        `SELECT tournament_id, tournament_name, venue_id, tournament_type FROM Tournaments WHERE status IN ('start', 'matches');`
+    );
+    return rows;
+};
+
+
 const getTournamentsByOrganizer = async (organizer_id) => {
     const [rows] = await db.execute(
         `SELECT 
@@ -618,6 +626,6 @@ module.exports = {
     insertPlaying11,
     getInningStatsById,
     getApplieddRequestsByTournamentID,
-    deleteAppliedRequest
-
+    deleteAppliedRequest,
+    getAllOngoingTournaments
 };
