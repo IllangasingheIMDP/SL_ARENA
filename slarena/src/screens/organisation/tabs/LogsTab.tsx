@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, FlatList, StyleSheet, Animated, Dimensions } from 'react-native';
+import React from 'react';
+import { View, Text, FlatList, StyleSheet, Dimensions } from 'react-native';
 import LogItem from '../../../components/organisation/LogItem';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
@@ -7,17 +7,6 @@ import { BlurView } from 'expo-blur';
 const { width } = Dimensions.get('window');
 
 const LogsTab = () => {
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 1000,
-      useNativeDriver: true,
-    }).start();
-  }, []);
-
   const logs = [
     { id: '1', title: 'Team Registration', description: 'New team "Lions" registered', date: 'Today, 10:30 AM', type: 'registration' },
     { id: '2', title: 'Tournament Update', description: 'Tournament schedule updated for Premier League', date: 'Yesterday, 3:45 PM', type: 'update' },
@@ -26,32 +15,16 @@ const LogsTab = () => {
     { id: '5', title: 'Payment Received', description: 'Payment received for tournament registration', date: 'Apr 20, 2:30 PM', type: 'payment' },
   ];
 
-  const renderLogItem = ({ item, index }: { item: any; index: number }) => {
-    const translateY = scrollY.interpolate({
-      inputRange: [-1, 0, 100 * index, 100 * (index + 2)],
-      outputRange: [0, 0, 0, -50],
-      extrapolate: 'clamp',
-    });
-
-    return (
-      <Animated.View
-        style={[
-          styles.logItemContainer,
-          {
-            transform: [{ translateY }],
-            opacity: fadeAnim,
-          },
-        ]}
-      >
-        <LogItem
-          title={item.title}
-          description={item.description}
-          date={item.date}
-          type={item.type}
-        />
-      </Animated.View>
-    );
-  };
+  const renderLogItem = ({ item }: { item: any }) => (
+    <View style={styles.logItemContainer}>
+      <LogItem
+        title={item.title}
+        description={item.description}
+        date={item.date}
+        type={item.type}
+      />
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -67,17 +40,12 @@ const LogsTab = () => {
         </LinearGradient>
       </View>
 
-      <Animated.FlatList
+      <FlatList
         data={logs}
         renderItem={renderLogItem}
         keyExtractor={item => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContainer}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
-        )}
-        scrollEventThrottle={16}
       />
     </View>
   );

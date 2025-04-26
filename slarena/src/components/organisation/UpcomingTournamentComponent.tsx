@@ -14,6 +14,16 @@ type UpcomingTournamentProps = {
   onViewDetails: () => void;
 };
 
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
+
 const UpcomingTournamentComponent: React.FC<UpcomingTournamentProps> = ({
   tournament_id,
   tournament_name,
@@ -26,9 +36,18 @@ const UpcomingTournamentComponent: React.FC<UpcomingTournamentProps> = ({
     <View style={styles.card}>
       <View style={styles.content}>
         <Text style={styles.tournamentName}>{tournament_name}</Text>
-        <Text style={styles.dateText}>Start: {new Date(start_date).toLocaleDateString()}</Text>
-        <Text style={styles.dateText}>End: {new Date(end_date).toLocaleDateString()}</Text>
-        <Text style={styles.typeText}>Type: {tournament_type}</Text>
+        <View style={styles.dateContainer}>
+          <Text style={styles.dateLabel}>Start:</Text>
+          <Text style={styles.dateText}>{formatDate(start_date)}</Text>
+        </View>
+        <View style={styles.dateContainer}>
+          <Text style={styles.dateLabel}>End:</Text>
+          <Text style={styles.dateText}>{formatDate(end_date)}</Text>
+        </View>
+        <View style={styles.typeContainer}>
+          <Text style={styles.typeLabel}>Type:</Text>
+          <Text style={styles.typeText}>{tournament_type}</Text>
+        </View>
       </View>
       <TouchableOpacity style={styles.button} onPress={onViewDetails}>
         <Text style={styles.buttonText}>View Details</Text>
@@ -40,45 +59,90 @@ const UpcomingTournamentComponent: React.FC<UpcomingTournamentProps> = ({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 16,
-    marginVertical: 8,
+    borderRadius: 15,
+    padding: 20,
+    marginVertical: 10,
     marginHorizontal: 16,
-    elevation: 3,
+    elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.15,
     shadowRadius: 3.84,
   },
   content: {
-    marginBottom: 12,
+    marginBottom: 15,
   },
   tournamentName: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#000080',
+    marginBottom: 15,
+    textShadowColor: 'rgba(0, 0, 0, 0.1)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 8,
+    backgroundColor: '#f0f4f8',
+    padding: 10,
+    borderRadius: 8,
+  },
+  dateLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000080',
+    marginRight: 8,
+    minWidth: 60,
   },
   dateText: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
+    fontSize: 16,
+    color: '#5f6368',
+    flex: 1,
+  },
+  typeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f0f4f8',
+    padding: 10,
+    borderRadius: 8,
+  },
+  typeLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000080',
+    marginRight: 8,
+    minWidth: 60,
   },
   typeText: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 16,
+    color: '#5f6368',
     fontStyle: 'italic',
+    flex: 1,
   },
   button: {
-    backgroundColor: '#f4511e',
-    padding: 10,
-    borderRadius: 5,
+    backgroundColor: '#000080',
+    padding: 15,
+    borderRadius: 10,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2.22,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#FFD700',
   },
   buttonText: {
-    color: '#fff',
+    color: '#FFD700',
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
 });
 

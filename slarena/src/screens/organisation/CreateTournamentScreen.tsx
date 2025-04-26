@@ -215,30 +215,35 @@ const CreateTournamentScreen = () => {
         <TextInput
           style={styles.input}
           placeholder="Tournament Name *"
+          placeholderTextColor="#000000"
           value={formData.tournament_name}
           onChangeText={(value) => handleInputChange("tournament_name", value)}
         />
         <TextInput
           style={styles.input}
           placeholder="Start Date (YYYY-MM-DD) *"
+          placeholderTextColor="#000000"
           value={formData.start_date}
           onChangeText={(value) => handleInputChange("start_date", value)}
         />
         <TextInput
           style={styles.input}
           placeholder="End Date (YYYY-MM-DD) *"
+          placeholderTextColor="#000000"
           value={formData.end_date}
           onChangeText={(value) => handleInputChange("end_date", value)}
         />
         <TextInput
           style={styles.input}
           placeholder="Tournament Type *"
+          placeholderTextColor="#000000"
           value={formData.tournament_type}
           onChangeText={(value) => handleInputChange("tournament_type", value)}
         />
         <TextInput
           style={[styles.input, styles.textArea]}
           placeholder="Rules"
+          placeholderTextColor="#000000"
           value={formData.rules}
           onChangeText={(value) => handleInputChange("rules", value)}
           multiline
@@ -301,6 +306,7 @@ const CreateTournamentScreen = () => {
             <TextInput
               style={styles.searchInput}
               placeholder="Enter venue name"
+              placeholderTextColor="#000000"
               value={searchQuery}
               onChangeText={handleSearchChange}
               autoFocus
@@ -334,14 +340,15 @@ const CreateTournamentScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF", // White background
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: "#1E3A8A", // Darker navy blue
+    backgroundColor: "#FFFFFF", // White background
   },
   backButton: {
     marginRight: 16,
@@ -349,25 +356,27 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#333",
+    color: "#D4AF37", // Gold color
   },
   formContainer: {
     padding: 16,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#1E3A8A", // Darker navy blue
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
     fontSize: 16,
+    backgroundColor: "#FFFFFF", // White background
+    color: "#0A192F", // Navy blue text
   },
   textArea: {
     height: 100,
     textAlignVertical: "top",
   },
   submitButton: {
-    backgroundColor: "#f4511e",
+    backgroundColor: "#D4AF37", // Gold color
     padding: 16,
     borderRadius: 8,
     alignItems: "center",
@@ -375,16 +384,16 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   submitButtonDisabled: {
-    backgroundColor: "#f4511e80",
+    backgroundColor: "#D4AF3780",
     opacity: 0.7,
   },
   submitButtonText: {
-    color: "#fff",
+    color: "#0A192F", // Navy blue text
     fontSize: 16,
     fontWeight: "bold",
   },
   venueSearchButton: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#1E3A8A", // Darker navy blue
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -393,21 +402,22 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   venueSearchButtonText: {
-    color: "#fff",
+    color: "#D4AF37", // Gold color
     fontSize: 16,
     fontWeight: "bold",
     marginLeft: 8,
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF", // White background
   },
   modalHeader: {
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: "#1E3A8A", // Darker navy blue
+    backgroundColor: "#FFFFFF", // White background
   },
   modalCloseButton: {
     marginRight: 16,
@@ -415,48 +425,53 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#333",
+    color: "#D4AF37", // Gold color
   },
   searchContainer: {
     flexDirection: "row",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: "#1E3A8A", // Darker navy blue
     alignItems: "center",
+    backgroundColor: "#FFFFFF", // White background
   },
   searchInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#1E3A8A", // Darker navy blue
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
+    backgroundColor: "#FFFFFF", // White background
+    color: "#0A192F", // Navy blue text
   },
   searchLoading: {
     marginLeft: 8,
   },
   searchResults: {
     flex: 1,
+    backgroundColor: "#FFFFFF", // White background
   },
   venueItem: {
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: "#1E3A8A", // Darker navy blue
+    backgroundColor: "#FFFFFF", // White background
   },
   venueName: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
+    color: "#D4AF37", // Gold color
     marginBottom: 4,
   },
   venueAddress: {
     fontSize: 14,
-    color: "#666",
+    color: "#0A192F", // Navy blue text
   },
   noResults: {
     textAlign: "center",
     padding: 16,
-    color: "#666",
+    color: "#D4AF37", // Gold color
   },
 });
 

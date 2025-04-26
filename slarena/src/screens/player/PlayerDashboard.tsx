@@ -62,24 +62,6 @@ const PlayerDashboard = () => {
                 </View>
               </TouchableOpacity>
 
-              <View style={styles.card}>
-                <Text style={styles.cardTitle}>Quick Actions</Text>
-                <View style={styles.actionButtons}>
-                  <TouchableOpacity style={styles.actionButton}>
-                    <Text style={styles.actionButtonText}>View Matches</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.actionButton}>
-                    <Text style={styles.actionButtonText}>My Teams</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.actionButton}>
-                    <Text style={styles.actionButtonText}>Tournaments</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.actionButton}>
-                    <Text style={styles.actionButtonText}>Statistics</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-
               <SportsCalendar />
 
               <TouchableOpacity style={styles.switchRoleButton} onPress={handleSwitchRole}>
