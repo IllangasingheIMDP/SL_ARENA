@@ -262,13 +262,13 @@ const FeedTab = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f0f4f8',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f0f4f8',
   },
   dateGroup: {
     marginBottom: 20,
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   dateHeaderText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#495057',
+    color: '#000080',
     textAlign: 'center',
   },
   feedItem: {
@@ -309,24 +309,24 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#000080',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
   avatarText: {
-    color: '#fff',
+    color: '#FFD700',
     fontSize: 18,
     fontWeight: 'bold',
   },
   username: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#212529',
+    color: '#000080',
   },
   date: {
     fontSize: 12,
-    color: '#6c757d',
+    color: '#5f6368',
     marginTop: 2,
   },
   moreButton: {
@@ -345,12 +345,12 @@ const styles = StyleSheet.create({
   videoPlaceholder: {
     width: '100%',
     height: width * 0.75,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f0f4f8',
     justifyContent: 'center',
     alignItems: 'center',
   },
   placeholderText: {
-    color: '#6c757d',
+    color: '#5f6368',
     marginTop: 8,
     fontSize: 14,
   },
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,128,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -377,18 +377,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#212529',
+    color: '#000080',
     marginBottom: 8,
   },
   description: {
     fontSize: 14,
-    color: '#495057',
+    color: '#5f6368',
     lineHeight: 20,
   },
   actions: {
     flexDirection: 'row',
     borderTopWidth: 1,
-    borderTopColor: '#e9ecef',
+    borderTopColor: '#e8eaed',
     padding: 12,
     justifyContent: 'center',
   },
@@ -398,17 +398,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 8,
     paddingHorizontal: 16,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f0f4f8',
     borderRadius: 20,
   },
   actionText: {
     marginLeft: 8,
     fontSize: 14,
-    color: '#495057',
+    color: '#000080',
     fontWeight: '500',
   },
   likedText: {
-    color: '#ff3b30',
+    color: '#FFD700',
   },
 });
 
