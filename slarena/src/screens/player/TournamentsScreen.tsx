@@ -67,6 +67,7 @@ const TournamentsScreen = () => {
   const fetchUpcomingTournaments = async () => {
     try {
       const tournaments = await tournamentService.getUpcomingTournamentsForPlayer();
+      console.log('tournaments', tournaments);
       setUpcomingTournaments(tournaments);
     } catch (error) {
       console.error('Error fetching tournaments:', error);

@@ -10,6 +10,7 @@ export const tournamentService = {
   getOngoingTournaments: async (): Promise<Tournament[]> => {
     try {
       const response = await api.get('/organizers/ongoingtournaments');
+      console.log('response', response);
       const tournaments = response.data;
   
       const transformedTournaments: Tournament[] = await Promise.all(
@@ -62,18 +63,21 @@ export const tournamentService = {
     try {
       const response = await api.get('/organizers/ongoingtournaments/all');
       const tournaments = response.data;
-  
+      //console.log('tournaments', tournaments);
       const transformedTournaments: Tournament[] = await Promise.all(
         tournaments.map(async (item: any) => {
           // Get detailed venue info using the venue_id
           let venueDetails;
+          //console.log('item', item.venue_id);
           try {
             venueDetails = await googleServices.getPlaceDetails(item.venue_id);
+            console.log('venueDetails', venueDetails);
             if (!venueDetails || !venueDetails.place_id || !venueDetails.name) {
               throw new Error('Invalid venue details received');
             }
           } catch (error) {
             console.error('Error fetching venue details:', error);
+      
             // Provide fallback venue details if the API call fails
             venueDetails = {
               place_id: item.venue.venue_id,

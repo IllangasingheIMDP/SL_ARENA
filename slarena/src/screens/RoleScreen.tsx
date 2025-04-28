@@ -90,7 +90,7 @@ const RoleScreen: React.FC = () => {
             style={styles.roleButton} 
             onPress={() => handleRoleSelect(role)}
           >
-            <Text style={styles.roleText}>{role}</Text>
+            <Text style={styles.roleText}>{role!='organisation' ? role.toUpperCase() : 'Organization'}</Text>
           </TouchableOpacity>
         ))
       ) : (
@@ -159,8 +159,8 @@ const RoleScreen: React.FC = () => {
               style={styles.roleCard} 
               onPress={() => isInitialSelection ? handleRoleSelect(role.id) : handleRequestRole(role.id)}
             >
-              <Text style={styles.roleCardTitle}>{role.title}</Text>
-              <Text style={styles.roleCardDescription}>{role.description}</Text>
+              <Text style={styles.roleCardTitle}>{role.title!='organisation' ? role.title : 'Organization'}</Text>
+              <Text style={styles.roleCardDescription}></Text>
             </TouchableOpacity>
           ))}
         </View>
